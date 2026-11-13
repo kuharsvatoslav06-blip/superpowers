@@ -8,7 +8,7 @@ import {FxOverlay, GlitchBars, HeatFilter} from './Fx';
 import {InsertLayer} from './InsertLayer';
 import {Subtitles} from './Subtitles';
 import {SceneAudio} from './SceneAudio';
-import {LIGHT, LocationView} from '../locations';
+import {LIGHT, LocationView, LocationFront} from '../locations';
 import {resolveLines, sceneSeconds, speakerOf} from '../episodes/timing';
 import {noise1} from '../animations/noise';
 import {easeOut, progress} from '../animations/ease';
@@ -57,6 +57,12 @@ export const SceneRenderer: React.FC<{ep: EpisodeDef; scene: SceneDef; last?: bo
       transform: `${wrapStyle.transform ?? ''} translate(${(noise1(f * 0.9, 1) - 0.5) * fx.jitter}px,${(noise1(f * 0.9, 2) - 0.5) * fx.jitter}px)`,
     };
   }
+  // цветокоррекция: поднимаем насыщенность и контраст, чтобы кадр не «серел»
+  const g = fx.grade ?? {};
+  wrapStyle = {
+    ...wrapStyle,
+    filter: `${wrapStyle.filter ?? ''} saturate(${g.sat ?? 1.25}) contrast(${g.contrast ?? 1.06}) brightness(${g.bright ?? 1.03})`.trim(),
+  };
   const outFade = last ? 1 - progress(t, dur - 0.25, dur) * 1 : 1;
 
   return (
@@ -73,6 +79,7 @@ export const SceneRenderer: React.FC<{ep: EpisodeDef; scene: SceneDef; last?: bo
             ) : null}
             <ActorsLayer actors={scene.actors ?? []} front={false} t={t} f={f} speaking={speaking} light={light} />
             <ActorsLayer actors={scene.actors ?? []} front={true} t={t} f={f} speaking={speaking} light={light} />
+            <LocationFront id={scene.loc.id} variant={scene.loc.variant} f={f} />
           </Camera>
         </svg>
         <FxOverlay fx={fx} t={t} f={f} />

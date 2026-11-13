@@ -48,6 +48,7 @@ export const ep01: EpisodeDef = {
           {t: 5.0, expr: 'determined'},
         ]),
       ],
+      inserts: [{type: 'radio', at: 0.35, dur: 7.4, from: 88.0, to: 101.5, banner: 'ТЕПЛОВАЯ ВОЛНА', y: 430, scale: 0.8}],
       lines: [
         RADIO('Внимание! Новая *тепловая волна*. Всем оставаться в укрытиях.', {at: 1.7, note: 'сквозь помехи, плоский голос диктора'}),
         MARC('Значит… *пора*.', {gap: 0.5, note: 'тихо, сам себе'}),
@@ -69,6 +70,22 @@ export const ep01: EpisodeDef = {
           {t: 3.7, pose: 'idle', expr: 'determined', backpack: true},
         ]),
       ],
+      inserts: [
+        {
+          type: 'items',
+          at: 0.25,
+          dur: 5.2,
+          y: 380,
+          scale: 0.72,
+          title: 'ПОСЛЕДНИЕ ЗАПАСЫ',
+          items: [
+            {icon: 'water', label: 'ВОДА', sub: '2 ДНЯ'},
+            {icon: 'food', label: 'ЕДА', sub: '3 ДНЯ'},
+            {icon: 'light', label: 'ФОНАРЬ'},
+            {icon: 'map', label: 'КАРТА'},
+          ],
+        },
+      ],
       lines: [N('Воды — на *двое суток*.', {at: 0.3}), N('Еды — на три. Если *повезёт*.')],
       sfx: [
         {t: 0.5, name: 'click', vol: 0.6},
@@ -82,7 +99,7 @@ export const ep01: EpisodeDef = {
       tIn: 'flash',
       loc: {id: 'city', heat: 0.8},
       cam: {from: {x: 300, y: 1000, zoom: 1.18}, to: {x: 480, y: 1000, zoom: 1.1}},
-      fx: {heat: 0.8, dust: 0.9, embers: 0.5, vignette: 0.45, rays: {x: 720, y: 620, opacity: 0.34}, tint: {color: '#ff7a2a', opacity: 0.08}, flashAt: [0]},
+      fx: {papers: 0.6, heat: 0.8, dust: 0.9, embers: 0.5, vignette: 0.45, rays: {x: 720, y: 620, opacity: 0.34}, tint: {color: '#ff7a2a', opacity: 0.08}, flashAt: [0]},
       actors: [
         A('marc', 'marc', [
           {t: 0, x: -140, y: 1360, scale: 1.3, pose: 'walk', expr: 'worried', look: 0.8, backpack: true},
@@ -96,12 +113,27 @@ export const ep01: EpisodeDef = {
         {t: 0, name: 'whoosh', vol: 0.7},
       ],
     },
+    /* Панорама: Марк крошечный на фоне руин (без реплик — только атмосфера). */
+    {
+      id: 's04b',
+      loc: {id: 'city', heat: 0.85},
+      dur: 3.6,
+      cam: {from: {x: 520, y: 1010, zoom: 1.0}, to: {x: 640, y: 990, zoom: 1.1}},
+      fx: {papers: 1, heat: 0.85, dust: 1, embers: 0.8, vignette: 0.3, rays: {x: 720, y: 620, opacity: 0.3}},
+      actors: [
+        A('marc', 'marc', [
+          {t: 0, x: 140, y: 1360, scale: 0.7, pose: 'walk', expr: 'worried', look: 0.9, backpack: true},
+          {t: 3.6, x: 420},
+        ]),
+      ],
+      sfx: [{t: 0, name: 'wind', vol: 0.6}],
+    },
     /* 5. Дорога по мёртвому городу. */
     {
       id: 's05',
       loc: {id: 'city', heat: 0.8},
       cam: {from: {x: 140, y: 1010, zoom: 1.12}, to: {x: 540, y: 1010, zoom: 1.12}, ease: 'linear'},
-      fx: {heat: 0.8, dust: 1, embers: 0.7, vignette: 0.5, rays: {x: 720, y: 620, opacity: 0.28}},
+      fx: {papers: 0.6, heat: 0.8, dust: 1, embers: 0.7, vignette: 0.5, rays: {x: 720, y: 620, opacity: 0.28}},
       actors: [
         A('marc', 'marc', [
           {t: 0, x: -60, y: 1360, scale: 1.3, pose: 'walk', expr: 'worried', look: 0.9, backpack: true},
@@ -120,7 +152,7 @@ export const ep01: EpisodeDef = {
       id: 's06',
       loc: {id: 'city', variant: 'terminal', heat: 0.8},
       cam: {from: {x: 540, y: 1010, zoom: 1.12}, to: {x: 660, y: 1000, zoom: 1.5}},
-      fx: {heat: 0.7, dust: 0.8, embers: 0.4, vignette: 0.55},
+      fx: {papers: 0.6, heat: 0.7, dust: 0.8, embers: 0.4, vignette: 0.55},
       actors: [
         A('marc', 'marc', [
           {t: 0, x: 480, y: 1360, scale: 1.3, pose: 'idle', expr: 'suspicious', look: 0.9, backpack: true},
@@ -138,7 +170,7 @@ export const ep01: EpisodeDef = {
       id: 's07',
       loc: {id: 'city', variant: 'terminal', heat: 0.8},
       cam: {from: {x: 660, y: 1000, zoom: 1.5}, to: {x: 670, y: 1010, zoom: 1.58}},
-      fx: {heat: 0.5, dust: 0.6, vignette: 0.6, scan: true},
+      fx: {papers: 0.6, heat: 0.5, dust: 0.6, vignette: 0.6, scan: true},
       actors: [
         A('marc', 'marc', [
           {t: 0, x: 480, y: 1360, scale: 1.3, pose: 'reach', expr: 'worried', look: 0.9, backpack: true},
@@ -162,7 +194,7 @@ export const ep01: EpisodeDef = {
       loc: {id: 'city', variant: 'terminal', heat: 0.8},
       tIn: 'dip',
       cam: {from: {x: 520, y: 900, zoom: 2.3}, to: {x: 520, y: 890, zoom: 2.7}},
-      fx: {heat: 0.4, dust: 0.9, vignette: 0.65},
+      fx: {papers: 0.6, heat: 0.4, dust: 0.9, vignette: 0.65},
       actors: [
         A('marc', 'marc', [
           {t: 0, x: 480, y: 1360, scale: 1.3, pose: 'idle', expr: 'tired', look: 0.9, backpack: true},

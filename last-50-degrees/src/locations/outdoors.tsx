@@ -60,50 +60,160 @@ export const Sky: React.FC<{
 
 /* ───────────────────────── Разрушенный город ───────────────────────── */
 
+/** Столб дыма над руинами: поднимающиеся и расширяющиеся клубы. */
+const Plume: React.FC<{x: number; y: number; f: number; s?: number; color?: string}> = ({x, y, f, s = 1, color = '#5a1c1c'}) => (
+  <g>
+    {Array.from({length: 9}).map((_, i) => {
+      const k = ((f * 0.006 + i / 9) % 1 + 1) % 1;
+      return (
+        <ellipse
+          key={i}
+          cx={x + Math.sin(k * 6 + i) * 26 * s + k * 90 * s}
+          cy={y - k * 520 * s}
+          rx={(26 + k * 70) * s}
+          ry={(22 + k * 54) * s}
+          fill={color}
+          opacity={0.5 * (1 - k)}
+        />
+      );
+    })}
+  </g>
+);
+
+/** Стая птиц (вороны) пересекает небо. */
+const Birds: React.FC<{f: number}> = ({f}) => (
+  <g fill="none" stroke="#2a0a14" strokeWidth={5} strokeLinecap="round">
+    {Array.from({length: 6}).map((_, i) => {
+      const x = (((f * 1.6 + i * 230) % 2000) + 2000) % 2000 - 360;
+      const y = 330 + (i % 3) * 70 + Math.sin(f * 0.04 + i) * 22;
+      const flap = Math.sin(f * 0.35 + i * 1.3) * 14;
+      return <path key={i} d={`M ${x - 24} ${y - flap} Q ${x - 8} ${y - 8} ${x} ${y} Q ${x + 8} ${y - 8} ${x + 24} ${y - flap}`} />;
+    })}
+  </g>
+);
+
+/** Электрические столбы с провисшими проводами. */
+const PowerLines: React.FC = () => (
+  <g>
+    {Array.from({length: 6}).map((_, i) => {
+      const x = -460 + i * 400;
+      return (
+        <g key={i}>
+          <rect x={x - 6} y={760} width={12} height={580} fill="#2a1020" />
+          <rect x={x - 70} y={790} width={140} height={10} fill="#2a1020" />
+          <rect x={x - 54} y={850} width={108} height={8} fill="#2a1020" />
+          {[-60, 0, 60].map((dx) => (
+            <path key={dx} d={`M ${x + dx} 796 Q ${x + dx + 200} 900 ${x + dx + 400} 796`} stroke="#2a1020" strokeWidth={3} fill="none" />
+          ))}
+        </g>
+      );
+    })}
+  </g>
+);
+
+const Billboard: React.FC<{f: number}> = ({f}) => {
+  const flick = noise1(f * 0.2, 11) > 0.12 ? 1 : 0.55;
+  return (
+    <g transform="translate(-330,700)">
+      <rect x={20} y={150} width={14} height={440} fill="#2a1428" />
+      <rect x={250} y={150} width={14} height={440} fill="#2a1428" />
+      <rect x={0} y={0} width={290} height={170} rx={8} fill="#1c3e48" stroke="#0c1a22" strokeWidth={8} />
+      <rect x={10} y={10} width={270} height={150} rx={4} fill="#2a8fa3" opacity={0.9 * flick} />
+      <text x={145} y={86} textAnchor="middle" fontFamily="Sans, sans-serif" fontWeight={800} fontSize={58} fill="#eafcff" opacity={flick}>ОАЗИС</text>
+      <text x={145} y={124} textAnchor="middle" fontFamily="Sans, sans-serif" fontWeight={600} fontSize={22} fill="#d6f4fa" opacity={flick}>прохлада каждый день</text>
+      <path d="M 40 150 L 80 100 L 60 160 Z M 210 20 L 250 60 L 232 30 Z" fill="#12303a" opacity={0.7} />
+    </g>
+  );
+};
+
 export const City: React.FC<LocProps> = ({f, variant, heat = 0.5}) => {
   const t = variant === 'terminal';
   const blink = noise1(f * 0.25, 4) > 0.2 ? 1 : 0.55;
   return (
     <g>
-      <Sky id="city" f={f} sunX={720} sunY={620} sunR={140} heat={heat} />
-      <Layer depth={0.22}>
-        <Skyline seed={11} base={1190} minH={160} maxH={420} minW={90} maxW={190} color="#c0552c" ruin={0.4} />
+      <Sky
+        id="city"
+        f={f}
+        sunX={720}
+        sunY={620}
+        sunR={140}
+        heat={heat}
+        stops={[
+          [0, '#2a0a2c'],
+          [0.3, '#9a1f34'],
+          [0.55, '#ec5a2a'],
+          [0.78, '#ffa13c'],
+          [1, '#ffd884'],
+        ]}
+      />
+      <Layer depth={0.2}>
+        <Skyline seed={11} base={1190} minH={160} maxH={420} minW={90} maxW={190} color="#d4623c" ruin={0.4} />
+        <Plume x={120} y={1100} f={f} s={0.9} color="#8a2a30" />
+        <Plume x={760} y={1090} f={f + 40} s={0.7} color="#8a2a30" />
       </Layer>
       <Layer depth={0.4}>
-        <Skyline seed={23} base={1250} minH={260} maxH={640} minW={110} maxW={230} color="#8a2e18" windows="#5a1a10" ruin={0.6} />
+        <Skyline seed={23} base={1250} minH={260} maxH={640} minW={110} maxW={230} color="#8c2a36" windows="#5e1a28" ruin={0.6} winOn="#ffcf6a" />
+      </Layer>
+      <Layer depth={0.55}>
+        <Billboard f={f} />
+        <PowerLines />
       </Layer>
       <Layer depth={0.65}>
-        <Skyline seed={37} base={1330} minH={380} maxH={860} minW={150} maxW={290} color="#4a1b12" windows="#2a0e0a" ruin={0.8} winOn="#ffb25a" />
+        <Skyline seed={37} base={1330} minH={380} maxH={860} minW={150} maxW={290} color="#4a1634" windows="#2a0e22" ruin={0.8} winOn="#ffc25a" />
+        <Plume x={420} y={900} f={f + 90} s={1.1} color="#4a1830" />
+      </Layer>
+      <Layer depth={0.3}>
+        <Birds f={f} />
       </Layer>
       {/* дымка у горизонта */}
       <Layer depth={0.7}>
-        <rect x={X0} y={1050} width={X1 - X0} height={300} fill="#f08a3c" opacity={0.14} />
+        <rect x={X0} y={1050} width={X1 - X0} height={300} fill="#ff9a3c" opacity={0.2} />
       </Layer>
-      <Floor y={1338} top="#3a2724" bottom="#1a1210" id="city-floor" />
+      <Floor y={1338} top="#4a2a2a" bottom="#1c1018" id="city-floor" />
       <Layer depth={1}>
-        <rect x={X0} y={1338} width={X1 - X0} height={22} fill="#5c4540" />
+        <rect x={X0} y={1338} width={X1 - X0} height={22} fill="#7a5048" />
+        <rect x={X0} y={1352} width={X1 - X0} height={8} fill="#ffb070" opacity={0.25} />
         <rect x={X0} y={1360} width={X1 - X0} height={6} fill="#0c0806" opacity={0.5} />
         <Cracks seed={5} y0={1400} y1={1880} color="#0d0807" n={18} />
         {Array.from({length: 9}).map((_, i) => (
-          <rect key={i} x={-480 + i * 260} y={1640} width={130} height={14} rx={4} fill="#c9a86a" opacity={0.28} />
+          <rect key={i} x={-480 + i * 260} y={1640} width={130} height={14} rx={4} fill="#e0b870" opacity={0.35} />
         ))}
-        {/* брошенная машина */}
+        {/* люк, лужа расплавленного асфальта, сухие кусты */}
+        <ellipse cx={420} cy={1500} rx={64} ry={14} fill="#1a0d0d" />
+        <ellipse cx={420} cy={1498} rx={52} ry={9} fill="#3a1c1c" />
+        <ellipse cx={-80} cy={1700} rx={150} ry={22} fill="#ff7a3c" opacity={0.12} />
+        {Array.from({length: 5}).map((_, i) => (
+          <g key={i} transform={`translate(${-420 + i * 340},1352)`} stroke="#4a2410" strokeWidth={4} strokeLinecap="round" fill="none">
+            <path d="M 0 0 L -14 -34 M 0 0 L 2 -44 M 0 0 L 16 -30 M 0 0 L 30 -18" />
+          </g>
+        ))}
+        {/* брошенная машина (теперь ржавая, с бликом) */}
         <g transform="translate(-130,1350)">
-          <rect x={0} y={-82} width={250} height={62} rx={14} fill="#241513" />
-          <path d="M 40 -82 L 70 -128 L 176 -128 L 210 -82 Z" fill="#2e1b17" />
-          <path d="M 80 -86 L 96 -120 L 130 -120 L 130 -86 Z M 140 -86 L 140 -120 L 170 -120 L 192 -86 Z" fill="#4a2a20" opacity={0.7} />
+          <rect x={0} y={-82} width={250} height={62} rx={14} fill="#4a2420" />
+          <path d="M 40 -82 L 70 -128 L 176 -128 L 210 -82 Z" fill="#5a2a24" />
+          <path d="M 80 -86 L 96 -120 L 130 -120 L 130 -86 Z M 140 -86 L 140 -120 L 170 -120 L 192 -86 Z" fill="#ffb070" opacity={0.35} />
+          <rect x={4} y={-80} width={242} height={8} rx={4} fill="#ffc27a" opacity={0.45} />
           <circle cx={52} cy={-18} r={26} fill="#0b0807" />
           <circle cx={198} cy={-18} r={26} fill="#0b0807" />
         </g>
+        {/* светофор: красный горит */}
+        <g transform="translate(-300,1350)">
+          <rect x={-5} y={-330} width={10} height={330} fill="#241018" />
+          <rect x={-24} y={-390} width={48} height={92} rx={8} fill="#241018" />
+          <circle cx={0} cy={-366} r={11} fill="#ff3b3b" opacity={0.7 + 0.3 * blink} />
+          <circle cx={0} cy={-366} r={26} fill="#ff3b3b" opacity={0.15 * blink} />
+          <circle cx={0} cy={-340} r={11} fill="#3a2a10" />
+          <circle cx={0} cy={-314} r={11} fill="#10301a" />
+        </g>
         {/* погнутый фонарь */}
         <g transform="translate(980,1350)">
-          <path d="M 0 0 L 0 -420 Q 0 -470 -60 -480 L -110 -470" stroke="#1a100d" strokeWidth={16} fill="none" strokeLinecap="round" />
-          <rect x={-130} y={-480} width={46} height={16} rx={6} fill="#1a100d" transform="rotate(14 -110 -470)" />
+          <path d="M 0 0 L 0 -420 Q 0 -470 -60 -480 L -110 -470" stroke="#2a1520" strokeWidth={16} fill="none" strokeLinecap="round" />
+          <rect x={-130} y={-480} width={46} height={16} rx={6} fill="#2a1520" transform="rotate(14 -110 -470)" />
         </g>
         {t && (
           <g transform="translate(760,1352)">
             <ellipse cx={80} cy={8} rx={110} ry={14} fill="#000" opacity={0.35} />
-            <Glow x={10} y={-340} w={130} h={170} color="#46d4ff" opacity={0.55 * blink} blur={50} />
+            <Glow x={10} y={-340} w={130} h={170} color="#46d4ff" opacity={0.7 * blink} blur={56} />
             <rect x={0} y={-390} width={160} height={390} rx={16} fill="#1c222d" />
             <rect x={14} y={-360} width={132} height={176} rx={8} fill="#08141d" />
             <rect x={20} y={-354} width={120} height={164} rx={6} fill="#0e4766" opacity={blink} />
@@ -122,6 +232,20 @@ export const City: React.FC<LocProps> = ({f, variant, heat = 0.5}) => {
     </g>
   );
 };
+
+/** Передний план города: тёмные обломки, арматура и провода — перекрывают край кадра и дают глубину. */
+export const CityFront: React.FC<{f: number}> = ({f}) => (
+  <Layer depth={1.28}>
+    <g fill="#1a0a16">
+      <path d="M -560 1500 L -420 1420 L -360 1470 L -250 1400 L -150 1470 L -60 1450 L -20 1700 L -560 1700 Z" />
+      <path d="M 1100 1480 L 1180 1400 L 1260 1450 L 1340 1380 L 1460 1470 L 1640 1500 L 1640 1700 L 1100 1700 Z" />
+    </g>
+    <g stroke="#1a0a16" strokeWidth={5} strokeLinecap="round" fill="none">
+      <path d="M -300 1410 L -318 1330 M -250 1400 L -246 1300 M 1180 1400 L 1198 1310 M 1340 1380 L 1330 1290" />
+    </g>
+    <path d="M -560 -60 Q 100 140 700 40 T 1640 120" stroke="#1a0a16" strokeWidth={4} fill="none" opacity={0.8} transform={`translate(0,${Math.sin(f * 0.03) * 4})`} />
+  </Layer>
+);
 
 /* ───────────────────────── Пустыня ───────────────────────── */
 

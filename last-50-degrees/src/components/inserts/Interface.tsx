@@ -218,3 +218,128 @@ export const ChoiceInsert: React.FC<{ins: Of<'choice'>; t: number}> = ({ins, t})
     </Panel>
   );
 };
+
+/* ───────────── Запасы (инфографика) ───────────── */
+
+const ItemIcon: React.FC<{kind: 'water' | 'food' | 'light' | 'map'; f: number}> = ({kind, f}) => {
+  switch (kind) {
+    case 'water':
+      return (
+        <svg width={120} height={150} viewBox="0 0 120 150">
+          <rect x={44} y={6} width={32} height={20} rx={5} fill="#cfd6e2" />
+          <path d="M 34 30 Q 34 22 44 22 L 76 22 Q 86 22 86 30 L 92 130 Q 92 144 78 144 L 42 144 Q 28 144 28 130 Z" fill="#1b3b52" stroke="#7fd8ff" strokeWidth={4} />
+          <path d="M 31 64 Q 60 52 89 64 L 92 130 Q 92 144 78 144 L 42 144 Q 28 144 28 130 Z" fill="#46d4ff" opacity={0.85} />
+          <circle cx={48} cy={96} r={5} fill="#fff" opacity={0.6} />
+        </svg>
+      );
+    case 'food':
+      return (
+        <svg width={120} height={150} viewBox="0 0 120 150">
+          <ellipse cx={60} cy={40} rx={38} ry={12} fill="#c9ced8" />
+          <rect x={22} y={40} width={76} height={86} fill="#d9692a" />
+          <rect x={22} y={64} width={76} height={36} fill="#f3d36a" />
+          <text x={60} y={90} textAnchor="middle" fontFamily="Sans, sans-serif" fontWeight={800} fontSize={22} fill="#5a2a10">ЕДА</text>
+          <ellipse cx={60} cy={126} rx={38} ry={12} fill="#a9aeb8" />
+        </svg>
+      );
+    case 'light': {
+      const glow = 0.55 + 0.25 * Math.sin(f * 0.15);
+      return (
+        <svg width={120} height={150} viewBox="0 0 120 150">
+          <path d="M 60 70 L 8 8 L 112 8 Z" fill="#ffe27a" opacity={glow * 0.5} />
+          <rect x={44} y={56} width={32} height={86} rx={8} fill="#3b4a66" stroke="#9fb4d8" strokeWidth={3} />
+          <path d="M 34 36 L 86 36 L 76 62 L 44 62 Z" fill="#6f7f9f" />
+          <ellipse cx={60} cy={36} rx={26} ry={6} fill="#fff6c8" />
+        </svg>
+      );
+    }
+    case 'map':
+      return (
+        <svg width={120} height={150} viewBox="0 0 120 150">
+          <path d="M 12 30 L 44 20 L 76 32 L 108 22 L 108 120 L 76 130 L 44 118 L 12 128 Z" fill="#e8d9a8" stroke="#8a6a2a" strokeWidth={3} />
+          <path d="M 44 20 L 44 118 M 76 32 L 76 130" stroke="#8a6a2a" strokeWidth={2} />
+          <path d="M 22 100 Q 50 60 70 84 T 98 50" stroke="#c2352a" strokeWidth={4} fill="none" strokeDasharray="8 6" />
+          <path d="M 92 44 l 12 12 m 0 -12 l -12 12" stroke="#c2352a" strokeWidth={5} strokeLinecap="round" />
+        </svg>
+      );
+  }
+};
+
+export const ItemsInsert: React.FC<{ins: Of<'items'>; t: number}> = ({ins, t}) => (
+  <div style={{width: 940}}>
+    {ins.title && (
+      <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 32, color: '#ffd447', letterSpacing: 6, textAlign: 'center', marginBottom: 18, textShadow: '0 3px 10px #000'}}>
+        {ins.title}
+      </div>
+    )}
+    <div style={{display: 'flex', gap: 18, justifyContent: 'center'}}>
+      {ins.items.map((it, i) => {
+        const p = easeOutBack(progress(t, 0.15 + i * 0.7, 0.55 + i * 0.7));
+        const tick = progress(t, 0.7 + i * 0.7, 0.95 + i * 0.7);
+        return (
+          <div
+            key={i}
+            style={{
+              width: 212,
+              padding: '22px 8px 16px',
+              borderRadius: 22,
+              background: 'linear-gradient(160deg, rgba(40,52,78,0.92), rgba(16,20,34,0.92))',
+              border: '3px solid #ffb347',
+              boxShadow: '0 0 36px rgba(255,170,60,0.45)',
+              textAlign: 'center',
+              transform: `scale(${clamp(p, 0, 1.12)}) rotate(${(1 - clamp(p)) * -8}deg)`,
+              opacity: clamp(p),
+              position: 'relative',
+            }}
+          >
+            <ItemIcon kind={it.icon} f={t * 30} />
+            <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 30, color: '#fff', marginTop: 8}}>{it.label}</div>
+            {it.sub && <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 22, color: '#ffd447', marginTop: 2}}>{it.sub}</div>}
+            <div style={{position: 'absolute', right: -10, top: -14, width: 46, height: 46, borderRadius: 23, background: '#6be39b', color: '#06210f', fontSize: 30, fontWeight: 800, lineHeight: '46px', transform: `scale(${easeOutBack(tick)})`, opacity: tick}}>
+              ✓
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+/* ───────────── Радио: поиск волны ───────────── */
+
+export const RadioInsert: React.FC<{ins: Of<'radio'>; t: number}> = ({ins, t}) => {
+  const lock = progress(t, 0.15, 1.65);
+  const freq = lerp(ins.from, ins.to, easeInOut(lock));
+  const locked = lock >= 1;
+  return (
+    <Panel w={860} theme="amber" title="РАДИОПРИЁМНИК · АВАРИЙНЫЙ КАНАЛ" t={t}>
+      <div style={{padding: '22px 28px 28px'}}>
+        <div style={{display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 14}}>
+          <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 120, color: '#ffc857', textShadow: '0 0 30px rgba(255,200,87,0.6)'}}>{freq.toFixed(1)}</div>
+          <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 40, color: '#b9862b'}}>МГц</div>
+        </div>
+        {/* шкала */}
+        <div style={{position: 'relative', height: 54, margin: '6px 0 14px', borderBottom: '3px solid #8a6420'}}>
+          {Array.from({length: 41}).map((_, i) => (
+            <div key={i} style={{position: 'absolute', left: `${(i / 40) * 100}%`, bottom: 0, width: 3, height: i % 5 === 0 ? 34 : 18, background: '#b9862b'}} />
+          ))}
+          <div style={{position: 'absolute', left: `${clamp((freq - ins.from) / (ins.to - ins.from || 1)) * 100}%`, bottom: -4, width: 6, height: 58, background: '#ff4a3a', boxShadow: '0 0 14px #ff4a3a', borderRadius: 3}} />
+        </div>
+        {/* сигнал: шум → ровная волна */}
+        <div style={{display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center', height: 90}}>
+          {Array.from({length: 34}).map((_, i) => {
+            const noise = noise1(t * 14 + i * 2.1, 3);
+            const clean = 0.5 + 0.45 * Math.sin(t * 8 + i * 0.5);
+            const v = lerp(noise, clean, locked ? 1 : lock * lock);
+            return <div key={i} style={{width: 14, height: 8 + v * 80, borderRadius: 7, background: locked ? '#6be39b' : '#ffb347', opacity: 0.9}} />;
+          })}
+        </div>
+        {ins.banner && locked && (
+          <div style={{marginTop: 16, textAlign: 'center', fontFamily: MONO, fontWeight: 700, fontSize: 34, color: '#ff4a3a', letterSpacing: 3, opacity: 0.6 + 0.4 * Math.abs(Math.sin(t * 6))}}>
+            ⚠ {ins.banner}
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+};

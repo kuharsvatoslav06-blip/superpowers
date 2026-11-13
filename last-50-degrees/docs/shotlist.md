@@ -2,14 +2,15 @@
 
 _Файл создан автоматически: `npm run docs`. Источник правды — `src/episodes/epNN.ts`._
 
-## Серия 1 · «ТЕМПЕРАТУРА 96°C» — 73.0 с
+## Серия 1 · «ТЕМПЕРАТУРА 96°C» — 76.6 с
 
 | Сцена | Длит. | Локация | Персонажи | Вставки | Звук/эффекты |
 |---|---|---|---|---|---|
 | s01 | 8.3 с | apartment | marc | thermo | siren, impact |
-| s02 | 9.5 с | apartment | marc | — | radio, static |
-| s03 | 6.8 с | apartment | marc | — | click |
+| s02 | 9.5 с | apartment | marc | radio | radio, static |
+| s03 | 6.8 с | apartment | marc | items | click |
 | s04 | 5.5 с | city | marc | thermo | wind, whoosh |
+| s04b | 3.6 с | city | marc | — | wind |
 | s05 | 5.9 с | city | marc | — | footsteps, wind |
 | s06 | 4.1 с | city/terminal | marc | — | hum, beep |
 | s07 | 11.5 с | city/terminal | marc | globe | beep, hum |
@@ -155,4 +156,4 @@ _Файл создан автоматически: `npm run docs`. Источн�
 
 Музыка: `tension`. Финал серии: финал сезона.
 
-**Итого сезон:** 642.9 с (10.7 мин).
+**Итого сезон:** 646.5 с (10.8 мин).

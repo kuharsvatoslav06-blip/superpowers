@@ -1,7 +1,7 @@
 import React from 'react';
 import {H, W} from '../config';
 import type {Insert} from '../types';
-import {TerminalInsert, ThermoInsert, BigTextInsert, CountdownInsert, ChoiceInsert} from './inserts/Interface';
+import {TerminalInsert, ThermoInsert, BigTextInsert, CountdownInsert, ChoiceInsert, ItemsInsert, RadioInsert} from './inserts/Interface';
 import {GlobeInsert, PhotoInsert, CalendarInsert, DossierInsert, VersionsInsert, VideoInsert, TerraInsert} from './inserts/Documents';
 import {easeOut, easeOutBack, clamp, progress} from '../animations/ease';
 import {noise1} from '../animations/noise';
@@ -19,6 +19,8 @@ const DEFAULT_Y: Partial<Record<Insert['type'], number>> = {
   video: 700,
   bigtext: 640,
   terra: 620,
+  items: 560,
+  radio: 520,
 };
 
 const Body: React.FC<{ins: Insert; t: number; f: number}> = ({ins, t, f}) => {
@@ -47,6 +49,10 @@ const Body: React.FC<{ins: Insert; t: number; f: number}> = ({ins, t, f}) => {
       return <BigTextInsert ins={ins} t={t} />;
     case 'terra':
       return <TerraInsert ins={ins} t={t} f={f} />;
+    case 'items':
+      return <ItemsInsert ins={ins} t={t} />;
+    case 'radio':
+      return <RadioInsert ins={ins} t={t} />;
   }
 };
 

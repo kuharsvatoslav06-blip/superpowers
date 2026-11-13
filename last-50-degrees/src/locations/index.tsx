@@ -4,6 +4,9 @@ import {City, Desert, Highway, Tech, WeatherOutside} from './outdoors';
 import {Apartment, Greenhouse, Shelter, WeatherInside} from './interiors';
 import {Complex, Lab} from './facilities';
 import type {LocProps} from './shared';
+import {Layer} from './shared';
+import {CityFront} from './outdoors';
+import {ApartmentFront} from './interiors';
 
 /** Освещение персонажей по локациям: контурный свет и общий фильтр цвета. */
 export interface LightDef {
@@ -13,14 +16,14 @@ export interface LightDef {
 }
 
 export const LIGHT: Record<LocationId, LightDef> = {
-  city: {rim: '#ffb070', rimAmount: 0.95, filter: 'sepia(0.18) saturate(1.1) brightness(0.95)'},
-  apartment: {rim: '#ff9a4a', rimAmount: 0.7, filter: 'sepia(0.2) brightness(0.9)'},
+  city: {rim: '#ffc27a', rimAmount: 1, filter: 'saturate(1.15) brightness(1.08) contrast(1.04)'},
+  apartment: {rim: '#ffb070', rimAmount: 0.9, filter: 'saturate(1.1) brightness(1.08)'},
   shelter: {rim: '#ffc857', rimAmount: 0.6, filter: 'brightness(0.82) saturate(0.85)'},
   weather: {rim: '#ffb070', rimAmount: 0.75, filter: 'sepia(0.15) brightness(0.88)'},
   complex: {rim: '#6fe0ff', rimAmount: 1, filter: 'hue-rotate(8deg) brightness(1.05) saturate(0.95)'},
   lab: {rim: '#6fe0ff', rimAmount: 1, filter: 'hue-rotate(10deg) brightness(1.12) saturate(0.95)'},
-  desert: {rim: '#ffcf8a', rimAmount: 1, filter: 'sepia(0.22) brightness(0.98)'},
-  highway: {rim: '#ffa070', rimAmount: 0.85, filter: 'sepia(0.2) brightness(0.9)'},
+  desert: {rim: '#ffcf8a', rimAmount: 1, filter: 'saturate(1.1) brightness(1.06)'},
+  highway: {rim: '#ffa070', rimAmount: 0.95, filter: 'saturate(1.1) brightness(1.04)'},
   tech: {rim: '#ffb070', rimAmount: 0.85, filter: 'sepia(0.18) brightness(0.95)'},
   greenhouse: {rim: '#a6ff9a', rimAmount: 0.55, filter: 'brightness(0.9) saturate(1.05)'},
 };
@@ -48,4 +51,11 @@ export const LocationView: React.FC<{id: LocationId} & LocProps> = ({id, ...p}) 
     case 'greenhouse':
       return <Greenhouse {...p} />;
   }
+};
+
+/** Передний план локации (рисуется поверх персонажей): даёт глубину. */
+export const LocationFront: React.FC<{id: LocationId; variant?: string; f: number}> = ({id, variant, f}) => {
+  if (id === 'city') return <CityFront f={f} />;
+  if (id === 'apartment' && variant !== 'cool') return <ApartmentFront f={f} />;
+  return null;
 };

@@ -19,7 +19,7 @@ const Wall: React.FC<{id: string; top: string; bottom: string; y1?: number}> = (
 
 /* ───────────────────────── Квартира Марка ───────────────────────── */
 
-export const Apartment: React.FC<LocProps> = ({f, variant, heat = 0.5}) => {
+const ApartmentBase: React.FC<LocProps> = ({f, variant, heat = 0.5}) => {
   const cool = variant === 'cool';
   const wob = noise1(f * 0.3, 2) > 0.08 ? 1 : 0.7;
   return (
@@ -160,6 +160,120 @@ export const Apartment: React.FC<LocProps> = ({f, variant, heat = 0.5}) => {
     </g>
   );
 };
+
+/** Обжитая квартира Марка: декор поверх базовой комнаты (бирюзовые акценты против оранжевого света). */
+export const Apartment: React.FC<LocProps> = (p) => {
+  const {f, variant} = p;
+  const lived = variant !== 'cool';
+  const hand = f * 0.6;
+  return (
+    <g>
+      <ApartmentBase {...p} />
+      {lived && (
+        <g>
+          <Layer depth={0.75}>
+            {/* обои: тонкие вертикальные полосы */}
+            {Array.from({length: 20}).map((_, i) => (
+              <rect key={i} x={-540 + i * 60} y={-300} width={6} height={1640} fill="#ffb070" opacity={0.06} />
+            ))}
+            {/* бирюзовые шторы по краям окна */}
+            {[
+              {x: 548, w: 50},
+              {x: 944, w: 50},
+            ].map((c, k) => (
+              <g key={k}>
+                <rect x={c.x} y={336} width={c.w} height={760} fill="#1f7a86" />
+                {[0, 1, 2].map((j) => (
+                  <rect key={j} x={c.x + 8 + j * 14} y={336} width={5} height={760} fill="#0f4a56" opacity={0.7} />
+                ))}
+                <rect x={c.x} y={1060} width={c.w} height={40} fill="#14606c" />
+              </g>
+            ))}
+            <rect x={540} y={318} width={462} height={14} rx={6} fill="#2a1a14" />
+            {/* настенные часы */}
+            <g transform="translate(360,420)">
+              <circle r={54} fill="#f1e6cf" stroke="#2a1a14" strokeWidth={8} />
+              {Array.from({length: 12}).map((_, i) => (
+                <line key={i} x1={0} y1={-44} x2={0} y2={-38} stroke="#2a1a14" strokeWidth={3} transform={`rotate(${i * 30})`} />
+              ))}
+              <line x1={0} y1={0} x2={0} y2={-30} stroke="#2a1a14" strokeWidth={6} strokeLinecap="round" transform="rotate(130)" />
+              <line x1={0} y1={0} x2={0} y2={-42} stroke="#2a1a14" strokeWidth={4} strokeLinecap="round" transform={`rotate(${hand})`} />
+              <circle r={5} fill="#c2352a" />
+            </g>
+            {/* рамки с картинками */}
+            <g transform="translate(60,520)">
+              <rect width={130} height={150} rx={4} fill="#2a1a14" />
+              <rect x={10} y={10} width={110} height={130} fill="#e08a3a" />
+              <circle cx={65} cy={64} r={26} fill="#ffe9a8" />
+              <path d="M 10 140 L 50 96 L 80 124 L 120 84 L 120 140 Z" fill="#7a2a2e" />
+            </g>
+            <g transform="translate(210,560)">
+              <rect width={96} height={116} rx={4} fill="#2a1a14" />
+              <rect x={8} y={8} width={80} height={100} fill="#2a8fa3" />
+              <path d="M 8 90 Q 48 40 88 90 L 88 108 L 8 108 Z" fill="#14606c" />
+            </g>
+            {/* мёртвый кондиционер */}
+            <g transform="translate(40,330)">
+              <rect width={280} height={84} rx={14} fill="#a8a29a" />
+              <rect x={14} y={54} width={252} height={18} rx={6} fill="#6f6a62" />
+              <circle cx={246} cy={26} r={6} fill="#ff3b3b" opacity={Math.floor(f / 20) % 2 ? 1 : 0.2} />
+            </g>
+            {/* полка с книгами и засохшим цветком */}
+            <g transform="translate(40,880)">
+              <rect x={0} y={90} width={310} height={14} rx={3} fill="#3a2418" />
+              {[
+                ['#d9692a', 58, 44],
+                ['#2a8fa3', 70, 40],
+                ['#f3d36a', 54, 36],
+                ['#7a2a5e', 66, 42],
+                ['#4fbf6b', 60, 38],
+              ].map(([c, h, w], i) => (
+                <rect key={i} x={10 + i * 46} y={90 - (h as number)} width={w as number} height={h as number} rx={3} fill={c as string} />
+              ))}
+              <rect x={238} y={50} width={48} height={40} rx={6} fill="#c2552a" />
+              <path d="M 262 50 L 246 8 M 262 50 L 266 -6 M 262 50 L 284 12" stroke="#8a5a2a" strokeWidth={5} strokeLinecap="round" />
+              <circle cx={246} cy={8} r={6} fill="#a8742a" />
+              <circle cx={284} cy={12} r={6} fill="#a8742a" />
+            </g>
+          </Layer>
+          {/* потолочный вентилятор (вертится медленно — электричество на пределе) */}
+          <Layer depth={0.9}>
+            <g transform="translate(840,200)">
+              <rect x={-4} y={-220} width={8} height={200} fill="#1a1210" />
+              <circle r={16} fill="#2a1a14" />
+              {[0, 120, 240].map((a) => (
+                <ellipse key={a} cx={0} cy={-58} rx={16} ry={56} fill="#3a2418" transform={`rotate(${a + f * 5})`} opacity={0.92} />
+              ))}
+            </g>
+            {/* ковёр */}
+            <ellipse cx={560} cy={1450} rx={300} ry={46} fill="#1f7a86" opacity={0.85} />
+            <ellipse cx={560} cy={1450} rx={240} ry={32} fill="none" stroke="#f3d36a" strokeWidth={4} opacity={0.7} />
+            <ellipse cx={560} cy={1450} rx={170} ry={20} fill="#14606c" opacity={0.9} />
+          </Layer>
+        </g>
+      )}
+    </g>
+  );
+};
+
+/** Передний план квартиры: листья растения в углу, висящий шнур — глубина кадра. */
+export const ApartmentFront: React.FC<{f: number}> = ({f}) => (
+  <Layer depth={1.25}>
+    <g transform={`translate(1040,1380) rotate(${Math.sin(f * 0.03) * 1.5})`}>
+      <path d="M 0 0 Q -40 -160 -120 -300" stroke="#10301a" strokeWidth={10} fill="none" />
+      {[
+        [-110, -290, -60],
+        [-70, -230, -20],
+        [-30, -160, 30],
+        [-130, -240, -80],
+      ].map(([x, y, r], i) => (
+        <ellipse key={i} cx={x} cy={y} rx={22} ry={64} fill="#16401f" transform={`rotate(${r} ${x} ${y})`} />
+      ))}
+      <rect x={-60} y={0} width={120} height={150} rx={14} fill="#3a1a10" />
+    </g>
+    <path d="M -560 1700 L 1640 1700 L 1640 1800 L -560 1800 Z" fill="#000" opacity={0} />
+  </Layer>
+);
 
 /* ───────────────────────── Подземное убежище ───────────────────────── */
 

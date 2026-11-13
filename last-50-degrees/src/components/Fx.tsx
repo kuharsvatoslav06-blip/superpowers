@@ -39,6 +39,31 @@ export const Embers: React.FC<{density: number; t: number}> = ({density, t}) => 
   );
 };
 
+/** Летящие листы бумаги и мусор. */
+export const Papers: React.FC<{density: number; t: number}> = ({density, t}) => {
+  const n = Math.round(8 * density);
+  const r = rng(53);
+  return (
+    <g>
+      {Array.from({length: n}).map((_, i) => {
+        const sp = 140 + r() * 180;
+        const by = 300 + r() * 1100;
+        const ph = r() * 3000;
+        const x = ((ph + t * sp) % (W + 400)) - 200;
+        const y = by + Math.sin(t * 2.2 + i * 1.7) * 46 - (x / W) * 40;
+        const rot = t * (120 + i * 25) + i * 40;
+        const w = 14 + r() * 14;
+        return (
+          <g key={i} transform={`translate(${x},${y}) rotate(${rot}) scale(1,${0.35 + 0.65 * Math.abs(Math.sin(t * 3 + i))})`}>
+            <rect x={-w / 2} y={-w * 0.65} width={w} height={w * 1.3} fill={i % 3 === 0 ? '#ffe9b8' : '#f3dfc0'} opacity={0.85} />
+            <line x1={-w / 2 + 4} y1={-4} x2={w / 2 - 4} y2={-4} stroke="#b8946a" strokeWidth={2} />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
 export const SunRays: React.FC<{x: number; y: number; opacity: number; t: number}> = ({x, y, opacity, t}) => (
   <g style={{mixBlendMode: 'screen'}}>
     <defs>
@@ -108,12 +133,13 @@ export const FxOverlay: React.FC<{fx?: FxDef; t: number; f: number}> = ({fx, t, 
       {fx.rays && <SunRays x={fx.rays.x} y={fx.rays.y} opacity={fx.rays.opacity ?? 0.32} t={t} />}
       {fx.dust ? <Dust density={fx.dust} t={t} /> : null}
       {fx.embers ? <Embers density={fx.embers} t={t} /> : null}
+      {fx.papers ? <Papers density={fx.papers} t={t} /> : null}
       {fx.tint && <rect width={W} height={H} fill={fx.tint.color} opacity={fx.tint.opacity} />}
       {fx.flicker && <rect width={W} height={H} fill="#000" opacity={1 - flick} />}
       {alarm > 0 && <rect width={W} height={H} fill="#ff1d1d" opacity={alarm} style={{mixBlendMode: 'multiply'}} />}
       {alarm > 0 && <rect width={W} height={H} fill="#ff2a1a" opacity={alarm * 0.35} style={{mixBlendMode: 'screen'}} />}
       {fx.scan && <rect width={W} height={H} fill="url(#scanpat)" />}
-      <rect width={W} height={H} fill="url(#vig)" opacity={fx.vignette ?? 0.55} />
+      <rect width={W} height={H} fill="url(#vig)" opacity={(fx.vignette ?? 0.55) * 0.7} />
       {fx.glitchAt && <GlitchBars t={t} at={fx.glitchAt} />}
       {flash > 0.01 && <rect width={W} height={H} fill="#fff" opacity={flash} />}
     </svg>

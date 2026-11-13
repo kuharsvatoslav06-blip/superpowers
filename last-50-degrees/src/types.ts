@@ -131,6 +131,10 @@ export interface FxDef {
   steam?: {x: number; y: number};
   /** Дрожание картинки (px) на всю сцену. */
   jitter?: number;
+  /** Летящие листы бумаги/мусор (0..1 — плотность). */
+  papers?: number;
+  /** Цветокоррекция сцены. По умолчанию sat 1.25, contrast 1.06. */
+  grade?: {sat?: number; contrast?: number; bright?: number};
 }
 
 export type TransitionName = 'cut' | 'fade' | 'flash' | 'glitch' | 'whip' | 'dip';
@@ -209,6 +213,8 @@ export type Insert = InsertBase &
     | {type: 'video'; char: CharId; caption: string; tint?: string; room?: 'station' | 'lab' | 'home'}
     | {type: 'bigtext'; text: string; sub?: string; color?: string; glitch?: boolean}
     | {type: 'terra'; mode?: 'calm' | 'hostile'; bare?: boolean}
+    | {type: 'items'; items: {icon: 'water' | 'food' | 'light' | 'map'; label: string; sub?: string}[]; title?: string}
+    | {type: 'radio'; from: number; to: number; banner?: string}
   );
 
 /* ───────────────────────── Реплики и звук ───────────────────────── */
