@@ -1,0 +1,5 @@
+node_modules/
+out/
+# заглушки аудио генерируются командой npm run audio:placeholders
+public/sound-effects/placeholder/
+public/music/placeholder/

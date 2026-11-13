@@ -1,0 +1,27 @@
+{
+  "sfx": {
+    "siren": "sound-effects/placeholder/siren.wav",
+    "beep": "sound-effects/placeholder/beep.wav",
+    "impact": "sound-effects/placeholder/impact.wav",
+    "whoosh": "sound-effects/placeholder/whoosh.wav",
+    "hum": "sound-effects/placeholder/hum.wav",
+    "static": "sound-effects/placeholder/static.wav",
+    "glitch": "sound-effects/placeholder/glitch.wav",
+    "wind": "sound-effects/placeholder/wind.wav",
+    "heartbeat": "sound-effects/placeholder/heartbeat.wav",
+    "click": "sound-effects/placeholder/click.wav",
+    "door": "sound-effects/placeholder/door.wav",
+    "lift": "sound-effects/placeholder/lift.wav",
+    "alarm": "sound-effects/placeholder/alarm.wav",
+    "footsteps": "sound-effects/placeholder/footsteps.wav",
+    "radio": "sound-effects/placeholder/radio.wav",
+    "stinger": "sound-effects/placeholder/stinger.wav"
+  },
+  "music": {
+    "tension": "music/placeholder/tension.mp3",
+    "dark": "music/placeholder/dark.mp3",
+    "cold": "music/placeholder/cold.mp3",
+    "hope": "music/placeholder/hope.mp3"
+  },
+  "voice": {}
+}
