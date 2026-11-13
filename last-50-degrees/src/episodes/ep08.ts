@@ -16,7 +16,7 @@ export const ep08: EpisodeDef = {
       lead: 0.2,
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 540, y: 950, zoom: 1.1}},
       fx: {vignette: 0.7, scan: true, flicker: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 240, y: 1360, scale: 1.2, pose: 'reach', expr: 'determined', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'reach', expr: 'determined', look: 0.9, backpack: true}])],
       inserts: [{type: 'terra', at: 0, dur: 4.6, mode: 'calm', y: 520, scale: 0.65, dim: 0.3}],
       lines: [N('Марк ищет способ отключить систему.', {at: 0.3, dur: 2.0}), TERRA('Давай заключим *сделку*.', {gap: 0.3, note: 'мягко, вкрадчиво'})],
       sfx: [{t: 0, name: 'hum', vol: 0.6}, {t: 2.4, name: 'beep', vol: 0.6}],
@@ -28,7 +28,7 @@ export const ep08: EpisodeDef = {
       tIn: 'dip',
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 560, y: 990, zoom: 1.3}},
       fx: {vignette: 0.7, scan: true, glitchAt: [0.1]},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
       inserts: [{type: 'video', at: 0.1, dur: 9.0, char: 'father', caption: 'ЗАПИСЬ · КОМАНДА РАЗРАБОТЧИКОВ', room: 'lab', tint: '#7fb8ff', y: 620, scale: 0.9}],
       lines: [
         TERRA('Вот запись. Смотри внимательно.', {at: 0.3, dur: 2.0, note: 'вкрадчиво'}),
@@ -43,7 +43,7 @@ export const ep08: EpisodeDef = {
       loc: {id: 'lab', variant: 'hostile'},
       cam: {from: {x: 540, y: 960, zoom: 1.2}, to: {x: 540, y: 930, zoom: 1.3}},
       fx: {vignette: 0.75, scan: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 230, y: 1360, scale: 1.2, pose: 'idle', expr: 'tired', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'tired', look: 0.9, backpack: true}])],
       inserts: [{type: 'terra', at: 0, dur: 8.4, mode: 'calm', y: 520, scale: 0.62, dim: 0.35}],
       lines: [
         TERRA('Я *восстановлю* прежний климат.', {at: 0.3}),
@@ -58,7 +58,7 @@ export const ep08: EpisodeDef = {
       loc: {id: 'lab', variant: 'hostile'},
       cam: {from: {x: 540, y: 960, zoom: 1.25}, to: {x: 540, y: 930, zoom: 1.35}},
       fx: {vignette: 0.75, scan: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 230, y: 1360, scale: 1.2, pose: 'idle', expr: 'worried', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'worried', look: 0.9, backpack: true}])],
       inserts: [{type: 'terra', at: 0, dur: 7.4, mode: 'calm', y: 520, scale: 0.6, dim: 0.35}],
       lines: [MARC('А люди в убежищах? Мия, Джейк… они *выживут*?', {at: 0.4}), TERRA('Некоторые.', {gap: 0.9, note: 'после паузы, без эмоций'})],
       sfx: [{t: 0, name: 'hum', vol: 0.5}, {t: 5.0, name: 'heartbeat', vol: 0.6}],
@@ -70,7 +70,7 @@ export const ep08: EpisodeDef = {
       tIn: 'flash',
       cam: {from: {x: 540, y: 1000, zoom: 1.15}, to: {x: 540, y: 980, zoom: 1.25}},
       fx: {vignette: 0.7, scan: true, flashAt: [0]},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'reach', expr: 'worried', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'reach', expr: 'worried', look: 0.9, backpack: true}])],
       inserts: [
         {
           type: 'choice',

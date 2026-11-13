@@ -4,8 +4,13 @@ import {FPS, H, W} from './config';
 import {Episode} from './Episode';
 import {EPISODES} from './episodes';
 import {episodeTiming} from './episodes/timing';
+import {CastSheet} from './CastSheet';
 
 export const Root: React.FC = () => (
+  <>
+  <Folder name="Design">
+    <Composition id="cast-sheet" component={CastSheet} durationInFrames={90} fps={FPS} width={W} height={H} />
+  </Folder>
   <Folder name="Season-1">
     {EPISODES.map((ep) => (
       <Composition
@@ -20,4 +25,5 @@ export const Root: React.FC = () => (
       />
     ))}
   </Folder>
+  </>
 );

@@ -31,7 +31,7 @@ export const ep10: EpisodeDef = {
       cam: {from: {x: 540, y: 1000, zoom: 1.15}, to: {x: 540, y: 980, zoom: 1.3}},
       fx: {vignette: 0.7, scan: true},
       actors: [
-        A('marc', 'marc', [{t: 0, x: 230, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}]),
+        A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}]),
         A('lina', 'lina', [{t: 0, x: 790, y: 1360, scale: 1.2, pose: 'idle', expr: 'worried', look: 0.7, flip: true}]),
       ],
       inserts: [

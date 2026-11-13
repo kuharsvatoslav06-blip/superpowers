@@ -71,3 +71,55 @@ export const TerraCore: React.FC<{size?: number; f: number; mode?: 'calm' | 'hos
     </svg>
   );
 };
+
+/**
+ * Облик ТЕРРА по референсу: фигура в плаще с кубической головой и круглым «глазом», рядом плавающие панели.
+ * Используется поверх колец TerraCore (вставка `terra`).
+ */
+export const TerraAvatar: React.FC<{f: number; mode?: 'calm' | 'hostile'; height?: number}> = ({f, mode = 'calm', height = 560}) => {
+  const col = mode === 'hostile' ? '#ff4a3a' : '#46d4ff';
+  const pulse = 1 + Math.sin(f * (mode === 'hostile' ? 0.25 : 0.09)) * 0.08;
+  const bob = Math.sin(f * 0.05) * 6;
+  return (
+    <svg width={height * 0.9} height={height} viewBox="-230 -300 460 560" style={{overflow: 'visible'}}>
+      <defs>
+        <linearGradient id="tv-cloak" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#222838" />
+          <stop offset="1" stopColor="#0a0c13" />
+        </linearGradient>
+      </defs>
+      <g transform={`translate(0,${bob})`}>
+        {/* плащ */}
+        <path d="M -48 -70 L 48 -70 L 150 240 L 78 262 L 30 222 L -22 262 L -80 226 L -150 240 Z" fill="url(#tv-cloak)" stroke={col} strokeWidth={3} strokeOpacity={0.55} strokeLinejoin="round" />
+        <path d="M -48 -70 L 0 -30 L 48 -70" fill="#151a27" />
+        <path d="M 0 -30 L 0 220" stroke={col} strokeWidth={2} opacity={0.35} />
+        {/* руки */}
+        <path d="M -48 -60 L -92 40 L -70 52 L -36 -20 Z" fill="#161b28" stroke={col} strokeWidth={2} strokeOpacity={0.4} />
+        <circle cx={-76} cy={58} r={17} fill="#2b3142" />
+        <path d="M 48 -60 L 96 30 L 74 46 L 36 -20 Z" fill="#161b28" stroke={col} strokeWidth={2} strokeOpacity={0.4} />
+        <circle cx={84} cy={50} r={17} fill="#2b3142" />
+        {/* кубическая голова */}
+        <rect x={-46} y={-176} width={92} height={96} rx={9} fill="#2d3344" />
+        <rect x={-46} y={-176} width={92} height={20} rx={9} fill="#3c4458" />
+        <rect x={30} y={-176} width={16} height={96} rx={6} fill="#1c2130" />
+        <circle cx={-6} cy={-124} r={22 * pulse} fill="#05101a" stroke={col} strokeWidth={5} />
+        <circle cx={-6} cy={-124} r={8 * pulse} fill={col} />
+        <rect x={-46} y={-176} width={92} height={96} rx={9} fill="none" stroke={col} strokeWidth={2.5} opacity={0.5} />
+      </g>
+      {/* плавающие панели */}
+      <g transform={`translate(-215,${-150 + Math.sin(f * 0.07) * 8})`}>
+        <rect width={74} height={116} rx={8} fill="#08141f" stroke={col} strokeWidth={3} />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <rect key={i} x={10} y={16 + i * 20} width={i % 2 ? 40 : 54} height={7} rx={3} fill={col} opacity={0.6} />
+        ))}
+      </g>
+      <g transform={`translate(145,${-70 + Math.sin(f * 0.06 + 2) * 8})`}>
+        <rect width={86} height={140} rx={8} fill="#08141f" stroke={col} strokeWidth={3} />
+        <rect x={10} y={12} width={30} height={30} rx={4} fill="none" stroke={col} strokeWidth={3} />
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <rect key={i} x={10} y={54 + i * 14} width={i % 2 ? 44 : 62} height={6} rx={3} fill={col} opacity={0.55} />
+        ))}
+      </g>
+    </svg>
+  );
+};

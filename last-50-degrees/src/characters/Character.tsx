@@ -4,13 +4,21 @@ import type {CharId, Expr, Pose} from '../types';
 import {ROSTER, type Look} from './roster';
 import {clamp} from '../animations/ease';
 
-/* Локальные координаты: ноги стоят в (0,0), персонаж смотрит вправо (+x), рост ≈ 430. */
-
-const L1 = 88; // бедро
-const L2 = 86; // голень
+/**
+ * Дизайн по референс-листам (public/characters/reference): высокая тонкая фигура, маленькая круглая голова,
+ * глаза-точки без рта и носа, широкие тёмные штаны, длинные рукава, крупные круглые кисти, тёплая контурная подсветка.
+ *
+ * Локальные координаты: ноги стоят в (0,0), персонаж смотрит вправо (+x), рост ≈ 470.
+ */
+const L1 = 100; // бедро
+const L2 = 98; // голень
 const HIP_Y = -(L1 + L2) + 2;
-const SHOULDER_Y = -308;
-const HEAD_Y = -372;
+const TOP = -356; // линия плеч
+const SHOULDER_Y = TOP + 12;
+const HEAD_Y = -410;
+const HEAD_S = 0.82; // голова рисуется в системе r=56, затем уменьшается до r≈46
+const ARM1 = 84;
+const ARM2 = 78;
 const RAD = 180 / Math.PI;
 
 export interface CharProps {
@@ -35,7 +43,7 @@ interface Vec {
   y: number;
 }
 
-/** Двухсуставная обратная кинематика: возвращает углы бедра/колена (в градусах, «вперёд — плюс»). */
+/** Двухсуставная обратная кинематика: углы бедра/колена (градусы, «вперёд — плюс»). */
 function ik(hip: Vec, foot: Vec) {
   const dx = foot.x - hip.x;
   const dy = foot.y - hip.y;
@@ -58,50 +66,48 @@ interface PoseParams {
   footN: Vec;
   footF: Vec;
   headTilt: number;
-  headLook: number;
 }
 
 function poseParams(pose: Pose, f: number): PoseParams {
   const breathe = Math.sin(f * 0.07);
   const base: PoseParams = {
-    nSh: 5 + breathe * 1.5,
-    nEl: 8,
+    nSh: 4 + breathe * 1.2,
+    nEl: 6,
     fSh: 3,
-    fEl: 6,
+    fEl: 5,
     lean: 0,
     bob: breathe * 2,
     drop: 0,
-    footN: {x: 7, y: 0},
-    footF: {x: -9, y: 0},
+    footN: {x: 8, y: 0},
+    footF: {x: -10, y: 0},
     headTilt: breathe * 0.8,
-    headLook: 0,
   };
   switch (pose) {
     case 'walk':
     case 'run': {
       const run = pose === 'run';
       const p = f * (run ? 0.3 : 0.13);
-      const stride = run ? 80 : 48;
-      const lift = run ? 58 : 30;
+      const stride = run ? 84 : 52;
+      const lift = run ? 60 : 32;
       const s = Math.sin(p);
       const c = Math.cos(p);
-      const swing = run ? 58 : 26;
+      const swing = run ? 58 : 24;
       return {
         ...base,
-        nSh: -swing * s + 6,
-        nEl: (run ? 80 : 14) + (run ? 8 : 18) * Math.max(0, -s),
-        fSh: swing * s + 6,
-        fEl: (run ? 80 : 14) + (run ? 8 : 18) * Math.max(0, s),
-        lean: run ? 11 : 2,
+        nSh: -swing * s + 5,
+        nEl: (run ? 80 : 12) + (run ? 8 : 16) * Math.max(0, -s),
+        fSh: swing * s + 5,
+        fEl: (run ? 80 : 12) + (run ? 8 : 16) * Math.max(0, s),
+        lean: run ? 11 : 3,
         bob: -(run ? 12 : 6) * Math.cos(2 * p) - (run ? 6 : 0),
         footN: {x: stride * s, y: -lift * Math.max(0, c)},
         footF: {x: -stride * s, y: -lift * Math.max(0, -c)},
-        headTilt: run ? 3 : 1,
+        headTilt: run ? 3 : 4,
       };
     }
     case 'reach': {
       const press = Math.sin(f * 0.25) * 2;
-      return {...base, nSh: 78 + press, nEl: 14, fSh: 6, fEl: 10, lean: 4, headTilt: 3};
+      return {...base, nSh: 78 + press, nEl: 12, fSh: 6, fEl: 10, lean: 4, headTilt: 3};
     }
     case 'point':
       return {...base, nSh: 100 + Math.sin(f * 0.1) * 2, nEl: 2, fSh: 4, lean: 3};
@@ -124,36 +130,36 @@ function poseParams(pose: Pose, f: number): PoseParams {
     case 'crouch':
       return {
         ...base,
-        drop: 74,
+        drop: 78,
         lean: 16,
         nSh: 50,
         nEl: 44,
         fSh: 40,
         fEl: 40,
-        footN: {x: 36, y: 0},
+        footN: {x: 38, y: 0},
         footF: {x: 4, y: 0},
         headTilt: 4,
       };
     case 'sit':
       return {
         ...base,
-        drop: 78,
+        drop: 84,
         lean: 2,
         nSh: 24,
         nEl: 70,
         fSh: 18,
         fEl: 74,
-        footN: {x: 126, y: 0},
-        footF: {x: 100, y: 0},
+        footN: {x: 132, y: 0},
+        footF: {x: 104, y: 0},
       };
     case 'slump':
       return {
         ...base,
         lean: 7,
-        nSh: 10,
-        nEl: 14,
-        fSh: 6,
-        fEl: 10,
+        nSh: 8,
+        nEl: 12,
+        fSh: 5,
+        fEl: 9,
         headTilt: 12 + breathe,
         bob: breathe * 3,
         footN: {x: 10, y: 0},
@@ -168,45 +174,44 @@ function poseParams(pose: Pose, f: number): PoseParams {
 
 /* ───────────────────────── Волосы ───────────────────────── */
 
-const HairFront: React.FC<{look: Look; f: number}> = ({look, f}) => {
+const HairFront: React.FC<{look: Look}> = ({look}) => {
   const c = look.hairColor;
   switch (look.hair) {
     case 'messy':
       return (
         <g fill={c}>
-          <path d="M -59 10 C -70 -42 -30 -74 6 -68 C 42 -68 66 -42 59 -10 L 45 -24 L 41 -4 L 27 -28 L 14 -6 L 3 -32 L -9 -8 L -22 -32 L -31 -4 L -41 -22 L -47 8 Z" />
-          <path d="M -22 -64 L -30 -80 L -8 -68 Z M 8 -68 L 12 -84 L 26 -66 Z M 32 -60 L 46 -72 L 50 -52 Z" />
+          <path d="M -60 12 C -72 -44 -30 -76 6 -70 C 44 -70 68 -44 60 -8 L 46 -26 L 42 -4 L 28 -30 L 15 -6 L 3 -34 L -9 -8 L -23 -34 L -32 -4 L -42 -24 L -48 10 Z" />
+          <path d="M -24 -66 L -36 -84 L -8 -70 Z M 8 -70 L 14 -90 L 28 -68 Z M 34 -62 L 52 -76 L 54 -52 Z M -50 -40 L -70 -52 L -58 -24 Z" />
         </g>
       );
-    case 'ponytail': {
+    case 'ponytail':
       return (
-        <path
-          fill={c}
-          d="M -59 10 C -66 -46 -26 -70 8 -67 C 46 -65 66 -36 59 -12 C 44 -36 12 -42 -12 -30 C -30 -22 -44 -6 -50 12 Z"
-        />
+        <g fill={c}>
+          <path d="M -60 12 C -68 -48 -26 -72 8 -69 C 46 -67 68 -38 60 -12 C 46 -38 12 -44 -12 -32 C -30 -24 -46 -8 -52 14 Z" />
+          <path d="M -30 -20 L -18 -4 L -8 -24 Z M 6 -36 L 18 -14 L 28 -38 Z" />
+        </g>
       );
-    }
     case 'short':
       return (
         <g fill={c}>
-          <path d="M -58 6 C -68 -42 -28 -70 8 -66 C 44 -64 64 -38 58 -8 L 44 -26 L 36 -14 L 22 -32 L 8 -20 L -6 -34 L -20 -18 L -34 -26 L -46 -6 Z" />
+          <path d="M -59 8 C -70 -44 -28 -72 8 -68 C 46 -66 66 -40 59 -8 L 46 -28 L 38 -14 L 22 -34 L 8 -20 L -6 -36 L -20 -18 L -34 -28 L -48 -6 Z" />
+          <path d="M -26 -64 L -34 -80 L -10 -68 Z M 20 -66 L 30 -82 L 40 -62 Z" />
         </g>
       );
     case 'beanie':
       return (
         <g>
-          {/* чёлка из-под шапки */}
-          <path fill={c} d="M -42 -14 C -30 4 -10 -4 -2 -12 C 12 -2 30 4 44 -12 L 44 -22 L -42 -22 Z" />
-          <path fill={look.beanie} d="M -62 -2 C -66 -52 -30 -82 4 -82 C 40 -82 66 -52 62 -2 Z" />
-          <rect x={-63} y={-20} width={126} height={20} rx={9} fill="#1b1d23" />
-          <circle cx={2} cy={-86} r={9} fill={look.beanie} />
+          <path fill={c} d="M -44 -14 C -32 6 -10 -4 -2 -12 C 12 -2 30 6 46 -12 L 46 -24 L -44 -24 Z" />
+          <path fill={look.beanie} d="M -63 -2 C -67 -54 -30 -84 4 -84 C 40 -84 68 -54 63 -2 Z" />
+          <rect x={-64} y={-22} width={128} height={22} rx={9} fill="#1b1b20" />
+          <circle cx={2} cy={-88} r={9} fill={look.beanie} />
         </g>
       );
     case 'long':
       return (
         <path
           fill={c}
-          d="M -60 20 C -70 -44 -30 -72 6 -68 C 44 -66 66 -38 59 -8 C 40 -34 8 -42 -14 -28 C -32 -18 -44 0 -48 22 Z"
+          d="M -61 22 C -72 -46 -30 -74 6 -70 C 46 -68 68 -40 60 -8 C 40 -36 8 -44 -14 -30 C -33 -19 -45 0 -49 24 Z"
         />
       );
   }
@@ -216,25 +221,17 @@ const HairBack: React.FC<{look: Look; f: number}> = ({look, f}) => {
   if (look.hair === 'ponytail') {
     const sway = Math.sin(f * 0.1) * 5;
     return (
-      <g transform={`translate(-52,-28) rotate(${sway})`}>
-        <path
-          fill={look.hairColor}
-          d="M 6 -4 C -38 -14 -70 22 -52 84 C -44 50 -26 26 6 20 Z"
-        />
-        <rect x={-6} y={-8} width={14} height={26} rx={5} fill={look.accent} />
+      <g transform={`translate(-54,-34) rotate(${sway})`}>
+        <path fill={look.hairColor} d="M 8 -6 C -38 -22 -74 14 -56 90 C -46 52 -26 28 8 22 Z" />
+        <rect x={-6} y={-10} width={14} height={28} rx={5} fill={look.accent} />
       </g>
     );
   }
   if (look.hair === 'long') {
-    return (
-      <path
-        fill={look.hairColor}
-        d="M -56 -20 C -78 20 -76 90 -52 118 L 12 118 C 4 70 -6 34 6 -10 Z"
-      />
-    );
+    return <path fill={look.hairColor} d="M -58 -20 C -80 20 -78 92 -54 120 L 12 120 C 4 72 -6 34 6 -10 Z" />;
   }
   if (look.hair === 'beanie') {
-    return <path fill={look.hairColor} d="M -58 0 C -68 30 -60 58 -44 62 L -36 18 Z" />;
+    return <path fill={look.hairColor} d="M -60 0 C -72 34 -62 66 -42 72 L -34 20 Z" />;
   }
   return null;
 };
@@ -250,106 +247,65 @@ const Face: React.FC<{
   seed: number;
 }> = ({look, expr, lookDir, talking, f, seed}) => {
   const fx = 20 + lookDir * 15;
-  const eyeY = 4;
-  const dark = '#15110f';
+  const eyeY = 6;
+  const dark = '#111014';
   const b = (f + seed * 37) % 118;
   const blink = b < 5 ? Math.max(0.12, Math.abs(b - 2.5) / 2.5) : 1;
-  const tired = expr === 'tired' ? 0.58 : 1;
-  const wide = expr === 'shocked';
-  const eyeR = wide ? 8.5 : 7;
+  const tired = expr === 'tired' ? 0.5 : 1;
+  const eyeR = expr === 'shocked' ? 8 : 7.4;
 
-  // брови
-  let backRot = 0;
-  let frontRot = 0;
-  let browY = -14;
+  // брови нужны только для эмоций; в нейтральном состоянии лицо — две точки (как в референсе)
+  let brows: {back: number; front: number; y: number} | null = null;
   switch (expr) {
     case 'worried':
     case 'sad':
-      backRot = -16;
-      frontRot = 16;
-      browY = -16;
+      brows = {back: -17, front: 17, y: -13};
       break;
     case 'determined':
-      backRot = 14;
-      frontRot = -14;
-      browY = -11;
-      break;
-    case 'shocked':
-      browY = -22;
-      backRot = -6;
-      frontRot = 6;
+      brows = {back: 17, front: -17, y: -10};
       break;
     case 'suspicious':
-      backRot = 10;
-      frontRot = -4;
-      browY = -13;
+      brows = {back: 12, front: -6, y: -11};
       break;
-    case 'tired':
-      browY = -11;
-      backRot = -5;
-      frontRot = 5;
-      break;
-    case 'smile':
-      browY = -16;
+    case 'shocked':
+      brows = {back: -6, front: 6, y: -20};
       break;
   }
 
   const mouthOpen = talking ? 2.5 + Math.abs(Math.sin(f * 0.85 + seed)) * 8 : 0;
-  let mouth: React.ReactNode;
-  const my = 28;
+  let mouth: React.ReactNode = null;
+  const my = 30;
   if (mouthOpen > 0.5 && expr !== 'shocked') {
-    mouth = <ellipse cx={fx + 4} cy={my} rx={7.5} ry={mouthOpen} fill="#2a0f0d" />;
-  } else {
-    let d = 'M -10 0 Q 0 2 10 0';
-    switch (expr) {
-      case 'smile':
-        d = 'M -12 -2 Q 0 12 12 -2';
-        break;
-      case 'worried':
-      case 'sad':
-        d = 'M -10 5 Q 0 -5 10 5';
-        break;
-      case 'determined':
-        d = 'M -10 2 L 10 -1';
-        break;
-      case 'tired':
-        d = 'M -8 2 L 8 2';
-        break;
-      case 'suspicious':
-        d = 'M -10 3 Q 0 0 10 -3';
-        break;
-    }
-    mouth =
-      expr === 'shocked' ? (
-        <ellipse cx={fx + 4} cy={my + 2} rx={8} ry={11} fill="#2a0f0d" />
-      ) : (
-        <path
-          d={d}
-          transform={`translate(${fx + 4},${my})`}
-          stroke="#2a0f0d"
-          strokeWidth={4.2}
-          strokeLinecap="round"
-          fill="none"
-        />
-      );
+    mouth = <ellipse cx={fx + 4} cy={my} rx={6.5} ry={mouthOpen} fill="#2a0f0d" />;
+  } else if (expr === 'shocked') {
+    mouth = <ellipse cx={fx + 4} cy={my + 2} rx={7} ry={10} fill="#2a0f0d" />;
+  } else if (expr === 'smile') {
+    mouth = <path d={`M ${fx - 8} ${my - 2} Q ${fx + 4} ${my + 12} ${fx + 16} ${my - 2}`} stroke="#2a0f0d" strokeWidth={4} strokeLinecap="round" fill="none" />;
+  } else if (expr === 'sad') {
+    mouth = <path d={`M ${fx - 6} ${my + 4} Q ${fx + 4} ${my - 4} ${fx + 14} ${my + 4}`} stroke="#2a0f0d" strokeWidth={3.5} strokeLinecap="round" fill="none" />;
   }
 
   const eye = (cx: number) => (
-    <g transform={`translate(${cx},${eyeY}) scale(1,${blink * tired})`}>
-      {wide && <circle r={11.5} fill="#f3eee6" />}
-      <circle r={wide ? 5 : eyeR} fill={dark} />
-      {!wide && <circle cx={2} cy={-2.4} r={2.1} fill="#f3eee6" opacity={0.85} />}
-    </g>
+    <circle cx={cx} cy={eyeY} r={eyeR} fill={dark} transform={`translate(${cx},${eyeY}) scale(1,${blink * tired}) translate(${-cx},${-eyeY})`} />
   );
 
   return (
     <g>
       {eye(fx - 20)}
       {eye(fx + 18)}
-      <g stroke={look.hairColor} strokeWidth={5} strokeLinecap="round">
-        <line x1={-9} y1={0} x2={9} y2={0} transform={`translate(${fx - 20},${browY}) rotate(${backRot})`} />
-        <line x1={-9} y1={0} x2={9} y2={0} transform={`translate(${fx + 18},${browY}) rotate(${frontRot})`} />
-      </g>
+      {brows && (
+        <g stroke={look.hairColor} strokeWidth={5.5} strokeLinecap="round">
+          <line x1={-9} y1={0} x2={9} y2={0} transform={`translate(${fx - 20},${brows.y}) rotate(${brows.back})`} />
+          <line x1={-9} y1={0} x2={9} y2={0} transform={`translate(${fx + 18},${brows.y}) rotate(${brows.front})`} />
+        </g>
+      )}
+      {expr === 'shocked' && (
+        <g stroke="#ece4d4" strokeWidth={4.5} strokeLinecap="round" opacity={0.95}>
+          <line x1={40} y1={-66} x2={48} y2={-80} />
+          <line x1={54} y1={-54} x2={68} y2={-62} />
+          <line x1={26} y1={-72} x2={28} y2={-88} />
+        </g>
+      )}
       {look.glasses && (
         <g fill="none" stroke="#c7ccd6" strokeWidth={3.2} opacity={0.9}>
           <circle cx={fx - 20} cy={eyeY} r={15} />
@@ -363,13 +319,13 @@ const Face: React.FC<{
         <path
           d={`M ${fx - 14} 38 Q ${fx + 4} 54 ${fx + 24} 36 L ${fx + 22} 44 Q ${fx + 4} 62 ${fx - 14} 46 Z`}
           fill={look.hairColor}
-          opacity={0.38}
+          opacity={0.32}
         />
       )}
       {look.wrinkles && (
         <g stroke={look.skinShade} strokeWidth={2.4} strokeLinecap="round" fill="none">
-          <path d={`M ${fx - 34} ${eyeY + 8} q 4 4 8 5`} />
-          <path d={`M ${fx + 34} ${eyeY + 8} q -4 4 -8 5`} />
+          <path d={`M ${fx - 34} ${eyeY + 9} q 4 4 8 5`} />
+          <path d={`M ${fx + 34} ${eyeY + 9} q -4 4 -8 5`} />
         </g>
       )}
     </g>
@@ -384,17 +340,16 @@ const Arm: React.FC<{
   el: number;
   look: Look;
   far?: boolean;
-  rim?: string;
-  rimAmount?: number;
-}> = ({x, sh, el, look, far, rim, rimAmount = 0}) => {
+}> = ({x, sh, el, look, far}) => {
   const col = far ? look.topShade : look.topColor;
   return (
-    <g transform={`translate(${x},${SHOULDER_Y + 6}) rotate(${-sh})`}>
-      <line x1={0} y1={0} x2={0} y2={76} stroke={col} strokeWidth={31} strokeLinecap="round" />
-      <g transform={`translate(0,76) rotate(${-el})`}>
-        <line x1={0} y1={0} x2={0} y2={66} stroke={col} strokeWidth={28} strokeLinecap="round" />
-        <rect x={-15} y={56} width={30} height={9} rx={4} fill={look.accent} opacity={far ? 0.45 : 0.7} />
-        <circle cx={0} cy={78} r={14.5} fill={far ? look.skinShade : look.skin} />
+    <g transform={`translate(${x},${SHOULDER_Y + 4}) rotate(${-sh})`}>
+      <line x1={0} y1={0} x2={0} y2={ARM1} stroke={col} strokeWidth={32} strokeLinecap="round" />
+      <g transform={`translate(0,${ARM1}) rotate(${-el})`}>
+        <line x1={0} y1={0} x2={0} y2={ARM2 - 6} stroke={col} strokeWidth={30} strokeLinecap="round" />
+        <rect x={-16} y={ARM2 - 22} width={32} height={9} rx={4} fill={look.accent} opacity={far ? 0.3 : 0.5} />
+        {/* крупная круглая кисть, как в референсе */}
+        <circle cx={0} cy={ARM2 + 8} r={19} fill={far ? look.skinShade : look.skin} />
       </g>
     </g>
   );
@@ -406,67 +361,82 @@ const Leg: React.FC<{
   hipY: number;
   look: Look;
   far?: boolean;
-}> = ({x, foot, hipY, look, far}) => {
+  rim?: string;
+  rimAmount?: number;
+}> = ({x, foot, hipY, look, far, rim, rimAmount = 0}) => {
   const r = ik({x: 0, y: hipY}, foot);
-  const col = far ? '#14161c' : look.pants;
+  const col = far ? '#0f0f14' : look.pants;
   const shoe = far ? '#050507' : look.shoes;
   return (
     <g transform={`translate(${x},${hipY}) rotate(${-r.thigh})`}>
-      <line x1={0} y1={0} x2={0} y2={L1} stroke={col} strokeWidth={36} strokeLinecap="round" />
+      <line x1={0} y1={0} x2={0} y2={L1} stroke={col} strokeWidth={52} strokeLinecap="round" />
+      {!far && rim && <line x1={25} y1={6} x2={25} y2={L1 - 2} stroke={rim} strokeWidth={2.6} strokeLinecap="round" opacity={rimAmount * 0.8} />}
       <g transform={`translate(0,${L1}) rotate(${r.knee})`}>
-        <line x1={0} y1={0} x2={0} y2={L2 - 6} stroke={col} strokeWidth={31} strokeLinecap="round" />
+        <line x1={0} y1={0} x2={0} y2={L2 - 8} stroke={col} strokeWidth={50} strokeLinecap="round" />
+        {!far && rim && <line x1={24} y1={0} x2={24} y2={L2 - 12} stroke={rim} strokeWidth={2.6} strokeLinecap="round" opacity={rimAmount * 0.8} />}
         {/* стопа: компенсируем поворот цепочки, чтобы подошва оставалась ровной */}
-        <g transform={`translate(0,${L2 - 4}) rotate(${r.shin})`}>
-          <path d="M -15 -8 L 14 -8 C 38 -6 46 4 46 12 L -17 12 Z" fill={shoe} />
-          <rect x={-17} y={9} width={64} height={5} rx={2} fill={far ? '#000' : '#26272d'} opacity={0.8} />
+        <g transform={`translate(0,${L2 - 6}) rotate(${r.shin})`}>
+          <path d="M -22 -12 L 18 -12 C 48 -10 60 4 60 18 L -24 18 Z" fill={shoe} />
+          <rect x={-24} y={13} width={86} height={6} rx={3} fill={far ? '#000' : '#26262c'} opacity={0.85} />
         </g>
       </g>
     </g>
   );
 };
 
-const Backpack: React.FC<{look: Look; kind: 'big' | 'small'; hipDrop: number}> = ({look, kind, hipDrop}) => {
+const Backpack: React.FC<{look: Look; kind: 'big' | 'small'}> = ({look, kind}) => {
   const c = look.backpackColor ?? '#3b3f35';
   const big = kind === 'big';
   return (
     <g>
-      <rect x={big ? -88 : -76} y={SHOULDER_Y + 14} width={big ? 56 : 42} height={big ? 130 : 92} rx={16} fill={c} />
-      <rect x={big ? -88 : -76} y={SHOULDER_Y + 14} width={big ? 56 : 42} height={20} rx={10} fill="#00000033" />
-      <rect x={big ? -78 : -68} y={SHOULDER_Y + 70} width={big ? 36 : 24} height={big ? 44 : 30} rx={8} fill="#00000040" />
+      <rect x={big ? -92 : -80} y={TOP + 14} width={big ? 58 : 44} height={big ? 140 : 100} rx={16} fill={c} />
+      <rect x={big ? -92 : -80} y={TOP + 14} width={big ? 58 : 44} height={20} rx={10} fill="#00000033" />
+      <rect x={big ? -82 : -72} y={TOP + 74} width={big ? 38 : 26} height={big ? 46 : 32} rx={8} fill="#00000040" />
     </g>
   );
 };
 
-const Torso: React.FC<{look: Look; rim?: string; rimAmount?: number; f: number}> = ({look, rim, rimAmount = 0, f}) => {
-  const body = 'M -56 -318 Q -58 -318 -58 -300 L -52 -176 Q -52 -164 -40 -164 L 40 -164 Q 52 -164 52 -176 L 58 -300 Q 58 -318 56 -318 Z';
+const Torso: React.FC<{look: Look; rim?: string; rimAmount?: number}> = ({look, rim, rimAmount = 0}) => {
+  const bottom = look.coat ? HIP_Y + 140 : HIP_Y + 30;
+  const body = `M -52 ${TOP + 14} Q -52 ${TOP} -38 ${TOP} L 38 ${TOP} Q 52 ${TOP} 52 ${TOP + 14} L 57 ${bottom - 8} Q 57 ${bottom} 46 ${bottom} L -46 ${bottom} Q -57 ${bottom} -57 ${bottom - 8} Z`;
   return (
     <g>
-      {look.top === 'hoodie' && <ellipse cx={-8} cy={SHOULDER_Y - 6} rx={60} ry={30} fill={look.topShade} />}
+      {look.top === 'hoodie' && <ellipse cx={-6} cy={TOP - 2} rx={62} ry={30} fill={look.topShade} />}
+      {look.top === 'hoodie' && <ellipse cx={-6} cy={TOP - 2} rx={50} ry={22} fill="#000" opacity={0.18} />}
       <path d={body} fill={look.topColor} />
-      {/* тень снизу */}
-      <path d="M -52 -214 L 52 -214 L 55 -176 Q 52 -164 40 -164 L -40 -164 Q -52 -164 -52 -176 Z" fill="#00000026" />
+      <path d={`M -52 ${bottom - 60} L 52 ${bottom - 60} L 57 ${bottom - 8} Q 57 ${bottom} 46 ${bottom} L -46 ${bottom} Q -57 ${bottom} -57 ${bottom - 8} Z`} fill="#00000026" />
       {look.top === 'hoodie' && (
         <g>
-          <path d="M -34 -236 L 34 -236 L 40 -196 L -40 -196 Z" fill={look.topShade} opacity={0.85} />
-          <line x1={-10} y1={-312} x2={-12} y2={-262} stroke={look.accent} strokeWidth={3} strokeLinecap="round" />
-          <line x1={12} y1={-312} x2={14} y2={-258} stroke={look.accent} strokeWidth={3} strokeLinecap="round" />
+          <path d={`M -34 ${TOP + 130} L 34 ${TOP + 130} L 40 ${TOP + 170} L -40 ${TOP + 170} Z`} fill={look.topShade} opacity={0.85} />
+          <line x1={-10} y1={TOP + 6} x2={-12} y2={TOP + 58} stroke={look.accent} strokeWidth={3} strokeLinecap="round" />
+          <line x1={12} y1={TOP + 6} x2={14} y2={TOP + 62} stroke={look.accent} strokeWidth={3} strokeLinecap="round" />
         </g>
       )}
       {look.top === 'jacket' && (
         <g>
-          <path d="M -26 -320 L 0 -286 L 26 -320 Z" fill={look.topShade} />
-          <line x1={0} y1={-286} x2={0} y2={-166} stroke={look.accent} strokeWidth={3.5} strokeLinecap="round" opacity={0.85} />
-          <rect x={-56} y={-186} width={112} height={8} fill={look.accent} opacity={0.25} />
+          <path d={`M -26 ${TOP - 2} L 0 ${TOP + 34} L 26 ${TOP - 2} Z`} fill={look.topShade} />
+          <line x1={0} y1={TOP + 34} x2={0} y2={bottom - 4} stroke={look.accent} strokeWidth={3} strokeLinecap="round" opacity={0.7} />
+          {/* накладные карманы, как у Лины/Джейка в референсе */}
+          <rect x={-46} y={TOP + 96} width={32} height={34} rx={5} fill={look.topShade} opacity={0.9} />
+          <rect x={14} y={TOP + 96} width={32} height={34} rx={5} fill={look.topShade} opacity={0.9} />
         </g>
       )}
       {look.top === 'cardigan' && (
         <g>
-          <path d="M -22 -320 L 0 -270 L 22 -320 Z" fill={look.accent} opacity={0.9} />
-          <line x1={0} y1={-270} x2={0} y2={-166} stroke={look.topShade} strokeWidth={3} />
+          <path d={`M -22 ${TOP - 2} L 0 ${TOP + 50} L 22 ${TOP - 2} Z`} fill={look.accent} opacity={0.9} />
+          <line x1={0} y1={TOP + 50} x2={0} y2={bottom - 4} stroke={look.topShade} strokeWidth={3} />
         </g>
       )}
+      {look.coat && <line x1={0} y1={bottom - 70} x2={0} y2={bottom} stroke="#00000055" strokeWidth={3} />}
       {rim && (
-        <path d="M -56 -314 Q -58 -314 -58 -300 L -52 -182" stroke={rim} strokeWidth={3} fill="none" strokeLinecap="round" opacity={rimAmount} />
+        <path
+          d={`M 52 ${TOP + 14} Q 52 ${TOP + 2} 40 ${TOP + 1} M 52 ${TOP + 18} L 57 ${bottom - 10}`}
+          stroke={rim}
+          strokeWidth={3.2}
+          fill="none"
+          strokeLinecap="round"
+          opacity={rimAmount}
+        />
       )}
     </g>
   );
@@ -485,7 +455,7 @@ export const Character: React.FC<CharProps> = ({
   frame,
   seed = 1,
   rim,
-  rimAmount = 0.8,
+  rimAmount = 0.9,
 }) => {
   const current = useCurrentFrame();
   const f = (frame ?? current) + seed * 11;
@@ -503,19 +473,24 @@ export const Character: React.FC<CharProps> = ({
   const kid = L.kid;
   const bp = backpack ?? !!L.backpack;
   const bpKind = L.backpack ?? 'small';
+  const shift = hipY - HIP_Y;
 
   const body = (
     <g>
       <Arm x={-8} sh={P.fSh} el={P.fEl} look={L} far />
       <Leg x={-4} foot={P.footF} hipY={hipY} look={L} far />
-      {bp && <g transform={`translate(0,${hipY - HIP_Y}) rotate(${P.lean} 0 ${HIP_Y})`}><Backpack look={L} kind={bpKind} hipDrop={P.drop} /></g>}
-      <Leg x={6} foot={P.footN} hipY={hipY} look={L} />
-      <g transform={`translate(0,${hipY - HIP_Y}) rotate(${P.lean} 0 ${HIP_Y})`}>
-        <Torso look={L} rim={rim} rimAmount={rimAmount} f={f} />
-        {/* шея */}
-        <rect x={-14} y={-336} width={30} height={30} rx={8} fill={L.skinShade} />
+      {bp && (
+        <g transform={`translate(0,${shift}) rotate(${P.lean} 0 ${HIP_Y})`}>
+          <Backpack look={L} kind={bpKind} />
+        </g>
+      )}
+      <Leg x={6} foot={P.footN} hipY={hipY} look={L} rim={rim} rimAmount={rimAmount} />
+      <g transform={`translate(0,${shift}) rotate(${P.lean} 0 ${HIP_Y})`}>
+        <Torso look={L} rim={rim} rimAmount={rimAmount} />
+        {/* тонкая шея */}
+        <rect x={-9} y={TOP - 26} width={20} height={34} rx={7} fill={L.skinShade} />
         {/* голова */}
-        <g transform={`translate(0,${HEAD_Y}) rotate(${headRot} 0 40) scale(${kid ? 1.28 : 1})`}>
+        <g transform={`translate(0,${HEAD_Y}) rotate(${headRot} 0 40) scale(${HEAD_S * (kid ? 1.28 : 1)})`}>
           <HairBack look={L} f={f} />
           <circle r={56} fill={L.skin} />
           {rim && (
@@ -523,38 +498,32 @@ export const Character: React.FC<CharProps> = ({
               r={56}
               fill="none"
               stroke={rim}
-              strokeWidth={3.2}
+              strokeWidth={3.6}
               strokeLinecap="round"
               opacity={rimAmount}
-              strokeDasharray="88 400"
-              transform="rotate(168)"
+              strokeDasharray="100 400"
+              transform="rotate(-62)"
             />
           )}
-          {/* ухо */}
-          <ellipse cx={-30} cy={10} rx={8} ry={11} fill={L.skinShade} />
           <Face look={L} expr={expr} lookDir={lookDir} talking={talking} f={f} seed={seed} />
-          <HairFront look={L} f={f} />
+          <HairFront look={L} />
           {L.goggles && (
             <g>
-              <path d="M -56 -22 Q 0 -44 58 -22" stroke="#1d1f24" strokeWidth={9} fill="none" strokeLinecap="round" />
-              <circle cx={8} cy={-44} r={17} fill="#1d1f24" />
-              <circle cx={36} cy={-40} r={15} fill="#1d1f24" />
-              <circle cx={8} cy={-44} r={11} fill="#7ec8e3" opacity={0.85} />
-              <circle cx={36} cy={-40} r={9.5} fill="#7ec8e3" opacity={0.85} />
+              <path d="M -58 -22 Q 0 -46 60 -22" stroke="#1d1f24" strokeWidth={9} fill="none" strokeLinecap="round" />
+              <circle cx={8} cy={-46} r={17} fill="#1d1f24" />
+              <circle cx={36} cy={-42} r={15} fill="#1d1f24" />
+              <circle cx={8} cy={-46} r={11} fill="#7ec8e3" opacity={0.85} />
+              <circle cx={36} cy={-42} r={9.5} fill="#7ec8e3" opacity={0.85} />
             </g>
           )}
         </g>
       </g>
-      <g transform={`translate(0,${hipY - HIP_Y}) rotate(${P.lean} 0 ${HIP_Y})`}>
-        <Arm x={8} sh={P.nSh} el={P.nEl} look={L} rim={rim} rimAmount={rimAmount} />
+      <g transform={`translate(0,${shift}) rotate(${P.lean} 0 ${HIP_Y})`}>
+        <Arm x={8} sh={P.nSh} el={P.nEl} look={L} />
       </g>
     </g>
   );
 
   const k = (L.size ?? 1) * (kid ? 0.62 : 1);
-  return (
-    <g transform={`scale(${k})`}>
-      {body}
-    </g>
-  );
+  return <g transform={`scale(${k})`}>{body}</g>;
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import {MONO, SANS} from '../../styles/fonts';
 import type {CharId, Insert} from '../../types';
 import {Character} from '../../characters/Character';
-import {TerraCore} from '../../characters/Terra';
+import {TerraAvatar, TerraCore} from '../../characters/Terra';
 import {Panel, THEME, typed} from './common';
 import {clamp, easeOut, easeOutBack, progress} from '../../animations/ease';
 import {noise1, rng} from '../../animations/noise';
@@ -28,7 +28,7 @@ export const Bust: React.FC<{char: CharId; w: number; h: number; f: number; talk
     </defs>
     <g clipPath={`url(#${id})`}>
       <rect width={w} height={h} fill={bg} />
-      <g transform={`translate(${w * 0.5},${h * 1.5}) scale(${h / 330})`}>
+      <g transform={`translate(${w * 0.5},${h * 1.5}) scale(${h / 360})`}>
         <Character char={char} pose="idle" expr={expr} look={0.5} talking={talking} frame={f} seed={2} />
       </g>
     </g>
@@ -340,7 +340,12 @@ export const TerraInsert: React.FC<{ins: Of<'terra'>; t: number; f: number}> = (
   const hostile = ins.mode === 'hostile';
   return (
     <div style={{textAlign: 'center'}}>
-      <TerraCore size={820} f={f} mode={ins.mode ?? 'calm'} id="terra-ins" />
+      <div style={{position: 'relative', width: 820, height: 820, margin: '0 auto'}}>
+        <TerraCore size={820} f={f} mode={ins.mode ?? 'calm'} id="terra-ins" />
+        <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <TerraAvatar f={f} mode={ins.mode ?? 'calm'} height={640} />
+        </div>
+      </div>
       {!ins.bare && (
         <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 54, letterSpacing: 14, color: hostile ? '#ff4a3a' : '#46d4ff', marginTop: -30, textShadow: `0 0 30px ${hostile ? '#ff4a3a' : '#46d4ff'}`}}>
           ТЕРРА

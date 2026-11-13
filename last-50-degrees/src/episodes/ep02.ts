@@ -17,7 +17,7 @@ export const ep02: EpisodeDef = {
       cam: {from: {x: 540, y: 990, zoom: 1.12}, to: {x: 560, y: 960, zoom: 1.3}},
       fx: {flicker: true, dust: 0.5, vignette: 0.65},
       actors: [
-        A('marc', 'marc', [{t: 0, x: 230, y: 1360, scale: 1.3, pose: 'idle', expr: 'determined', look: 0.9, backpack: true}]),
+        A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.3, pose: 'idle', expr: 'determined', look: 0.9, backpack: true}]),
         A('mia', 'mia', [{t: 0, x: 690, y: 1360, scale: 1.25, pose: 'idle', expr: 'suspicious', look: 0.7, flip: true}]),
         A('jake', 'jake', [{t: 0, x: 900, y: 1360, scale: 1.3, pose: 'idle', expr: 'smile', look: 0.7, flip: true}]),
       ],
@@ -40,7 +40,7 @@ export const ep02: EpisodeDef = {
       fx: {flicker: true, dust: 0.5, vignette: 0.7},
       actors: [
         A('marc', 'marc', [
-          {t: 0, x: 230, y: 1360, scale: 1.3, pose: 'idle', expr: 'determined', look: 0.9, backpack: true},
+          {t: 0, x: 300, y: 1360, scale: 1.3, pose: 'idle', expr: 'determined', look: 0.9, backpack: true},
           {t: 2.2, flip: true, look: -0.2},
         ]),
       ],

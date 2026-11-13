@@ -120,7 +120,7 @@ export const ep06: EpisodeDef = {
       tIn: 'dip',
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 560, y: 980, zoom: 1.3}},
       fx: {vignette: 0.7, scan: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}])],
       inserts: [
         {
           type: 'terminal',
@@ -145,7 +145,7 @@ export const ep06: EpisodeDef = {
       loc: {id: 'lab'},
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 540, y: 980, zoom: 1.3}},
       fx: {vignette: 0.7, scan: true, flicker: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
       inserts: [
         {type: 'photo', at: 0.2, dur: 7.2, who: ['marcKid'], caption: 'ПЕРВЫЙ УЧАСТНИК ПРОГРАММЫ', y: 560, scale: 0.72, dim: 0.5},
       ],

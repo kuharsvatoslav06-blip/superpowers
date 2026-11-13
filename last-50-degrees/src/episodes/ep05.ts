@@ -16,7 +16,7 @@ export const ep05: EpisodeDef = {
       lead: 0.2,
       cam: {from: {x: 540, y: 980, zoom: 1.25}, to: {x: 540, y: 960, zoom: 1.15}},
       fx: {vignette: 0.7, scan: true, flicker: true, glitchAt: [0.05]},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
       inserts: [
         {
           type: 'dossier',
@@ -46,7 +46,7 @@ export const ep05: EpisodeDef = {
       tIn: 'glitch',
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 540, y: 980, zoom: 1.35}},
       fx: {vignette: 0.7, scan: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 240, y: 1360, scale: 1.2, pose: 'idle', expr: 'worried', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'worried', look: 0.9, backpack: true}])],
       inserts: [{type: 'bigtext', at: 0.3, dur: 4.6, text: '3 МАРТА\n2039', sub: 'ДАТА ИСЧЕЗНОВЕНИЯ', color: '#ffc857', y: 540, scale: 0.7, dim: 0.4, glitch: true}],
       lines: [N('Дата исчезновения — *третье марта*.', {at: 0.4}), MARC('Меня *не существует*… а я стою здесь.', {gap: 0.6, note: 'почти шёпотом'})],
       sfx: [{t: 0.3, name: 'impact', vol: 0.7}],
@@ -68,7 +68,7 @@ export const ep05: EpisodeDef = {
       tIn: 'glitch',
       cam: {from: {x: 540, y: 1000, zoom: 1.2}, to: {x: 560, y: 990, zoom: 1.3}},
       fx: {vignette: 0.7, scan: true, glitchAt: [0.1]},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'idle', expr: 'shocked', look: 0.9, backpack: true}])],
       inserts: [{type: 'video', at: 0.1, dur: 10.8, char: 'marcOld', caption: 'ЗАПИСЬ · ДОКТОР ВЕЙЛ', room: 'lab', tint: '#7fb8ff', y: 620, scale: 0.9}],
       lines: [
         N('На экране появляется мужчина. Очень похожий на него. Только *старше*.', {at: 0.3}),
@@ -98,7 +98,7 @@ export const ep05: EpisodeDef = {
       loc: {id: 'lab'},
       cam: {from: {x: 540, y: 1000, zoom: 1.15}, to: {x: 540, y: 980, zoom: 1.2}},
       fx: {vignette: 0.7, scan: true},
-      actors: [A('marc', 'marc', [{t: 0, x: 220, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}])],
+      actors: [A('marc', 'marc', [{t: 0, x: 300, y: 1360, scale: 1.2, pose: 'reach', expr: 'suspicious', look: 0.9, backpack: true}])],
       inserts: [
         {
           type: 'versions',
