@@ -8,6 +8,7 @@
  * Без --quiet печатает отчёт о недостающих ресурсах.
  */
 import {existsSync, readdirSync, writeFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import path from 'node:path';
 import {ROOT, loadEpisodes} from './lib.mjs';
 
@@ -23,7 +24,7 @@ const find = (dir, name) => {
 const SFX = ['siren', 'beep', 'impact', 'whoosh', 'hum', 'static', 'glitch', 'wind', 'heartbeat', 'click', 'door', 'lift', 'alarm', 'footsteps', 'radio', 'stinger'];
 const MUSIC = ['tension', 'dark', 'cold', 'hope'];
 
-const res = {sfx: {}, music: {}, voice: {}};
+const res = {sfx: {}, music: {}, voice: {}, voiceDur: {}};
 const missing = {sfx: [], music: [], real: {sfx: 0, music: 0}};
 for (const n of SFX) {
   const real = find('sound-effects', n);
@@ -42,6 +43,7 @@ for (const n of MUSIC) {
   else missing.music.push(n);
 }
 
+let warnedProbe = false;
 let lineCount = 0;
 let voiced = 0;
 try {
@@ -54,6 +56,14 @@ try {
         if (v) {
           res.voice[l.id] = v;
           voiced++;
+          // реальная длительность дорожки: по ней строится тайминг сцен и субтитров
+          const r = spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path.join(pub, v)], {encoding: 'utf8'});
+          const d = parseFloat(r.stdout);
+          if (Number.isFinite(d)) res.voiceDur[l.id] = Math.round(d * 100) / 100;
+          else if (!warnedProbe) {
+            warnedProbe = true;
+            console.warn('ffprobe не найден: длительность озвучки оценивается по тексту (установите ffmpeg).');
+          }
         }
       }
     }

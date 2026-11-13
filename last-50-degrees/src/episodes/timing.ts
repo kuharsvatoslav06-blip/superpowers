@@ -1,5 +1,6 @@
 import {END_CARD_SEC, END_PAUSE_SEC, FPS} from '../config';
 import type {EpisodeDef, Line, SceneDef} from '../types';
+import {voiceDuration} from '../audio/durations';
 
 export interface ResolvedLine extends Line {
   at: number;
@@ -14,10 +15,13 @@ export const estimateDur = (text: string) => Math.max(1.1, text.replace(/\*/g, '
 export function resolveLines(epId: string, scene: SceneDef): ResolvedLine[] {
   let cursor = scene.lead ?? 0.35;
   return (scene.lines ?? []).map((l, i) => {
+    const id = `${epId}-${scene.id}-l${i + 1}`;
     const at = l.at ?? cursor + (l.gap ?? 0.12);
-    const dur = l.dur ?? estimateDur(l.text);
+    // если реплика озвучена — длительность берётся из файла, иначе из данных/оценки по тексту
+    const vd = voiceDuration(id);
+    const dur = vd !== undefined ? vd + 0.12 : (l.dur ?? estimateDur(l.text));
     cursor = at + dur;
-    return {...l, at, dur, id: `${epId}-${scene.id}-l${i + 1}`};
+    return {...l, at, dur, id};
   });
 }
 

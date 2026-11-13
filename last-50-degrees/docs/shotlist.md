@@ -2,19 +2,19 @@
 
 _Файл создан автоматически: `npm run docs`. Источник правды — `src/episodes/epNN.ts`._
 
-## Серия 1 · «ТЕМПЕРАТУРА 96°C» — 64.6 с
+## Серия 1 · «ТЕМПЕРАТУРА 96°C» — 73.0 с
 
 | Сцена | Длит. | Локация | Персонажи | Вставки | Звук/эффекты |
 |---|---|---|---|---|---|
-| s01 | 6.6 с | apartment | marc | thermo | siren, impact |
-| s02 | 8.4 с | apartment | marc | — | radio, static |
-| s03 | 4.9 с | apartment | marc | — | click |
-| s04 | 5.7 с | city | marc | thermo | wind, whoosh |
-| s05 | 5.3 с | city | marc | — | footsteps, wind |
-| s06 | 3.4 с | city/terminal | marc | — | hum, beep |
-| s07 | 9.2 с | city/terminal | marc | globe | beep, hum |
-| s08 | 3.9 с | city/terminal | marc | — | wind |
-| s09 | 6.3 с | city/terminal | marc | terminal | glitch, impact |
+| s01 | 8.3 с | apartment | marc | thermo | siren, impact |
+| s02 | 9.5 с | apartment | marc | — | radio, static |
+| s03 | 6.8 с | apartment | marc | — | click |
+| s04 | 5.5 с | city | marc | thermo | wind, whoosh |
+| s05 | 5.9 с | city | marc | — | footsteps, wind |
+| s06 | 4.1 с | city/terminal | marc | — | hum, beep |
+| s07 | 11.5 с | city/terminal | marc | globe | beep, hum |
+| s08 | 4.1 с | city/terminal | marc | — | wind |
+| s09 | 6.4 с | city/terminal | marc | terminal | glitch, impact |
 | s10 | 7.0 с | city/terminal | marc | terminal | glitch, heartbeat, stinger |
 
 Музыка: `tension`. Финал серии: сюжетный поворот → «Продолжение следует».
@@ -155,4 +155,4 @@ _Файл создан автоматически: `npm run docs`. Источн�
 
 Музыка: `tension`. Финал серии: финал сезона.
 
-**Итого сезон:** 634.4 с (10.6 мин).
+**Итого сезон:** 642.9 с (10.7 мин).
