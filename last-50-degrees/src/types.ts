@@ -277,6 +277,19 @@ export type MusicName = 'tension' | 'dark' | 'cold' | 'hope';
 
 /* ───────────────────────── Сцена и серия ───────────────────────── */
 
+/** Информационная полоса сверху: место, время, температура, датчики. */
+export interface HudDef {
+  /** С какой секунды сцены показывать (по умолчанию 0.3). */
+  at?: number;
+  place?: string;
+  /** Время «ЧЧ:ММ»: [от, до] — часы идут вперёд за время сцены. */
+  time?: [string, string?];
+  /** Температура °C: [от, до?]. */
+  temp?: [number, number?];
+  tempLabel?: string;
+  chips?: {label: string; value: string; tone?: 'ok' | 'warn' | 'alert'}[];
+}
+
 export interface SceneDef {
   id: string;
   /** Длительность в секундах. Если не указана — по последней реплике + хвост. */
@@ -288,6 +301,7 @@ export interface SceneDef {
   cam?: CameraDef;
   fx?: FxDef;
   inserts?: Insert[];
+  hud?: HudDef;
   lines?: Line[];
   sfx?: SfxCue[];
   /** Переход в начало сцены. */

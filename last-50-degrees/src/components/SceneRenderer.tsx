@@ -7,6 +7,7 @@ import {ActorsLayer} from './Actors';
 import {FxOverlay, GlitchBars, HeatFilter} from './Fx';
 import {InsertLayer} from './InsertLayer';
 import {Subtitles} from './Subtitles';
+import {Hud} from './Hud';
 import {SceneAudio} from './SceneAudio';
 import {LIGHT, LocationView, LocationFront} from '../locations';
 import {resolveLines, sceneSeconds, speakerOf} from '../episodes/timing';
@@ -84,6 +85,7 @@ export const SceneRenderer: React.FC<{ep: EpisodeDef; scene: SceneDef; last?: bo
         </svg>
         <FxOverlay fx={fx} t={t} f={f} />
         <InsertLayer inserts={scene.inserts ?? []} t={t} f={f} />
+        {scene.hud && <Hud hud={scene.hud} t={t} dur={dur} />}
       </AbsoluteFill>
       <Subtitles lines={lines} t={t} />
       <Transition name={tIn} t={t} />

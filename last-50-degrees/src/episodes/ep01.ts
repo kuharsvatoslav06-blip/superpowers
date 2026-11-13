@@ -16,6 +16,7 @@ export const ep01: EpisodeDef = {
     {
       id: 's01',
       note: 'Крупно градусник, красная тревога, Марк вскакивает.',
+      hud: {at: 3.8, place: 'КВАРТИРА · ЭТАЖ 14', time: ['05:58', '06:03'], chips: [{label: 'ВЛАЖНОСТЬ', value: '9%'}]},
       loc: {id: 'apartment', heat: 0.9},
       lead: 0.5,
       cam: {from: {x: 470, y: 650, zoom: 2.7}, to: {x: 400, y: 1000, zoom: 1.22}, ease: 'out', shake: 7, shakeAt: [0, 2.2]},
@@ -37,6 +38,7 @@ export const ep01: EpisodeDef = {
     /* 2. Радио. */
     {
       id: 's02',
+      hud: {place: 'КВАРТИРА · ЭТАЖ 14', time: ['06:04', '06:09'], temp: [54], tempLabel: 'ВОЗДУХ', chips: [{label: 'КАНАЛ', value: 'АВАРИЙНЫЙ', tone: 'warn'}]},
       loc: {id: 'apartment', heat: 0.9},
       tIn: 'dip',
       cam: {from: {x: 540, y: 1000, zoom: 1.05}, to: {x: 740, y: 1040, zoom: 1.6}},
@@ -48,7 +50,7 @@ export const ep01: EpisodeDef = {
           {t: 5.0, expr: 'determined'},
         ]),
       ],
-      inserts: [{type: 'radio', at: 0.35, dur: 7.4, from: 88.0, to: 101.5, banner: 'ТЕПЛОВАЯ ВОЛНА', y: 430, scale: 0.8}],
+      inserts: [{type: 'radio', at: 0.35, dur: 7.4, from: 88.0, to: 101.5, banner: 'ТЕПЛОВАЯ ВОЛНА', y: 500, scale: 0.8}],
       lines: [
         RADIO('Внимание! Новая *тепловая волна*. Всем оставаться в укрытиях.', {at: 1.7, note: 'сквозь помехи, плоский голос диктора'}),
         MARC('Значит… *пора*.', {gap: 0.5, note: 'тихо, сам себе'}),
@@ -61,6 +63,7 @@ export const ep01: EpisodeDef = {
     /* 3. Сборы. */
     {
       id: 's03',
+      hud: {place: 'КВАРТИРА · ЭТАЖ 14', time: ['06:10', '06:24'], temp: [54], chips: [{label: 'РЮКЗАК', value: '11 КГ'}]},
       loc: {id: 'apartment', heat: 0.8},
       cam: {from: {x: 300, y: 1130, zoom: 1.7}, to: {x: 330, y: 1060, zoom: 1.45}},
       fx: {dust: 0.6, vignette: 0.6, flicker: true},
@@ -75,7 +78,7 @@ export const ep01: EpisodeDef = {
           type: 'items',
           at: 0.25,
           dur: 5.2,
-          y: 380,
+          y: 430,
           scale: 0.72,
           title: 'ПОСЛЕДНИЕ ЗАПАСЫ',
           items: [
@@ -97,6 +100,7 @@ export const ep01: EpisodeDef = {
     {
       id: 's04',
       tIn: 'flash',
+      hud: {place: 'УЛИЦА · СЕКТОР 7', time: ['06:30', '06:34'], temp: [96], tempLabel: 'ПОВЕРХН.', chips: [{label: 'УФ', value: '16', tone: 'alert'}]},
       loc: {id: 'city', heat: 0.8},
       cam: {from: {x: 300, y: 1000, zoom: 1.18}, to: {x: 480, y: 1000, zoom: 1.1}},
       fx: {papers: 0.6, heat: 0.8, dust: 0.9, embers: 0.5, vignette: 0.45, rays: {x: 720, y: 620, opacity: 0.34}, tint: {color: '#ff7a2a', opacity: 0.08}, flashAt: [0]},
@@ -106,7 +110,7 @@ export const ep01: EpisodeDef = {
           {t: 4.6, x: 500},
         ]),
       ],
-      inserts: [{type: 'thermo', at: 0.4, dur: 4.4, from: 54, to: 96, label: 'НА УЛИЦЕ', y: 330}],
+      inserts: [{type: 'thermo', at: 0.4, dur: 4.4, from: 54, to: 96, label: 'НА УЛИЦЕ', y: 430}],
       lines: [N('Единственное место, где ещё можно *дышать* — подземное убежище.', {at: 0.5})],
       sfx: [
         {t: 0, name: 'wind', vol: 0.6},
@@ -116,6 +120,7 @@ export const ep01: EpisodeDef = {
     /* Панорама: Марк крошечный на фоне руин (без реплик — только атмосфера). */
     {
       id: 's04b',
+      hud: {place: 'СЕКТОР 7', time: ['06:41', '06:45'], temp: [96], chips: [{label: 'ВЕТЕР', value: '38 КМ/Ч'}, {label: 'ЛЮДЕЙ', value: '0', tone: 'warn'}]},
       loc: {id: 'city', heat: 0.85},
       dur: 3.6,
       cam: {from: {x: 520, y: 1010, zoom: 1.0}, to: {x: 640, y: 990, zoom: 1.1}},
@@ -131,6 +136,7 @@ export const ep01: EpisodeDef = {
     /* 5. Дорога по мёртвому городу. */
     {
       id: 's05',
+      hud: {place: 'ПРОСПЕКТ', time: ['07:05', '07:12'], temp: [96], chips: [{label: 'ПУТЬ', value: '2/3 КВ.'}, {label: 'ВОДА', value: '1.6 Л', tone: 'warn'}]},
       loc: {id: 'city', heat: 0.8},
       cam: {from: {x: 140, y: 1010, zoom: 1.12}, to: {x: 540, y: 1010, zoom: 1.12}, ease: 'linear'},
       fx: {papers: 0.6, heat: 0.8, dust: 1, embers: 0.7, vignette: 0.5, rays: {x: 720, y: 620, opacity: 0.28}},
@@ -150,6 +156,7 @@ export const ep01: EpisodeDef = {
     /* 6. Терминал. */
     {
       id: 's06',
+      hud: {place: 'ТЕРМИНАЛ № 07', time: ['07:20', '07:22'], temp: [97], chips: [{label: 'СЕТЬ', value: 'РЕЗЕРВ', tone: 'warn'}]},
       loc: {id: 'city', variant: 'terminal', heat: 0.8},
       cam: {from: {x: 540, y: 1010, zoom: 1.12}, to: {x: 660, y: 1000, zoom: 1.5}},
       fx: {papers: 0.6, heat: 0.7, dust: 0.8, embers: 0.4, vignette: 0.55},
@@ -191,6 +198,7 @@ export const ep01: EpisodeDef = {
     /* 8. Решение. */
     {
       id: 's08',
+      hud: {place: 'ПРОСПЕКТ', time: ['07:31'], temp: [97], chips: [{label: 'ЦЕЛЬ', value: 'СТАНЦИЯ'}]},
       loc: {id: 'city', variant: 'terminal', heat: 0.8},
       tIn: 'dip',
       cam: {from: {x: 520, y: 900, zoom: 2.3}, to: {x: 520, y: 890, zoom: 2.7}},
@@ -207,6 +215,7 @@ export const ep01: EpisodeDef = {
     /* 9. Первое сообщение. */
     {
       id: 's09',
+      hud: {place: 'ТЕРМИНАЛ № 07', time: ['07:32'], temp: [98], chips: [{label: 'СИГНАЛ', value: 'НЕИЗВЕСТЕН', tone: 'alert'}]},
       loc: {id: 'city', variant: 'terminal', heat: 0.9},
       tIn: 'glitch',
       cam: {from: {x: 640, y: 1000, zoom: 1.3}, to: {x: 640, y: 1000, zoom: 1.4}, shake: 5, shakeAt: [0, 0.6]},
@@ -240,6 +249,7 @@ export const ep01: EpisodeDef = {
     /* 10. Второе сообщение — поворот. */
     {
       id: 's10',
+      hud: {place: 'ТЕРМИНАЛ № 07', time: ['07:33'], temp: [98], chips: [{label: 'СИГНАЛ', value: 'ТЕРМИНАЛ', tone: 'alert'}]},
       loc: {id: 'city', variant: 'terminal', heat: 0.9},
       dur: 7.0,
       cam: {from: {x: 640, y: 1000, zoom: 1.4}, to: {x: 520, y: 900, zoom: 2.6}, ease: 'in'},
