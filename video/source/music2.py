@@ -301,8 +301,40 @@ with wave.open(sys.argv[1]) as wf:
 v = v / (np.max(np.abs(v)) + 1e-9) * 0.75
 xL, xR = sfx_layer(v)
 
+# ---- narration (optional) ----
+if len(sys.argv) > 4:
+    import json
+    spans = json.load(open(sys.argv[4]))
+    act = np.zeros(N, bool)
+    pts = [(0, 0)]
+    for a, b in spans:
+        pts += [(a - 0.25, 0), (a - 0.05, 1), (b + 0.2, 1), (b + 0.5, 0)]
+        act[int(a * SR):int(b * SR)] = True
+    pts.append((90, 0))
+    g = np.clip(env_pts(pts), 0, 1)
+    mL *= 1 - 0.5 * g; mR *= 1 - 0.5 * g
+    xL *= 1 - 0.25 * g; xR *= 1 - 0.25 * g
+    with wave.open(sys.argv[3]) as wf:
+        nar = np.frombuffer(wf.readframes(wf.getnframes()), dtype=np.int16).astype(float) / 32768
+    nar = np.pad(nar, (0, max(0, N - len(nar))))[:N]
+    hook = np.zeros(N); add_at(hook, 0.25, v)
+    def arms(x): x = x[np.abs(x) > 0.02]; return np.sqrt((x ** 2).mean())
+    nar *= arms(hook) / arms(nar)
+    bg = (mL + xL)[act]; vv = nar[act]
+    print('voice/bg dB before', 20*np.log10(np.sqrt((vv**2).mean())/np.sqrt((bg**2).mean())))
+    target = float(sys.argv[5]) if len(sys.argv) > 5 else 9.0
+    k = 10 ** (target / 20) * np.sqrt((bg ** 2).mean()) / np.sqrt((vv ** 2).mean())
+    nar *= k
+    xL += nar; xR += nar
+    # bring the opening line to the same voice/bed ratio
+    ha = np.abs(hook) > 0.02
+    hb = (mL + xL - hook)[ha]
+    kh = 10 ** (target / 20) * np.sqrt((hb ** 2).mean()) / np.sqrt((hook[ha] ** 2).mean())
+    print('hook gain', kh, 'nar gain', k)
+    if kh > 1: xL += hook * (kh - 1); xR += hook * (kh - 1)
+
 L = mL + xL; R = mR + xR
-fade = env_pts([(0, 1), (88.2, 1), (90, 0)])
+fade = env_pts([(0, 1), (88.7, 1), (90, 0)])
 L *= fade; R *= fade
 st = np.stack([L, R], 1)
 st = np.tanh(st * 1.15) / np.tanh(1.15)
