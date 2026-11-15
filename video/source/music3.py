@@ -113,6 +113,7 @@ mL = SL * 1.0 + PL * 1.0 + KL * 0.9
 mR = SR_ * 1.0 + PR * 1.0 + KR * 0.9
 wetL = reverb(SL * 0.8 + PL + KL * 0.5, 1); wetR = reverb(SR_ * 0.8 + PR + KR * 0.5, 2)
 mL = mL + wetL * 0.35; mR = mR + wetR * 0.35
+mL = np.tanh(mL / np.max(np.abs(mL)) * 2.2) / np.tanh(2.2); mR = np.tanh(mR / np.max(np.abs(mR)) * 2.2) / np.tanh(2.2)
 scale = 0.5 / max(np.max(np.abs(mL)), np.max(np.abs(mR)))
 mL *= scale; mR *= scale
 duck = 1 - 0.45 * env_pts([(0, 0), (0.2, 1), (2.8, 1), (3.3, 0), (90, 0)])
@@ -136,7 +137,7 @@ if len(sys.argv) > 4:
         act[int(a * SR):int(b * SR)] = True
     pts.append((90, 0))
     g = np.clip(env_pts(pts), 0, 1)
-    mL *= 1 - 0.25 * g; mR *= 1 - 0.25 * g
+    mL *= 1 - 0.1 * g; mR *= 1 - 0.1 * g
     xL *= 1 - 0.25 * g; xR *= 1 - 0.25 * g
     with wave.open(sys.argv[3]) as wf:
         nar = np.frombuffer(wf.readframes(wf.getnframes()), dtype=np.int16).astype(float) / 32768

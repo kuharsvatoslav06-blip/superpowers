@@ -36,12 +36,12 @@ def put(bufL, bufR, at, s, pan=0.5):
 
 # --- section intensities (0..1) ---
 def k(pts, x): xs, ys = zip(*pts); return float(np.interp(x, xs, ys))
-BASS_ON = [(0, 0), (2.9, 0), (3.0, 0.55), (8, 0.8), (26, 0.8), (47.6, 1.0), (47.7, 0), (48, 1), (53.4, 1), (53.5, 0), (58.9, 0), (59, 0.9), (70, 0.9), (70.01, 0.65), (88, 0.6), (90, 0.3)]
+BASS_ON = [(0, 0), (2.9, 0), (3.0, 0.55), (8, 0.8), (26, 0.8), (47.6, 1.0), (47.7, 0), (48, 1), (53.4, 1), (53.5, 0.6), (58.9, 0.7), (59, 0.95), (70, 0.9), (70.01, 0.8), (88, 0.75), (90, 0.4)]
 BASS_CUT = [(0, 300), (8, 380), (26, 420), (47, 1500), (48, 700), (59, 800), (70, 900), (90, 900)]
-ARP_ON = [(0, 0), (8, 0), (8.01, 0.6), (26, 0.8), (47.6, 1), (47.7, 0), (48, 0.9), (53.4, 0.9), (53.5, 0.35), (59, 0.9), (70, 0.9), (90, 0.8)]
-ARP_CUT = [(0, 900), (8, 1100), (26, 1300), (47, 4000), (48, 1800), (59, 2000), (70, 2600), (90, 2200)]
+ARP_ON = [(0, 0), (8, 0), (8.01, 0.6), (26, 0.8), (47.6, 1), (47.7, 0), (48, 0.9), (53.4, 0.9), (53.5, 0.7), (59, 0.95), (70, 0.9), (90, 0.8)]
+ARP_CUT = [(0, 900), (8, 1100), (26, 1300), (47, 4000), (48, 1800), (59, 2000), (70, 2000), (90, 1800)]
 BELL_ON = [(0, 0.5), (8, 0.7), (26, 0.7), (47.6, 0.9), (47.7, 0), (48, 0.8), (70, 1.0), (90, 0.8)]
-HAT_ON = [(0, 0), (31.5, 0), (32, 0.4), (47.6, 1), (47.7, 0), (48, 0.7), (53.5, 0), (59, 0), (59.1, 0.6), (70, 0.9), (70.01, 0.35), (90, 0.3)]
+HAT_ON = [(0, 0), (3, 0), (3.01, 0.25), (26, 0.3), (32, 0.45), (47.6, 1), (47.7, 0), (48, 0.7), (53.5, 0.5), (59, 0.6), (70, 0.9), (70.01, 0.5), (90, 0.5)]
 CLAP_ON = [(0, 0), (37, 0), (37.01, 0.7), (47.6, 1), (47.7, 0), (48, 0.9), (53.5, 0), (59, 0), (64.5, 0), (64.51, 0.8), (70, 0.8), (70.01, 0), (90, 0)]
 
 # chord per bar (root midi of bass, triad tones for arp/pad)
@@ -49,8 +49,8 @@ DM, BB, C, A_, F, GM = (38, [62, 65, 69]), (34, [58, 62, 65]), (36, [60, 64, 67]
 def chord_at(tt):
     if tt < 26:  prog = [DM, DM, C, BB, DM, DM, C, A_]
     elif tt < 48: prog = [DM, BB, C, A_]
-    elif tt < 70: prog = [DM, DM, (39, [63, 67, 70]), DM]   # Eb for dread
-    else: prog = [F, C, DM, BB]
+    elif tt < 70: prog = [DM, BB, C, A_]
+    else: prog = [DM, BB, F, C]
     return prog[int(tt // BAR) % len(prog)]
 
 
@@ -73,6 +73,7 @@ while tt < 90:
         put(SL, SR_, tt, s * e * on * acc * 0.32, 0.5)
     tt += step
 
+def lerp_cut(x): return float(np.interp(x, [0, 26, 47, 48, 70, 90], [500, 650, 1300, 800, 950, 900]))
 # ---- pad: dark detuned saws, chord per bar ----
 PAD_ON = [(0, 0.6), (3, 0.5), (8, 0.55), (26, 0.5), (47.6, 0.9), (47.7, 0.3), (48, 0.6), (53.5, 0.9), (59, 0.6), (70, 0.7), (88, 0.8), (90, 0.4)]
 for b in range(int(90 / BAR) + 1):
@@ -84,10 +85,8 @@ for b in range(int(90 / BAR) + 1):
     for m in notes:
         for d in (-0.006, 0.0, 0.007):
             s += wt(SAW, hz(m) * (1 + d) * (1 + 0.002 * np.sin(2 * np.pi * 0.3 * tau)), n)
-    s = lp_short(s, 700 if t0 < 70 else 1100) * e / (3 * len(notes))
+    s = lp_short(s, lerp_cut(t0)) * e / (3 * len(notes))
     a = k(PAD_ON, t0)
-    if 53.5 <= t0 < 59:  # breakdown: warped pad
-        s = lp_short(s * (1 + 0.5 * np.sin(2 * np.pi * 5 * tau)), 900)
     put(SL, SR_, t0, s * a * 0.55, 0.35 + 0.3 * (b % 2))
 
 # ---- triplet pluck arp ----
@@ -128,7 +127,7 @@ for b in range(0, int(90 / BAR), 2):
     root, tri = chord_at(t0)
     base = hz(tri[2] + 12) if t0 < 70 else hz(tri[1] + 12)
     dur = BAR * 1.3; n = int(dur * SR); tau = np.arange(n) / SR
-    glide = np.where(tau < 0.25, 2 ** (-(1 - tau / 0.25) * 3 / 12), 1.0) * np.where(tau > dur - 0.5, 2 ** (-((tau - (dur - 0.5)) / 0.5) * 5 / 12), 1.0)
+    glide = np.where(tau < 0.25, 2 ** (-(1 - tau / 0.25) * 3 / 12), 1.0) 
     f = base * glide * (1 + 0.006 * np.sin(2 * np.pi * 5.5 * tau) * np.minimum(1, tau / 0.6))
     s = wt(SAW, f, n) * 0.3 + np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.7
     s = lp_short(s, 2500) * np.minimum(1, tau / 0.15) * np.minimum(1, (dur - tau) / 0.3)
@@ -168,3 +167,10 @@ for t0, t1, a in ((42.0, 47.65, 0.06), (66.0, 69.9, 0.04)):
     n = int((t1 - t0) * SR); tau = np.arange(n) / SR
     s = fft_filter(rs.standard_normal(n), lo=1500, hi=9000) * (tau / (t1 - t0)) ** 3
     put(KL, KR, t0, s * a, 0.5)
+
+# ---- low sustained drone (weight + tension), slowly swelling ----
+DR = [(0, 0.5), (8, 0.6), (26, 0.7), (47.6, 1.0), (47.7, 0.6), (48, 0.85), (70, 0.95), (88, 0.9), (90, 0.5)]
+n = N; tau = t
+dr = (wt(SAW, hz(26), n) * 0.6 + np.sin(2 * np.pi * hz(26) * tau) * 0.6 + wt(SAW, hz(33) * 1.003, n) * 0.3)
+dr = fft_filter(dr, lo=25, hi=260) * env_pts(DR) * (0.85 + 0.15 * np.sin(2 * np.pi * 0.125 * tau))
+SL += dr * 0.16; SR_ += dr * 0.16
