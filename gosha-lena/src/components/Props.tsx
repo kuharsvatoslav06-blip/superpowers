@@ -1,0 +1,207 @@
+import React from 'react';
+import { Img, staticFile } from 'remotion';
+import { INK, clamp, popScale } from '../anim';
+import { Gosha } from '../characters/Gosha';
+
+/* ---------------- Телефон с чатом ---------------- */
+export const Phone: React.FC<{
+  contact: string; avatar: string; status: string;
+  messages: { t: number; from: 'her' | 'me'; text: string; time?: string }[];
+  typing?: number[];
+  time: number; at: number;
+}> = ({ contact, avatar, status, messages, typing = [], time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  const typingOn = typing.some((t0, i) => i % 2 === 0 && time >= t0 && time < (typing[i + 1] ?? t0 + 1));
+  return (
+    <div style={{ position: 'absolute', left: 150, top: 330, width: 780, height: 1080, transform: `scale(${s})`, transformOrigin: '50% 60%' }}>
+      <div style={{ position: 'absolute', inset: 0, background: '#14141C', borderRadius: 80, border: `8px solid ${INK}`, boxShadow: '0 24px 0 rgba(0,0,0,0.3)' }} />
+      <div style={{ position: 'absolute', left: 22, top: 22, right: 22, bottom: 22, borderRadius: 60, overflow: 'hidden', background: '#DDE8CF' }}>
+        {/* узор фона чата */}
+        <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.25 }}>
+          {Array.from({ length: 30 }).map((_, i) => (
+            <circle key={i} cx={(i * 137) % 740} cy={(i * 251) % 1040} r={10 + (i % 3) * 6} fill="none" stroke="#7A9A6A" strokeWidth={4} />
+          ))}
+        </svg>
+        {/* шапка */}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 170, background: '#fff', borderBottom: '3px solid #D8D8D8', display: 'flex', alignItems: 'center', padding: '40px 30px 0', gap: 22 }}>
+          <div style={{ fontFamily: 'Inter', fontWeight: 900, fontSize: 56, color: '#2F8BEA' }}>‹</div>
+          <Img src={staticFile(avatar)} style={{ width: 96, height: 96, borderRadius: 48, border: `4px solid ${INK}` }} />
+          <div>
+            <div style={{ fontFamily: 'Inter', fontWeight: 800, fontSize: 42, color: '#111' }}>{contact} <span style={{ color: '#FF4F8B' }}>♥</span></div>
+            <div style={{ fontFamily: 'Inter', fontWeight: 600, fontSize: 30, color: typingOn ? '#2F8BEA' : '#2F8BEA' }}>{typingOn ? 'печатает…' : status}</div>
+          </div>
+        </div>
+        {/* время */}
+        <div style={{ position: 'absolute', top: 10, left: 50, fontFamily: 'Inter', fontWeight: 800, fontSize: 26, color: '#111' }}>21:47</div>
+        {/* сообщения */}
+        <div style={{ position: 'absolute', left: 26, right: 26, top: 200, display: 'flex', flexDirection: 'column', gap: 22 }}>
+          {messages.map((m, i) => {
+            const k = popScale(time, m.t);
+            if (k <= 0) return null;
+            const her = m.from === 'her';
+            return (
+              <div key={i} style={{ alignSelf: her ? 'flex-start' : 'flex-end', maxWidth: '82%', transform: `scale(${k})`, transformOrigin: her ? '0% 100%' : '100% 100%' }}>
+                <div style={{ background: her ? '#fff' : '#D6F5B8', borderRadius: 34, borderBottomLeftRadius: her ? 8 : 34, borderBottomRightRadius: her ? 34 : 8, padding: '22px 30px 14px', border: `4px solid ${INK}`, boxShadow: '0 6px 0 rgba(0,0,0,0.15)' }}>
+                  <div style={{ fontFamily: 'Inter, Noto Color Emoji', fontWeight: 600, fontSize: 42, lineHeight: 1.25, color: '#111' }}>{m.text}</div>
+                  <div style={{ fontFamily: 'Inter', fontSize: 22, color: '#8A8A8A', textAlign: 'right', marginTop: 4 }}>{m.time ?? '21:47'}{her ? '' : ' ✓✓'}</div>
+                </div>
+              </div>
+            );
+          })}
+          {typingOn && (
+            <div style={{ alignSelf: 'flex-start', background: '#fff', borderRadius: 34, padding: '24px 30px', border: `4px solid ${INK}`, display: 'flex', gap: 12 }}>
+              {[0, 1, 2].map((d) => (
+                <div key={d} style={{ width: 18, height: 18, borderRadius: 9, background: '#999', transform: `translateY(${Math.sin(time * 12 - d) * 6}px)` }} />
+              ))}
+            </div>
+          )}
+        </div>
+        {/* поле ввода */}
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 120, background: '#fff', borderTop: '3px solid #D8D8D8', display: 'flex', alignItems: 'center', padding: '0 26px', gap: 18 }}>
+          <div style={{ flex: 1, height: 70, borderRadius: 35, background: '#EFEFF2', fontFamily: 'Inter', fontSize: 30, color: '#9A9AA2', display: 'flex', alignItems: 'center', paddingLeft: 30 }}>Сообщение</div>
+          <div style={{ width: 70, height: 70, borderRadius: 35, background: '#2F8BEA', color: '#fff', fontSize: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>➤</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Фото «с моря» (накачанный парень) ---------------- */
+export const BeachPhoto: React.FC<{ x: number; y: number; w: number; rot?: number; caption?: string; stamp?: string; stampAt?: number; time: number; at: number }> = ({ x, y, w, rot = -4, caption, stamp, stampAt = 99, time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  const st = popScale(time, stampAt);
+  const h = w * 1.18;
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rot}deg) scale(${s})` }}>
+      <div style={{ position: 'absolute', inset: 0, background: '#FBFBF5', border: `7px solid ${INK}`, borderRadius: 14, boxShadow: '0 16px 0 rgba(0,0,0,0.3)' }} />
+      <svg viewBox="0 0 400 400" style={{ position: 'absolute', left: w * 0.06, top: w * 0.06, width: w * 0.88, height: w * 0.88, border: `5px solid ${INK}`, boxSizing: 'border-box' }}>
+        <rect width={400} height={400} fill="#7FD3F7" />
+        <circle cx={320} cy={80} r={40} fill="#FFE066" />
+        <rect y={220} width={400} height={80} fill="#2E9FD8" />
+        <path d="M 0 232 Q 50 222 100 232 T 200 232 T 300 232 T 400 232" fill="none" stroke="#fff" strokeWidth={5} />
+        <rect y={290} width={400} height={110} fill="#F4D58D" />
+        {/* качок */}
+        <g transform="translate(200 0)" stroke={INK} strokeWidth={5} strokeLinejoin="round">
+          {/* ноги */}
+          <rect x={-42} y={300} width={34} height={90} fill="#D9935F" />
+          <rect x={8} y={300} width={34} height={90} fill="#D9935F" />
+          {/* руки-бицепсы (согнуты) */}
+          <path d="M -70 175 C -120 175 -140 150 -130 110 C -125 90 -105 88 -100 105 L -95 140 L -60 150 Z" fill="#E0A06A" />
+          <path d="M 70 175 C 120 175 140 150 130 110 C 125 90 105 88 100 105 L 95 140 L 60 150 Z" fill="#E0A06A" />
+          <circle cx={-112} cy={98} r={18} fill="#E0A06A" />
+          <circle cx={112} cy={98} r={18} fill="#E0A06A" />
+          {/* торс V */}
+          <path d="M -85 160 C -85 140 -60 132 0 132 C 60 132 85 140 85 160 L 50 290 L -50 290 Z" fill="#E0A06A" />
+          <path d="M -30 175 Q 0 190 30 175 M 0 190 L 0 280 M -22 215 L 22 215 M -20 245 L 20 245" fill="none" strokeWidth={4} stroke="#A9683C" />
+          {/* шорты */}
+          <path d="M -52 285 L 52 285 L 48 330 L 4 330 L 0 310 L -4 330 L -48 330 Z" fill="#E34B4B" />
+          {/* голова */}
+          <rect x={-14} y={110} width={28} height={28} fill="#E0A06A" />
+          <ellipse cx={0} cy={88} rx={34} ry={40} fill="#E0A06A" />
+          <path d="M -36 72 C -36 40 36 40 36 72 C 20 60 -20 60 -36 72 Z" fill="#3A2A1E" />
+          <rect x={-32} y={80} width={64} height={18} rx={6} fill={INK} />
+          <path d="M -12 112 Q 0 120 12 112" fill="none" strokeWidth={4} />
+        </g>
+      </svg>
+      {caption && (
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: w * 0.03, textAlign: 'center', fontFamily: 'Inter', fontWeight: 800, fontStyle: 'italic', fontSize: w * 0.1, color: '#222' }}>{caption}</div>
+      )}
+      {stamp && st > 0 && (
+        <div style={{ position: 'absolute', right: -w * 0.12, bottom: w * 0.22, transform: `rotate(-14deg) scale(${st})`, fontFamily: 'Oswald', fontWeight: 700, fontSize: w * 0.15, color: '#fff', background: '#FF3B47', border: `7px solid ${INK}`, borderRadius: 16, padding: '0 22px' }}>{stamp}</div>
+      )}
+    </div>
+  );
+};
+
+/* ---------------- Стол + кулак + кружка ---------------- */
+export const Desk: React.FC<{ punchAt: number; fistX: number; time: number }> = ({ punchAt, fistX, time }) => {
+  const d = time - punchAt;
+  // кулак: замах вверх, удар, отскок
+  const fistY = d < -0.5 ? 900 : d < 0 ? 900 - 220 * Math.sin(((d + 0.5) / 0.5) * Math.PI * 0.5) : d < 0.12 ? 680 + (1060 - 680) * clamp(d / 0.08) : 1060;
+  // кружка подпрыгивает
+  const mugJump = d > 0 && d < 0.5 ? -Math.sin((d / 0.5) * Math.PI) * 130 : 0;
+  const mugRot = d > 0 && d < 0.5 ? Math.sin((d / 0.5) * Math.PI * 2) * 18 : 0;
+  return (
+    <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
+      {/* столешница */}
+      <rect x={-20} y={1150} width={1120} height={60} fill="#8A5A3A" stroke={INK} strokeWidth={10} />
+      <rect x={-20} y={1210} width={1120} height={420} fill="#6E452B" stroke={INK} strokeWidth={10} />
+      <rect x={60} y={1260} width={420} height={140} rx={10} fill="#7C4F33" stroke={INK} strokeWidth={8} />
+      <rect x={600} y={1260} width={420} height={140} rx={10} fill="#7C4F33" stroke={INK} strokeWidth={8} />
+      <rect x={240} y={1320} width={60} height={14} rx={6} fill={INK} />
+      <rect x={780} y={1320} width={60} height={14} rx={6} fill={INK} />
+      {/* кружка */}
+      <g transform={`translate(0 ${mugJump}) rotate(${mugRot} 800 1080)`}>
+        <path d="M 860 1030 C 900 1030 900 1100 860 1100" fill="none" stroke={INK} strokeWidth={14} />
+        <rect x={740} y={1000} width={125} height={152} rx={14} fill="#F2F2F2" stroke={INK} strokeWidth={10} />
+        <text x={802} y={1068} fontFamily="Inter" fontWeight={900} fontSize={30} fill={INK} textAnchor="middle">НЕ</text>
+        <text x={802} y={1106} fontFamily="Inter" fontWeight={900} fontSize={28} fill="#C9302C" textAnchor="middle">БУДИТЬ</text>
+      </g>
+      {/* предплечье и кулак */}
+      <g transform={`translate(${fistX} ${fistY})`}>
+        <path d="M -70 40 L 70 40 L 90 700 L -90 700 Z" fill="#F4C6A0" stroke={INK} strokeWidth={10} strokeLinejoin="round" />
+        <rect x={-95} y={-90} width={190} height={150} rx={60} fill="#F4C6A0" stroke={INK} strokeWidth={10} />
+        {[-45, 0, 45].map((dx) => (
+          <path key={dx} d={`M ${dx} -88 L ${dx} -40`} stroke={INK} strokeWidth={7} strokeLinecap="round" />
+        ))}
+        <path d="M -95 -10 C -60 -30 -30 -10 -10 10" fill="none" stroke={INK} strokeWidth={7} strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+};
+
+/* ---------------- Полоска прогресса ---------------- */
+export const ProgressBar: React.FC<{ x: number; y: number; w: number; value: number; label?: string; time: number; at: number }> = ({ x, y, w, value, label, time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  const blink = Math.floor(time * 3) % 2 === 0;
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, width: w, transform: `translate(-50%,-50%) scale(${s})` }}>
+      {label && (
+        <div style={{ fontFamily: 'Oswald', fontWeight: 700, fontSize: 120, color: '#fff', textAlign: 'center', WebkitTextStroke: `16px ${INK}`, paintOrder: 'stroke fill', lineHeight: 1 }}>{label}</div>
+      )}
+      <div style={{ fontFamily: 'Oswald', fontWeight: 700, fontSize: 260, color: '#B8FFCB', textAlign: 'center', WebkitTextStroke: `22px ${INK}`, paintOrder: 'stroke fill', lineHeight: 1.05 }}>{value}%</div>
+      <div style={{ height: 96, borderRadius: 48, background: '#123A22', border: `8px solid ${INK}`, overflow: 'hidden', position: 'relative', boxShadow: '0 10px 0 rgba(0,0,0,0.25)' }}>
+        <div style={{ width: `${Math.max(value, 0)}%`, height: '100%', background: '#4BE07F' }} />
+        <div style={{ position: 'absolute', left: 24, top: 16, width: 14, height: 48, borderRadius: 7, background: '#4BE07F', opacity: blink ? 1 : 0.2 }} />
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Вариант выбора ---------------- */
+export const Choice: React.FC<{ x: number; y: number; w: number; text: string; color: string; num: string; rot?: number; time: number; at: number }> = ({ x, y, w, text, color, num, rot = 0, time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, width: w, transform: `translate(-50%,-50%) rotate(${rot}deg) scale(${s})`, background: color, border: `8px solid ${INK}`, borderRadius: 30, padding: '26px 30px', display: 'flex', alignItems: 'center', gap: 28, boxShadow: '0 12px 0 rgba(0,0,0,0.3)' }}>
+      <div style={{ flex: 'none', width: 110, height: 110, borderRadius: 55, background: '#fff', border: `7px solid ${INK}`, fontFamily: 'Oswald', fontWeight: 700, fontSize: 76, color: INK, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{num}</div>
+      <div style={{ fontFamily: 'Oswald', fontWeight: 700, fontSize: 64, lineHeight: 1.08, color: '#fff', textShadow: '0 4px 0 rgba(0,0,0,0.3)' }}>{text}</div>
+    </div>
+  );
+};
+
+/* ---------------- Комментарий ---------------- */
+export const Comment: React.FC<{ x: number; y: number; w: number; name: string; text: string; likes: number; avatarColor?: string; time: number; at: number }> = ({ x, y, w, name, text, likes, avatarColor = '#F2994A', time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  const likeShown = Math.round(likes * clamp((time - at) / 1.2));
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, width: w, transform: `scale(${s})`, transformOrigin: '0 50%', background: '#fff', border: `6px solid ${INK}`, borderRadius: 28, padding: '20px 24px', display: 'flex', gap: 20, alignItems: 'center', boxShadow: '0 10px 0 rgba(0,0,0,0.25)' }}>
+      <div style={{ flex: 'none', width: 76, height: 76, borderRadius: 38, background: avatarColor, border: `5px solid ${INK}` }} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontFamily: 'Inter', fontWeight: 700, fontSize: 26, color: '#8A8A95' }}>{name}</div>
+        <div style={{ fontFamily: 'Inter', fontWeight: 800, fontSize: 38, color: '#15151F', lineHeight: 1.2 }}>{text}</div>
+      </div>
+      <div style={{ flex: 'none', textAlign: 'center', fontFamily: 'Inter', fontWeight: 800 }}>
+        <div style={{ fontSize: 44, color: '#FF3B5C', lineHeight: 1 }}>♥</div>
+        <div style={{ fontSize: 28, color: '#15151F' }}>{likeShown}</div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Гоша как слой ---------------- */
+export { Gosha };

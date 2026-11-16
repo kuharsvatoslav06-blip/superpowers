@@ -1,0 +1,774 @@
+{
+  "id": "day01",
+  "title": "Гоша и Лена — День 1",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "voice": {
+    "src": "voice/day01.mp3",
+    "stub": "voice/day01_silence.mp3",
+    "volume": 1
+  },
+  "music": {
+    "src": "music/theme.mp3",
+    "volume": 0.18
+  },
+  "hud": {
+    "days": 30,
+    "progress": 0
+  },
+  "scenes": [
+    {
+      "id": "01-intro",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "hud": false,
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "caption": {
+        "text": "Это **Гоша**. До встречи с Леной ровно тридцать дней",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 4.6
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "stink": true,
+          "pop": true,
+          "t": 0,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            }
+          ]
+        },
+        {
+          "type": "fly",
+          "t": 0,
+          "orbit": {
+            "cx": 540,
+            "cy": 470,
+            "rx": 260,
+            "ry": 70,
+            "speed": 2.2
+          }
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 0.2,
+          "text": "30 ДНЕЙ ДО ВСТРЕЧИ",
+          "x": 540,
+          "y": 290,
+          "color": "#FF3B47",
+          "size": 76,
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "02-closeup",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        },
+        {
+          "t": 0.8,
+          "zoom": 2,
+          "x": 513,
+          "y": 700
+        },
+        {
+          "t": 5,
+          "zoom": 2.08,
+          "x": 513,
+          "y": 700
+        }
+      ],
+      "caption": {
+        "text": "Посмотрите на него. Прыщи, борода и… **антенна**",
+        "accent": "red",
+        "start": 0.3,
+        "end": 4.4
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 3.4,
+              "antenna": "up",
+              "eyes": "worried"
+            }
+          ]
+        },
+        {
+          "type": "arrowLabel",
+          "screen": true,
+          "t": 1.7,
+          "text": "ПРЫЩИ",
+          "x": 190,
+          "y": 770,
+          "tx": 300,
+          "ty": 980,
+          "color": "#FF3B47",
+          "rot": -5
+        },
+        {
+          "type": "arrowLabel",
+          "screen": true,
+          "t": 2.5,
+          "text": "БОРОДА 2 ГОДА",
+          "x": 790,
+          "y": 1340,
+          "tx": 690,
+          "ty": 1230,
+          "color": "#8A5A3A",
+          "rot": 3
+        },
+        {
+          "type": "arrowLabel",
+          "screen": true,
+          "t": 3.4,
+          "text": "АНТЕННА",
+          "x": 850,
+          "y": 330,
+          "tx": 640,
+          "ty": 400,
+          "color": "#2F6FD6",
+          "rot": 4
+        }
+      ]
+    },
+    {
+      "id": "03-belly",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 0.7,
+          "zoom": 1.75,
+          "x": 513,
+          "y": 1240
+        },
+        {
+          "t": 5,
+          "zoom": 1.82,
+          "x": 513,
+          "y": 1240
+        }
+      ],
+      "caption": {
+        "text": "А это его главное **достижение**",
+        "accent": "red",
+        "start": 0.3,
+        "end": 3.6
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 2.2,
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "fly",
+          "t": 0,
+          "orbit": {
+            "cx": 513,
+            "cy": 1110,
+            "rx": 220,
+            "ry": 60,
+            "speed": 2.6
+          },
+          "land": {
+            "t": 3.0,
+            "x": 600,
+            "y": 1190
+          }
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.0,
+          "text": "ПУЗО: 1 шт.",
+          "x": 540,
+          "y": 520,
+          "color": "#FF3B47",
+          "size": 100,
+          "rot": -4
+        }
+      ]
+    },
+    {
+      "id": "04-chat",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "text": "И тут пишет **Лена**",
+        "accent": "pink",
+        "start": 0.3,
+        "end": 2.0
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": 0,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "typing": [
+            0.3,
+            0.9,
+            2.8,
+            3.7
+          ],
+          "messages": [
+            {
+              "t": 0.9,
+              "from": "her",
+              "text": "Гош, привет! Через месяц приеду, наконец увидимся вживую 😄"
+            },
+            {
+              "t": 3.7,
+              "from": "her",
+              "text": "Ты же такой же, как на фото?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "05-fake-photo",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "purple"
+      },
+      "caption": {
+        "text": "Только на фото был **не он**",
+        "accent": "red",
+        "start": 0.4,
+        "end": 2.6
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": -1,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "messages": [
+            {
+              "t": -1,
+              "from": "her",
+              "text": "Гош, привет! Через месяц приеду, наконец увидимся вживую 😄"
+            },
+            {
+              "t": -1,
+              "from": "her",
+              "text": "Ты же такой же, как на фото?"
+            }
+          ]
+        },
+        {
+          "type": "beachPhoto",
+          "t": 0.5,
+          "x": 540,
+          "y": 860,
+          "w": 600,
+          "rot": -5,
+          "caption": "это я",
+          "stamp": "(НЕТ)",
+          "stampAt": 2.2
+        }
+      ]
+    },
+    {
+      "id": "06-shock",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1.5,
+          "x": 513,
+          "y": 760
+        },
+        {
+          "t": 0.5,
+          "zoom": 1.8,
+          "x": 513,
+          "y": 720
+        },
+        {
+          "t": 5,
+          "zoom": 1.85,
+          "x": 513,
+          "y": 720
+        }
+      ],
+      "shake": [
+        {
+          "t": 0.5,
+          "dur": 0.9,
+          "amp": 28
+        }
+      ],
+      "caption": {
+        "text": "Тридцать… **дней**?!",
+        "accent": "red",
+        "start": 0.4,
+        "end": 2.2
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 0.5,
+              "eyes": "shock",
+              "mouth": "open",
+              "antenna": "up",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "exclaim",
+          "screen": true,
+          "t": 0.55,
+          "x": 140,
+          "y": 600,
+          "rot": -12
+        },
+        {
+          "type": "exclaim",
+          "screen": true,
+          "t": 0.65,
+          "x": 945,
+          "y": 600,
+          "rot": 12
+        },
+        {
+          "type": "bigText",
+          "screen": true,
+          "t": 0.9,
+          "text": "30 ДНЕЙ?!",
+          "x": 540,
+          "y": 1240,
+          "size": 130,
+          "color": "#FFD23A",
+          "shake": 4,
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "07-punch",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "orange"
+      },
+      "shake": [
+        {
+          "t": 1.0,
+          "dur": 0.5,
+          "amp": 32
+        }
+      ],
+      "caption": {
+        "text": "Всё. Пора **меняться**",
+        "accent": "green",
+        "start": 0.8,
+        "end": 3.4
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 330,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "angry",
+              "mouth": "grit"
+            }
+          ]
+        },
+        {
+          "type": "desk",
+          "punchAt": 1.0,
+          "fistX": 330
+        },
+        {
+          "type": "impact",
+          "t": 1.0,
+          "x": 330,
+          "y": 1150,
+          "size": 300
+        },
+        {
+          "type": "sticker",
+          "t": 1.1,
+          "text": "ВСЁ.",
+          "x": 800,
+          "y": 300,
+          "color": "#FF3B47",
+          "size": 120,
+          "rot": 6
+        }
+      ]
+    },
+    {
+      "id": "08a-goal",
+      "duration": 3.5,
+      "bg": {
+        "type": "rays",
+        "color": "blue"
+      },
+      "caption": {
+        "text": "Цель: стать **человеком**.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 2.6
+      },
+      "layers": [
+        {
+          "type": "sticker",
+          "t": 0.1,
+          "text": "ЦЕЛЬ",
+          "x": 540,
+          "y": 340,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 100,
+          "rot": -3
+        },
+        {
+          "type": "beachPhoto",
+          "t": 0.4,
+          "x": 540,
+          "y": 780,
+          "w": 500,
+          "rot": 3
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "сейчас →",
+          "x": 330,
+          "y": 1250,
+          "color": "#FF5FA8",
+          "size": 72,
+          "rot": -4
+        },
+        {
+          "type": "gosha",
+          "t": 1.5,
+          "pop": true,
+          "x": 800,
+          "y": 1060,
+          "h": 380,
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "flat"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "08b-progress",
+      "duration": 3.5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "hud": {
+        "progress": 0
+      },
+      "caption": {
+        "text": "Прогресс: **ноль**",
+        "accent": "red",
+        "start": 0.2,
+        "end": 1.8
+      },
+      "layers": [
+        {
+          "type": "progressBar",
+          "t": 0.1,
+          "x": 540,
+          "y": 840,
+          "w": 860,
+          "value": 0,
+          "label": "ПРОКАЧКА"
+        },
+        {
+          "type": "gosha",
+          "t": 0.6,
+          "pop": true,
+          "x": 540,
+          "y": 1130,
+          "h": 290,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o",
+              "sweat": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "09-choice",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "text": "С чего **начать**?",
+        "accent": "blue",
+        "start": 0.2,
+        "end": 1.6
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "С ЧЕГО\nНАЧАТЬ?",
+          "x": 540,
+          "y": 450,
+          "size": 116,
+          "color": "#FFD23A"
+        },
+        {
+          "type": "choice",
+          "t": 0.8,
+          "x": 540,
+          "y": 690,
+          "w": 920,
+          "num": "1",
+          "text": "ПОБРИТЬСЯ\nИ ПОДСТРИЧЬСЯ",
+          "color": "#2F6FD6",
+          "rot": -1.5
+        },
+        {
+          "type": "bigText",
+          "t": 1.4,
+          "text": "ИЛИ",
+          "x": 540,
+          "y": 862,
+          "size": 74,
+          "color": "#fff"
+        },
+        {
+          "type": "choice",
+          "t": 1.7,
+          "x": 540,
+          "y": 1030,
+          "w": 920,
+          "num": "2",
+          "text": "ВЫБРОСИТЬ МУСОР\nИЗ КОМНАТЫ",
+          "color": "#E3477E",
+          "rot": 1.5
+        },
+        {
+          "type": "gosha",
+          "t": 2.2,
+          "pop": true,
+          "x": 540,
+          "y": 1150,
+          "h": 290,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "question",
+          "t": 2.6,
+          "x": 690,
+          "y": 1175,
+          "size": 120
+        }
+      ]
+    },
+    {
+      "id": "10-cta",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Пиши в **комменты**",
+        "accent": "green",
+        "start": 0.2,
+        "end": 1.6
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ПИШИ\nВ КОММЕНТЫ",
+          "x": 540,
+          "y": 440,
+          "size": 110,
+          "color": "#fff"
+        },
+        {
+          "type": "sticker",
+          "t": 0.6,
+          "text": "1 — ВНЕШНОСТЬ",
+          "x": 400,
+          "y": 650,
+          "color": "#2F6FD6",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 0.9,
+          "text": "2 — КОМНАТА",
+          "x": 400,
+          "y": 770,
+          "color": "#E3477E",
+          "size": 60,
+          "rot": 2
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "ЛУЧШИЙ ВАРИАНТ → СЕРИЯ 2",
+          "x": 470,
+          "y": 890,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 50,
+          "rot": -2
+        },
+        {
+          "type": "comment",
+          "t": 2.0,
+          "x": 50,
+          "y": 990,
+          "w": 640,
+          "name": "dimon_228",
+          "text": "1!!! бороду срочно",
+          "likes": 312,
+          "avatarColor": "#F2994A"
+        },
+        {
+          "type": "comment",
+          "t": 2.7,
+          "x": 50,
+          "y": 1170,
+          "w": 640,
+          "name": "katya.zh",
+          "text": "2, там уже новая цивилизация",
+          "likes": 254,
+          "avatarColor": "#9B6BF2"
+        },
+        {
+          "type": "gosha",
+          "x": 860,
+          "y": 900,
+          "h": 560,
+          "wave": true,
+          "mug": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "leftArm": "wave"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

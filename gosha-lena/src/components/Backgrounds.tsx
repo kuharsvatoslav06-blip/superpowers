@@ -1,0 +1,99 @@
+import React from 'react';
+import { INK } from '../anim';
+
+const RAYS: Record<string, [string, string]> = {
+  blue: ['#5B6BEE', '#4D5CE0'],
+  pink: ['#E3668C', '#D5587F'],
+  purple: ['#3A1E5C', '#2C164A'],
+  green: ['#33B061', '#2A9E55'],
+  orange: ['#F7943A', '#EC832A'],
+  dark: ['#1F1C33', '#17152A'],
+};
+
+export const Rays: React.FC<{ color: keyof typeof RAYS; time: number }> = ({ color, time }) => {
+  const [a, b] = RAYS[color] ?? RAYS.blue;
+  const n = 18;
+  const rot = time * 4;
+  const R = 2400;
+  const wedges = [];
+  for (let i = 0; i < n; i++) {
+    const a0 = ((i / n) * 2 * Math.PI);
+    const a1 = (((i + 0.5) / n) * 2 * Math.PI);
+    wedges.push(
+      <path key={i} d={`M 0 0 L ${R * Math.cos(a0)} ${R * Math.sin(a0)} L ${R * Math.cos(a1)} ${R * Math.sin(a1)} Z`} fill={b} />,
+    );
+  }
+  return (
+    <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <radialGradient id={`vig-${color}`} cx="50%" cy="45%" r="75%">
+          <stop offset="55%" stopColor="#000" stopOpacity={0} />
+          <stop offset="100%" stopColor="#000" stopOpacity={0.35} />
+        </radialGradient>
+      </defs>
+      <rect width={1080} height={1920} fill={a} />
+      <g transform={`translate(540 860) rotate(${rot})`}>{wedges}</g>
+      <rect width={1080} height={1920} fill={`url(#vig-${color})`} />
+    </svg>
+  );
+};
+
+/** Тёмная комната: окно со звёздами, стол с монитором, коробки от пиццы, мусор */
+export const Room: React.FC<{ time: number }> = ({ time }) => {
+  const stars: [number, number, number][] = [
+    [690, 330, 4], [760, 300, 3], [850, 360, 5], [905, 420, 3], [720, 450, 3], [800, 500, 4], [880, 540, 3], [740, 590, 4], [660, 520, 3], [830, 610, 3],
+  ];
+  const trash: [number, number, number, string][] = [
+    [140, 1560, 20, '#F2C94C'], [960, 1620, -30, '#E35A4C'], [610, 1760, 15, '#7CC36A'], [90, 1800, 40, '#F2C94C'], [430, 1835, -15, '#E0E0E0'], [1000, 1840, 25, '#7CC36A'], [770, 1690, 60, '#E0E0E0'],
+  ];
+  return (
+    <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+      {/* стена */}
+      <rect width={1080} height={1920} fill="#272A57" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <rect key={i} x={i * 140 - 20} y={0} width={70} height={1500} fill="#2B2F5F" />
+      ))}
+      {/* окно */}
+      <rect x={630} y={270} width={330} height={400} rx={10} fill="#0E1030" stroke={INK} strokeWidth={14} />
+      {stars.map(([x, y, r], i) => (
+        <circle key={i} cx={x} cy={y} r={r * (0.8 + 0.3 * Math.sin(time * 3 + i))} fill="#FFF7C2" />
+      ))}
+      <circle cx={900} cy={320} r={28} fill="#FFF3B0" />
+      <circle cx={912} cy={312} r={24} fill="#0E1030" />
+      <line x1={795} y1={270} x2={795} y2={670} stroke={INK} strokeWidth={10} />
+      <line x1={630} y1={470} x2={960} y2={470} stroke={INK} strokeWidth={10} />
+      {/* постер */}
+      <rect x={110} y={330} width={170} height={230} rx={6} fill="#E35A4C" stroke={INK} strokeWidth={10} transform="rotate(-4 195 445)" />
+      <path d="M 150 500 L 195 400 L 240 500 Z" fill="#F2C94C" stroke={INK} strokeWidth={8} transform="rotate(-4 195 445)" />
+      {/* пол */}
+      <rect x={0} y={1500} width={1080} height={420} fill="#4A3B3F" />
+      {[1560, 1640, 1740, 1860].map((y) => (
+        <line key={y} x1={0} y1={y} x2={1080} y2={y} stroke="#3C2F33" strokeWidth={6} />
+      ))}
+      <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
+      {/* стол с монитором */}
+      <rect x={760} y={1030} width={300} height={24} fill="#7A5236" stroke={INK} strokeWidth={8} />
+      <rect x={790} y={1054} width={20} height={460} fill="#6A452C" stroke={INK} strokeWidth={6} />
+      <rect x={1010} y={1054} width={20} height={460} fill="#6A452C" stroke={INK} strokeWidth={6} />
+      <rect x={800} y={830} width={250} height={170} rx={10} fill="#111" stroke={INK} strokeWidth={10} />
+      <rect x={814} y={844} width={222} height={142} rx={4} fill="#3F7BE0" />
+      <path d="M 814 986 L 880 910 L 930 960 L 970 925 L 1036 986 Z" fill="#6FCF6F" />
+      <circle cx={990} cy={880} r={16} fill="#FFE06A" />
+      <rect x={905} y={1000} width={40} height={30} fill="#222" stroke={INK} strokeWidth={6} />
+      {/* коробки от пиццы */}
+      <g transform="rotate(-6 210 1610)">
+        <rect x={60} y={1570} width={300} height={56} rx={6} fill="#D9A866" stroke={INK} strokeWidth={8} />
+        <rect x={80} y={1520} width={280} height={52} rx={6} fill="#E3B677" stroke={INK} strokeWidth={8} />
+        <text x={220} y={1556} fontFamily="Oswald" fontSize={30} fontWeight={700} fill="#A0472E" textAnchor="middle">ПИЦЦА</text>
+      </g>
+      {/* мусор */}
+      {trash.map(([x, y, r, c], i) => (
+        <rect key={i} x={x - 16} y={y - 10} width={32} height={20} rx={4} fill={c} stroke={INK} strokeWidth={5} transform={`rotate(${r} ${x} ${y})`} />
+      ))}
+      <g transform="rotate(80 880 1780)">
+        <rect x={850} y={1755} width={60} height={34} rx={8} fill="#5BAE5B" stroke={INK} strokeWidth={6} />
+      </g>
+      <circle cx={300} cy={1720} r={22} fill="#EDEDED" stroke={INK} strokeWidth={6} />
+    </svg>
+  );
+};
