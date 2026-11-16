@@ -35,4 +35,8 @@ await renderMedia({
   frameRange: framesArg ? framesArg.split('=')[1].split('-').map(Number) : undefined,
   onProgress: ({ progress }) => { const p = Math.round(progress * 100); if (p % 10 === 0 && p !== globalThis.__lp) { globalThis.__lp = p; console.log(`${p}%`); } },
 });
+// громкость под соцсети: −14 LUFS, пик −1.5 dBTP (видео копируется без перекодирования)
+const tmp = out.replace(/\.mp4$/, '.tmp.mp4');
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', out, '-c:v', 'copy', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-ar', '48000', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', tmp]);
+execFileSync('mv', [tmp, out]);
 console.log(`\n→ ${out}`);

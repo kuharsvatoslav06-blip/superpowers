@@ -75,7 +75,7 @@ export const Subtitles: React.FC<{ caption: Caption; time: number; y?: number }>
   const chunk = chunks[idx];
   const color = ACCENTS[accent];
   return (
-    <div style={{ position: 'absolute', left: 40, right: 40, top: y - 80, height: 160, display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '0 26px' }}>
+    <div style={{ position: 'absolute', left: 40, right: 40, top: y - 80, height: 160, display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '0 44px' }}>
       {chunk.map((w, i) => {
         const s = popScale(time, w.t);
         return (
