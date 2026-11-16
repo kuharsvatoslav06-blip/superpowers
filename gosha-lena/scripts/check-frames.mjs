@@ -13,7 +13,7 @@ mkdirSync(dir, { recursive: true });
 let t0 = 0;
 const files = [];
 for (const s of ep.scenes) {
-  const t = t0 + (mode === 'caption' && s.caption ? Math.min(s.caption.end + 0.3, s.duration - 0.05) : s.duration * Number(mode));
+  const t = t0 + (mode === 'caption' && s.caption ? Math.min((s.caption.parts ? s.caption.parts[s.caption.parts.length - 1].end : s.caption.end) + 0.3, s.duration - 0.05) : s.duration * Number(mode));
   const f = path.join(dir, `${s.id}${mode === 'caption' ? '_cap' : ''}.png`);
   // красные полосы — безопасные зоны TikTok/Reels: 150 px сверху, 300 px снизу
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', t.toFixed(2), '-i', path.join(root, 'out', `${id}.mp4`), '-frames:v', '1',

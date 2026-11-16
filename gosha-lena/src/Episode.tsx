@@ -182,7 +182,7 @@ const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
         {world.map((l, i) => <LayerView key={i} l={l} t={t} />)}
       </AbsoluteFill>
       {screen.map((l, i) => <LayerView key={i} l={l} t={t} />)}
-      {scene.caption && <Subtitles {...scene.caption} time={t} />}
+      {scene.caption && <Subtitles caption={scene.caption} time={t} />}
     </AbsoluteFill>
   );
 };
@@ -239,6 +239,11 @@ export const EpisodeComp: React.FC<EpisodeProps> = (props) => {
       {episode.scenes.map((s, i) => (
         <Sequence key={s.id} from={Math.round(starts[i] * fps)} durationInFrames={Math.round(s.duration * fps)} name={s.id}>
           <SceneView scene={s} />
+          {props.voiceSrc && s.voice && (
+            <Sequence from={Math.round(s.voice.at * fps)} name="voice">
+              <Audio src={staticFile(props.voiceSrc)} trimBefore={Math.round(s.voice.from * fps)} trimAfter={Math.round(s.voice.to * fps)} volume={episode.voice.volume ?? 1} />
+            </Sequence>
+          )}
           {autoSfx(s).map((fx, j) => {
             const file = [...sfxFiles].find((f) => f.replace(/\.[a-z0-9]+$/, '') === fx.name);
             if (!file) return null;
@@ -251,7 +256,8 @@ export const EpisodeComp: React.FC<EpisodeProps> = (props) => {
         </Sequence>
       ))}
       <HudTrack props={props} starts={starts} />
-      <Audio src={staticFile(props.voiceSrc ?? episode.voice.stub)} volume={episode.voice.volume ?? 1} />
+      {/* без нарезки по сценам — файл озвучки целиком (или тишина-заглушка) */}
+      {!(props.voiceSrc && episode.scenes.some((s) => s.voice)) && <Audio src={staticFile(props.voiceSrc ?? episode.voice.stub)} volume={episode.voice.volume ?? 1} />}
       {props.musicSrc && <Audio src={staticFile(props.musicSrc)} volume={episode.music?.volume ?? 0.18} loop />}
     </AbsoluteFill>
   );

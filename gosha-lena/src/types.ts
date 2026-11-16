@@ -31,6 +31,9 @@ export type Layer = Base & (
   | { type: 'impact'; x: number; y: number; size?: number }
 );
 
+/** Субтитр: либо одна фраза text/start/end, либо куски parts (каждый со своим таймингом) */
+export type Caption = { accent: Accent; text?: string; start?: number; end?: number; parts?: { text: string; start: number; end: number }[] };
+
 export type CameraKey = { t: number; zoom: number; x: number; y: number };
 
 export type Scene = {
@@ -40,7 +43,9 @@ export type Scene = {
   hud?: boolean | { days?: number; progress?: number };
   camera?: CameraKey[];
   shake?: { t: number; dur: number; amp: number }[];
-  caption?: { text: string; accent: Accent; start: number; end: number };
+  caption?: Caption;
+  /** отрезок файла озвучки [from, to] (с), звучит с секунды `at` сцены — пишет scripts/sync-voice.mjs */
+  voice?: { from: number; to: number; at: number };
   layers: Layer[];
   sfx?: { t: number; name: string; volume?: number }[];
 };

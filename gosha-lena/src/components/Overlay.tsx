@@ -1,6 +1,6 @@
 import React from 'react';
 import { ACCENTS, INK, clamp, popScale } from '../anim';
-import type { Accent } from '../types';
+import type { Caption } from '../types';
 
 /* ---------------- HUD ---------------- */
 export const Hud: React.FC<{ days: number; progress: number; opacity: number }> = ({ days, progress, opacity }) => {
@@ -64,9 +64,12 @@ export const layoutCaption = (text: string, start: number, end: number) => {
   return chunks;
 };
 
-export const Subtitles: React.FC<{ text: string; accent: Accent; start: number; end: number; time: number; y?: number }> = ({ text, accent, start, end, time, y = 1500 }) => {
+export const Subtitles: React.FC<{ caption: Caption; time: number; y?: number }> = ({ caption, time, y = 1500 }) => {
+  const parts = caption.parts ?? [{ text: caption.text ?? '', start: caption.start ?? 0, end: caption.end ?? 1 }];
+  const start = parts[0].start, end = parts[parts.length - 1].end;
   if (time < start - 0.05 || time > end + 0.6) return null;
-  const chunks = layoutCaption(text, start, end);
+  const accent = caption.accent;
+  const chunks = parts.flatMap((p) => layoutCaption(p.text, p.start, p.end));
   let idx = 0;
   for (let i = 0; i < chunks.length; i++) if (time >= chunks[i][0].t) idx = i;
   const chunk = chunks[idx];
