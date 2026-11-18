@@ -230,7 +230,6 @@ const autoSfx = (scene: Scene, index: number): Fx[] => {
       case 'question': out.push({ t: at, name: 'boing', volume: 0.4 }); break;
       case 'phone': l.messages.forEach((m) => m.t >= 0 && out.push({ t: m.t, name: 'message', volume: 0.6 })); break;
       case 'desk': out.push({ t: l.punchAt, name: 'punch', volume: 1 }); break;
-      case 'fly': out.push({ t: at, name: 'buzz', volume: 0.3 }); break;
       case 'beachPhoto':
         out.push({ t: at, name: 'whoosh', volume: 0.5 });
         if (l.stamp && l.stampAt !== undefined) out.push({ t: l.stampAt, name: 'stamp', volume: 0.8 });

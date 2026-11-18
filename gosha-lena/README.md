@@ -35,7 +35,7 @@ node scripts/render.mjs day01
 
 ## Звуки и музыка
 Всё синтезировано кодом (без чужих сэмплов, без проблем с авторскими правами): `python3 scripts/make-audio.py` → `assets/music/theme.mp3` и `assets/sfx/*.wav` (pop, message, punch, buzz, whoosh, boing, shock, fail, stamp). Любой файл можно заменить своим с тем же именем.
-Эффекты расставляются сами по слоям сцены (наклейки → pop, сообщения → message, удар → punch, муха → buzz, шок → shock, фото → whoosh + stamp, смена сцены и наезд камеры → whoosh); дополнительные — в `scene.sfx: [{t, name, volume}]`.
+Эффекты расставляются сами по слоям сцены (наклейки → pop, сообщения → message, удар → punch, шок → shock, фото → whoosh + stamp, смена сцены и наезд камеры → whoosh); дополнительные — в `scene.sfx: [{t, name, volume}]`.
 Музыка (`music.volume`, `music.duck`) приглушается под голосом; пауза — `scene.musicStop: [{t, dur}]`. Общая громкость эффектов — `sfxVolume`. Итог нормализуется до −14 LUFS.
 
 ## Персонажи
