@@ -10,7 +10,7 @@ const RAYS: Record<string, [string, string]> = {
   dark: ['#1F1C33', '#17152A'],
 };
 
-export const Rays: React.FC<{ color: keyof typeof RAYS; time: number }> = ({ color, time }) => {
+export const Rays: React.FC<{ color: keyof typeof RAYS; time: number; w?: number; h?: number; cx?: number; cy?: number }> = ({ color, time, w = 1080, h = 1920, cx = 540, cy = 860 }) => {
   const [a, b] = RAYS[color] ?? RAYS.blue;
   const n = 18;
   const rot = time * 4;
@@ -24,16 +24,16 @@ export const Rays: React.FC<{ color: keyof typeof RAYS; time: number }> = ({ col
     );
   }
   return (
-    <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+    <svg width={w} height={h} style={{ position: 'absolute', inset: 0 }}>
       <defs>
         <radialGradient id={`vig-${color}`} cx="50%" cy="45%" r="75%">
           <stop offset="55%" stopColor="#000" stopOpacity={0} />
           <stop offset="100%" stopColor="#000" stopOpacity={0.35} />
         </radialGradient>
       </defs>
-      <rect width={1080} height={1920} fill={a} />
-      <g transform={`translate(540 860) rotate(${rot})`}>{wedges}</g>
-      <rect width={1080} height={1920} fill={`url(#vig-${color})`} />
+      <rect width={w} height={h} fill={a} />
+      <g transform={`translate(${cx} ${cy}) rotate(${rot})`}>{wedges}</g>
+      <rect width={w} height={h} fill={`url(#vig-${color})`} />
     </svg>
   );
 };

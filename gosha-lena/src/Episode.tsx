@@ -8,14 +8,14 @@ import { Fly, VIEWBOX } from './characters/Gosha';
 import { clamp, easeInOut, lerp, noise, popScale } from './anim';
 
 /* ---------- шрифты ---------- */
-const FONT_CSS = `
+export const FONT_CSS = `
 @font-face { font-family: 'Oswald'; font-weight: 700; src: url('${staticFile('fonts/oswald-cyrillic-700-normal.woff2')}') format('woff2'); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
 @font-face { font-family: 'Oswald'; font-weight: 700; src: url('${staticFile('fonts/oswald-latin-700-normal.woff2')}') format('woff2'); }
 @font-face { font-family: 'Inter'; font-weight: 900; src: url('${staticFile('fonts/Inter-Black.otf')}') format('opentype'); }
 @font-face { font-family: 'Inter'; font-weight: 800; src: url('${staticFile('fonts/Inter-ExtraBold.otf')}') format('opentype'); }
 `;
 
-const useFonts = () => {
+export const useFonts = () => {
   const [handle] = useState(() => delayRender('fonts'));
   useEffect(() => {
     Promise.all([

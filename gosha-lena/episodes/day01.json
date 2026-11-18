@@ -17,6 +17,15 @@
     "days": 30,
     "progress": 0
   },
+  "cover": {
+    "badge": "ДЕНЬ 1 / 30",
+    "title": "30 ДНЕЙ",
+    "subtitle": "ЧТОБЫ СТАТЬ\nКАК НА ФОТО",
+    "bubble": "Ты же как на фото? 😄",
+    "photoCaption": "это я",
+    "stamp": "(НЕТ)",
+    "color": "blue"
+  },
   "scenes": [
     {
       "id": "01-intro",

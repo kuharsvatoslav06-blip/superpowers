@@ -173,7 +173,7 @@ export const BigText: React.FC<{ text: string; x: number; y: number; size?: numb
     <div
       style={{
         position: 'absolute', left: x + jx, top: y + jy, transform: `translate(-50%,-50%) rotate(${rot}deg) scale(${s})`,
-        fontFamily: 'Inter', fontWeight: 900, fontSize: size, color, whiteSpace: 'pre', textAlign: 'center', lineHeight: 1.05,
+        fontFamily: 'Inter', fontWeight: 900, fontSize: size, color, whiteSpace: 'pre', textAlign: 'center', lineHeight: 1.05, wordSpacing: '0.15em',
         WebkitTextStroke: `${Math.round(size * 0.2)}px ${INK}`, paintOrder: 'stroke fill', textShadow: '0 10px 0 rgba(0,0,0,0.3)',
       }}
     >

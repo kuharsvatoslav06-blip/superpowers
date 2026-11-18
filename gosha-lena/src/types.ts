@@ -59,6 +59,8 @@ export type Episode = {
   voice: { src: string; stub: string; volume?: number };
   music?: { src: string; volume?: number } | null;
   hud: { days: number; progress: number };
+  /** тексты обложек TikTok/YouTube (scripts/render-covers.mjs) */
+  cover?: { badge?: string; title?: string; subtitle?: string; bubble?: string; photoCaption?: string; stamp?: string; color?: string };
   scenes: Scene[];
 };
 

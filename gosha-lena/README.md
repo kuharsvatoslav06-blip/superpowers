@@ -19,6 +19,12 @@ npx remotion studio                     # живой предпросмотр
 `screen: true` ставит слой поверх камеры (не масштабируется наездом). Все `t` — секунды от начала сцены. Камера: `camera: [{t, zoom, x, y}]`, где (x, y) — точка, которая окажется в центре кадра. Тряска: `shake: [{t, dur, amp}]`.
 Субтитры: `caption.text`, ключевое слово в `**звёздочках**`, цвет `accent`: red|green|blue|pink|yellow.
 
+## Обложки
+```bash
+node scripts/render-covers.mjs day01   # → out/day01_cover_tiktok.png (1080×1920), out/day01_cover_youtube.jpg (1280×720)
+```
+Тексты — в блоке `cover` файла серии: `badge`, `title`, `subtitle`, `bubble`, `photoCaption`, `stamp`, `color`.
+
 ## Озвучка
 Текст для ElevenLabs: `episodes/day01_voiceover.txt`. Готовый файл положите в `assets/voice/day01.mp3`, затем:
 ```bash
