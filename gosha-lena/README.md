@@ -21,7 +21,7 @@ npx remotion studio                     # живой предпросмотр
 
 ## Обложки
 ```bash
-node scripts/render-covers.mjs day01   # → out/day01_cover_tiktok.png (1080×1920), out/day01_cover_youtube.jpg (1280×720)
+node scripts/render-covers.mjs day01   # → out/day01_cover_tiktok.png (TikTok, Shorts, Reels), out/day01_cover_youtube.jpg (обычный YouTube), out/day01_shorts.mp4 (видео с обложкой первым кадром)
 ```
 Тексты — в блоке `cover` файла серии: `badge`, `title`, `subtitle`, `bubble`, `photoCaption`, `stamp`, `color`.
 
