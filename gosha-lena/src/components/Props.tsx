@@ -153,9 +153,12 @@ export const Desk: React.FC<{ punchAt: number; fistX: number; time: number }> = 
 };
 
 /* ---------------- Полоска прогресса ---------------- */
-export const ProgressBar: React.FC<{ x: number; y: number; w: number; value: number; label?: string; time: number; at: number }> = ({ x, y, w, value, label, time, at }) => {
+export const ProgressBar: React.FC<{ x: number; y: number; w: number; value: number; from?: number; label?: string; time: number; at: number }> = ({ x, y, w, value: target, from, label, time, at }) => {
   const s = popScale(time, at);
   if (s <= 0) return null;
+  // рост от from до value за 1.2 с после появления
+  const k = clamp((time - at - 0.4) / 1.2);
+  const value = Math.round(from === undefined ? target : from + (target - from) * (1 - Math.pow(1 - k, 3)));
   const blink = Math.floor(time * 3) % 2 === 0;
   return (
     <div style={{ position: 'absolute', left: x, top: y, width: w, transform: `translate(-50%,-50%) scale(${s})` }}>
@@ -205,3 +208,89 @@ export const Comment: React.FC<{ x: number; y: number; w: number; name: string; 
 
 /* ---------------- Гоша как слой ---------------- */
 export { Gosha };
+
+/* ---------------- Иконки-предметы ---------------- */
+export const Icon: React.FC<{ name: 'razor' | 'razorBroken' | 'scissors' | 'comb'; x: number; y: number; size?: number; rot?: number; wiggle?: number; time: number; at: number }> = ({ name, x, y, size = 300, rot = 0, wiggle = 0, time, at }) => {
+  const s = popScale(time, at);
+  if (s <= 0) return null;
+  const r = rot + (wiggle ? Math.sin(time * 18) * wiggle : 0);
+  const body = (() => {
+    switch (name) {
+      case 'razor':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <rect x={-18} y={-10} width={36} height={170} rx={16} fill="#2F6FD6" />
+            <rect x={-80} y={-60} width={160} height={56} rx={14} fill="#E8EDF5" />
+            <line x1={-66} y1={-32} x2={66} y2={-32} stroke="#9AA6B8" strokeWidth={6} />
+            <rect x={-12} y={40} width={24} height={60} rx={8} fill="#4E8BEA" strokeWidth={0} />
+          </g>
+        );
+      case 'razorBroken':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <rect x={-18} y={20} width={36} height={140} rx={16} fill="#2F6FD6" transform="rotate(14 0 90)" />
+            <path d="M -18 0 L -4 14 L 8 -2 L 18 12 L 18 -10 L -18 -10 Z" fill="#2F6FD6" transform="rotate(-8 0 0)" />
+            <g transform="translate(-40 -60) rotate(-22)">
+              <rect x={-80} y={-30} width={160} height={56} rx={14} fill="#E8EDF5" />
+              <path d="M -60 -2 L -20 -2 M 10 -2 L 60 -2" stroke="#9AA6B8" strokeWidth={6} />
+            </g>
+            <path d="M 70 -40 l 30 -20 M 80 -10 l 36 0 M 60 -70 l 14 -30" stroke="#FFD23A" strokeWidth={10} strokeLinecap="round" />
+          </g>
+        );
+      case 'scissors':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <g transform={`rotate(${Math.sin(time * 22) * 10})`}>
+              <path d="M 0 0 L 150 -26 L 150 -6 Z" fill="#DDE3EC" />
+              <circle cx={-60} cy={34} r={30} fill="none" stroke="#E3477E" strokeWidth={16} />
+              <path d="M 0 0 L -38 22" stroke="#E3477E" strokeWidth={16} strokeLinecap="round" />
+            </g>
+            <g transform={`rotate(${-Math.sin(time * 22) * 10})`}>
+              <path d="M 0 0 L 150 26 L 150 6 Z" fill="#DDE3EC" />
+              <circle cx={-60} cy={-34} r={30} fill="none" stroke="#E3477E" strokeWidth={16} />
+              <path d="M 0 0 L -38 -22" stroke="#E3477E" strokeWidth={16} strokeLinecap="round" />
+            </g>
+            <circle cx={0} cy={0} r={9} fill={INK} />
+          </g>
+        );
+      default:
+        return (
+          <g stroke={INK} strokeWidth={8}>
+            <rect x={-120} y={-24} width={240} height={40} rx={10} fill="#1E1E2A" />
+            {Array.from({ length: 14 }).map((_, i) => <line key={i} x1={-108 + i * 17} y1={16} x2={-108 + i * 17} y2={64} strokeWidth={8} />)}
+          </g>
+        );
+    }
+  })();
+  return (
+    <svg width={size} height={size} viewBox="-170 -170 340 340" style={{ position: 'absolute', left: x - size / 2, top: y - size / 2, overflow: 'visible', transform: `rotate(${r}deg) scale(${s})` }}>
+      {body}
+    </svg>
+  );
+};
+
+/* ---------------- Частицы: клочки волос / искры ---------------- */
+export const Particles: React.FC<{ kind: 'hair' | 'sparkle'; x: number; y: number; w: number; h: number; count?: number; dur?: number; time: number; at: number }> = ({ kind, x, y, w, h, count = 24, dur = 99, time, at }) => {
+  const d = time - at;
+  if (d < 0 || d > dur) return null;
+  const rnd = (i: number, k: number) => { const v = Math.sin(i * 91.7 + k * 13.3) * 43758.5; return v - Math.floor(v); };
+  return (
+    <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
+      {Array.from({ length: count }).map((_, i) => {
+        const delay = rnd(i, 1) * Math.min(dur, 2.5);
+        const life = d - delay;
+        if (life < 0) return null;
+        if (kind === 'hair') {
+          const px = x + rnd(i, 2) * w + Math.sin(life * 3 + i) * 30;
+          const py = y + ((life * (180 + rnd(i, 3) * 160)) % h);
+          const a = life * 120 * (rnd(i, 4) - 0.5) + rnd(i, 5) * 180;
+          return <path key={i} d="M -26 0 C -10 -14 10 14 26 0" transform={`translate(${px} ${py}) rotate(${a})`} fill="none" stroke="#3B281D" strokeWidth={9} strokeLinecap="round" />;
+        }
+        const ph = (life * 1.4 + rnd(i, 6)) % 1;
+        const sc = Math.sin(ph * Math.PI);
+        const px = x + rnd(i, 2) * w, py = y + rnd(i, 3) * h;
+        return <path key={i} d="M 0 -30 L 8 -8 L 30 0 L 8 8 L 0 30 L -8 8 L -30 0 L -8 -8 Z" transform={`translate(${px} ${py}) scale(${sc})`} fill="#FFE14D" stroke={INK} strokeWidth={4} />;
+      })}
+    </svg>
+  );
+};

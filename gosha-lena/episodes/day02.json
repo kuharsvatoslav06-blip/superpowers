@@ -1,0 +1,913 @@
+{
+  "id": "day02",
+  "title": "Гоша и Лена — День 2",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "voice": {
+    "src": "voice/day02.mp3",
+    "stub": "voice/day02_silence.mp3",
+    "volume": 1
+  },
+  "music": {
+    "src": "music/theme.mp3",
+    "volume": 0.15,
+    "duck": 0.5
+  },
+  "sfxVolume": 0.5,
+  "hud": {
+    "days": 30,
+    "progress": 0
+  },
+  "cover": {
+    "badge": "ДЕНЬ 2 / 30",
+    "title": "МИНУС БОРОДА",
+    "subtitle": "НО АНТЕННА\nНЕПОБЕДИМА",
+    "bubble": "Ого, ты подстригся?? 😍",
+    "color": "orange",
+    "gosha": {
+      "beard": "stubble",
+      "hair": "short",
+      "eyes": "happy",
+      "mouth": "smile",
+      "antenna": "up"
+    },
+    "before": true,
+    "fly": false,
+    "exclaim": false
+  },
+  "scenes": [
+    {
+      "id": "01-intro",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "hud": {
+        "days": 29
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "caption": {
+        "text": "День второй. Вы выбрали: **побриться** и подстричься.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.3
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            }
+          ]
+        },
+        {
+          "type": "fly",
+          "t": 0,
+          "orbit": {
+            "cx": 540,
+            "cy": 470,
+            "rx": 260,
+            "ry": 70,
+            "speed": 2.2
+          }
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 0.2,
+          "text": "ДЕНЬ 2",
+          "x": 800,
+          "y": 300,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 84,
+          "rot": 4
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.4,
+          "text": "ВЫ ВЫБРАЛИ: 1 ✂",
+          "x": 540,
+          "y": 1250,
+          "color": "#2FA55A",
+          "size": 70,
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "02-razor",
+      "duration": 5,
+      "bg": {
+        "type": "bathroom"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.12,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "caption": {
+        "text": "Гоша взял бритву. Впервые за **два года**.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 3.5
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 520,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 1.6,
+              "eyes": "worried",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0.7,
+          "name": "razor",
+          "x": 850,
+          "y": 1080,
+          "size": 340,
+          "rot": -25,
+          "wiggle": 5
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 2.2,
+          "text": "ПОСЛЕДНИЙ РАЗ: 2024",
+          "x": 640,
+          "y": 370,
+          "color": "#FF3B47",
+          "size": 56,
+          "rot": 3
+        }
+      ]
+    },
+    {
+      "id": "03-broken",
+      "duration": 5,
+      "bg": {
+        "type": "bathroom"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1.12,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "shake": [
+        {
+          "t": 0.9,
+          "dur": 0.5,
+          "amp": 26
+        }
+      ],
+      "caption": {
+        "text": "Бритва сломалась. Борода **победила**.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 3.3
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 520,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "flat",
+              "sweat": true
+            },
+            {
+              "t": 0.9,
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0,
+          "name": "razor",
+          "x": 850,
+          "y": 1080,
+          "size": 340,
+          "rot": -25,
+          "wiggle": 8,
+          "until": 0.88
+        },
+        {
+          "type": "icon",
+          "t": 0.9,
+          "name": "razorBroken",
+          "x": 850,
+          "y": 1080,
+          "size": 340,
+          "rot": -25
+        },
+        {
+          "type": "impact",
+          "t": 0.9,
+          "x": 780,
+          "y": 980,
+          "size": 300
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.8,
+          "text": "БОРОДА 1 : 0 БРИТВА",
+          "x": 540,
+          "y": 1290,
+          "color": "#8A5A3A",
+          "size": 66,
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "04-barber",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "orange"
+      },
+      "caption": {
+        "text": "Пришлось идти к **барберу**. Барбер долго молчал.",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 4.2
+      },
+      "layers": [
+        {
+          "type": "sticker",
+          "t": 0.1,
+          "text": "БАРБЕРШОП",
+          "x": 640,
+          "y": 370,
+          "color": "#1E1E2A",
+          "size": 70,
+          "rot": -3
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "cape": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 3.4,
+              "eyes": "worried",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 1.3,
+          "name": "scissors",
+          "x": 870,
+          "y": 620,
+          "size": 260,
+          "rot": 20
+        },
+        {
+          "type": "sticker",
+          "t": 3.4,
+          "text": "«ЭТО ЧТО… ГНЕЗДО?»",
+          "x": 540,
+          "y": 1300,
+          "color": "#fff",
+          "textColor": "#1E1E2A",
+          "size": 62,
+          "rot": -2
+        }
+      ]
+    },
+    {
+      "id": "05-montage",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "purple"
+      },
+      "shake": [
+        {
+          "t": 0.5,
+          "dur": 2.8,
+          "amp": 6
+        }
+      ],
+      "caption": {
+        "text": "Сорок минут. Три ножницы. Муха улетела **навсегда**.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.2
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "cape": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "grit"
+            }
+          ]
+        },
+        {
+          "type": "particles",
+          "t": 0.3,
+          "kind": "hair",
+          "x": 180,
+          "y": 380,
+          "w": 720,
+          "h": 1100,
+          "count": 46
+        },
+        {
+          "type": "icon",
+          "t": 0.4,
+          "name": "scissors",
+          "x": 260,
+          "y": 640,
+          "size": 240,
+          "rot": -30
+        },
+        {
+          "type": "icon",
+          "t": 0.9,
+          "name": "scissors",
+          "x": 830,
+          "y": 560,
+          "size": 240,
+          "rot": 30
+        },
+        {
+          "type": "icon",
+          "t": 1.6,
+          "name": "razor",
+          "x": 860,
+          "y": 1050,
+          "size": 260,
+          "rot": -30,
+          "wiggle": 10
+        },
+        {
+          "type": "sticker",
+          "t": 0.6,
+          "text": "ЧИК",
+          "x": 230,
+          "y": 950,
+          "color": "#E3477E",
+          "size": 70,
+          "rot": -10
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "ЧИК-ЧИК",
+          "x": 830,
+          "y": 1260,
+          "color": "#2F6FD6",
+          "size": 70,
+          "rot": 8
+        },
+        {
+          "type": "fly",
+          "t": 0,
+          "orbit": {
+            "cx": 540,
+            "cy": 520,
+            "rx": 240,
+            "ry": 70,
+            "speed": 2.6
+          },
+          "leave": {
+            "t": 3.0,
+            "x": 1250,
+            "y": 120
+          }
+        },
+        {
+          "type": "sticker",
+          "t": 3.4,
+          "text": "МУХА: ВСЁ",
+          "x": 820,
+          "y": 380,
+          "color": "#FF3B47",
+          "size": 56,
+          "rot": 6
+        }
+      ]
+    },
+    {
+      "id": "06-reveal",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "blue"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 6,
+          "zoom": 1.08,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "caption": {
+        "text": "И вот… **новый Гоша**! Почти красавчик.",
+        "accent": "green",
+        "start": 0.6,
+        "end": 3.8
+      },
+      "layers": [
+        {
+          "type": "particles",
+          "t": 0.2,
+          "kind": "sparkle",
+          "x": 120,
+          "y": 380,
+          "w": 840,
+          "h": 900,
+          "count": 16
+        },
+        {
+          "type": "gosha",
+          "t": 0.3,
+          "pop": true,
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ],
+          "beard": "stubble",
+          "hair": "short"
+        },
+        {
+          "type": "sticker",
+          "t": 1.0,
+          "text": "НОВЫЙ ГОША",
+          "x": 640,
+          "y": 370,
+          "color": "#2FA55A",
+          "size": 76,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "−2 ГОДА БОРОДЫ",
+          "x": 540,
+          "y": 1290,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 62,
+          "rot": 2
+        }
+      ]
+    },
+    {
+      "id": "07-antenna",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        },
+        {
+          "t": 0.7,
+          "zoom": 2,
+          "x": 513,
+          "y": 700
+        },
+        {
+          "t": 5,
+          "zoom": 2.05,
+          "x": 513,
+          "y": 700
+        }
+      ],
+      "shake": [
+        {
+          "t": 1.4,
+          "dur": 0.4,
+          "amp": 14
+        }
+      ],
+      "sfx": [
+        {
+          "t": 1.4,
+          "name": "boing",
+          "volume": 0.8
+        }
+      ],
+      "caption": {
+        "text": "Только антенну не берёт **ничего**.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 3.2
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            },
+            {
+              "t": 1.4,
+              "eyes": "worried",
+              "mouth": "flat",
+              "antenna": "up"
+            }
+          ],
+          "beard": "stubble",
+          "hair": "short"
+        },
+        {
+          "type": "arrowLabel",
+          "screen": true,
+          "t": 1.6,
+          "text": "НЕПОБЕДИМА",
+          "x": 830,
+          "y": 420,
+          "tx": 600,
+          "ty": 360,
+          "color": "#FF3B47",
+          "rot": 4
+        }
+      ]
+    },
+    {
+      "id": "08-chat",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "text": "Лена заметила **сразу**. «Ого, покажи!» А показывать пока рано.",
+        "accent": "pink",
+        "start": 0.3,
+        "end": 4.8
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": 0,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "typing": [
+            0.2,
+            1.2,
+            3.0,
+            3.9
+          ],
+          "messages": [
+            {
+              "t": 1.2,
+              "from": "her",
+              "text": "Ого, ты подстригся?? 😍 Покажи!"
+            },
+            {
+              "t": 3.9,
+              "from": "me",
+              "text": "потом 😅"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "09-progress",
+      "duration": 4.5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "hud": {
+        "progress": 10
+      },
+      "caption": {
+        "text": "Прогресс: **десять процентов**. Минус борода, минус муха.",
+        "accent": "green",
+        "start": 0.2,
+        "end": 4.0
+      },
+      "layers": [
+        {
+          "type": "progressBar",
+          "t": 0.1,
+          "x": 540,
+          "y": 800,
+          "w": 860,
+          "value": 10,
+          "from": 0,
+          "label": "ПРОКАЧКА"
+        },
+        {
+          "type": "sticker",
+          "t": 2.0,
+          "text": "− БОРОДА",
+          "x": 280,
+          "y": 1250,
+          "color": "#8A5A3A",
+          "size": 60,
+          "rot": -4
+        },
+        {
+          "type": "sticker",
+          "t": 2.8,
+          "text": "− МУХА",
+          "x": 800,
+          "y": 1250,
+          "color": "#1E1E2A",
+          "size": 60,
+          "rot": 4
+        },
+        {
+          "type": "gosha",
+          "t": 0.6,
+          "pop": true,
+          "x": 540,
+          "y": 1090,
+          "h": 300,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ],
+          "beard": "stubble",
+          "hair": "short"
+        }
+      ]
+    },
+    {
+      "id": "10-choice",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "text": "Что **дальше**? Выбросить мусор… или первая тренировка?",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 4.3
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ЧТО\nДАЛЬШЕ?",
+          "x": 540,
+          "y": 450,
+          "size": 116,
+          "color": "#FFD23A"
+        },
+        {
+          "type": "choice",
+          "t": 1.3,
+          "x": 540,
+          "y": 690,
+          "w": 920,
+          "num": "1",
+          "text": "ВЫБРОСИТЬ МУСОР\nИЗ КОМНАТЫ",
+          "color": "#E3477E",
+          "rot": -1.5
+        },
+        {
+          "type": "bigText",
+          "t": 2.5,
+          "text": "ИЛИ",
+          "x": 540,
+          "y": 862,
+          "size": 74,
+          "color": "#fff"
+        },
+        {
+          "type": "choice",
+          "t": 2.8,
+          "x": 540,
+          "y": 1030,
+          "w": 920,
+          "num": "2",
+          "text": "ПЕРВАЯ\nТРЕНИРОВКА",
+          "color": "#2F6FD6",
+          "rot": 1.5
+        },
+        {
+          "type": "gosha",
+          "t": 0.6,
+          "pop": true,
+          "x": 540,
+          "y": 1150,
+          "h": 290,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ],
+          "beard": "stubble",
+          "hair": "short"
+        },
+        {
+          "type": "question",
+          "t": 1.0,
+          "x": 690,
+          "y": 1175,
+          "size": 120
+        }
+      ]
+    },
+    {
+      "id": "11-cta",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Пиши в **комменты**: один или два. Итоги — в третьей серии.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.6
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ПИШИ\nВ КОММЕНТЫ",
+          "x": 540,
+          "y": 440,
+          "size": 110,
+          "color": "#fff"
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "1 — МУСОР",
+          "x": 400,
+          "y": 650,
+          "color": "#E3477E",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 1.9,
+          "text": "2 — ТРЕНИРОВКА",
+          "x": 420,
+          "y": 770,
+          "color": "#2F6FD6",
+          "size": 60,
+          "rot": 2
+        },
+        {
+          "type": "sticker",
+          "t": 2.8,
+          "text": "ИТОГИ → СЕРИЯ 3",
+          "x": 400,
+          "y": 890,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 54,
+          "rot": -2
+        },
+        {
+          "type": "comment",
+          "t": 3.4,
+          "x": 50,
+          "y": 990,
+          "w": 640,
+          "name": "sasha_kot",
+          "text": "1, там уже крысы с паспортами",
+          "likes": 287,
+          "avatarColor": "#F2994A"
+        },
+        {
+          "type": "comment",
+          "t": 4.1,
+          "x": 50,
+          "y": 1170,
+          "w": 640,
+          "name": "lera.fit",
+          "text": "2!!! пузо само не уйдёт",
+          "likes": 264,
+          "avatarColor": "#2FA55A"
+        },
+        {
+          "type": "gosha",
+          "x": 860,
+          "y": 900,
+          "h": 560,
+          "wave": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "leftArm": "wave"
+            }
+          ],
+          "beard": "stubble",
+          "hair": "short"
+        }
+      ]
+    }
+  ]
+}

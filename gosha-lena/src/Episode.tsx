@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import type { EpisodeProps, Layer, Scene } from './types';
-import { Rays, Room } from './components/Backgrounds';
+import { Bathroom, Rays, Room } from './components/Backgrounds';
 import { ArrowLabel, BigText, Exclaim, Hud, Impact, Question, Sticker, Subtitles } from './components/Overlay';
-import { BeachPhoto, Choice, Comment, Desk, Gosha, Phone, ProgressBar } from './components/Props';
+import { BeachPhoto, Choice, Comment, Desk, Gosha, Icon, Particles, Phone, ProgressBar } from './components/Props';
 import { Fly, VIEWBOX } from './characters/Gosha';
 import { clamp, easeInOut, lerp, noise, popScale } from './anim';
 
@@ -98,6 +98,9 @@ const GoshaLayer: React.FC<{ l: Extract<Layer, { type: 'gosha' }>; t: number }> 
         blink={blink}
         showMug={l.mug ?? true}
         showStink={l.stink}
+        beard={l.beard}
+        hair={l.hair}
+        cape={l.cape}
         style={{ position: 'absolute', inset: 0 }}
       />
       {l.stink && (
@@ -139,6 +142,11 @@ const FlyLayer: React.FC<{ l: Extract<Layer, { type: 'fly' }>; t: number }> = ({
       p = { x: lerp(o.x, l.land.x, k), y: lerp(o.y, l.land.y, k) };
     }
   }
+  if (l.leave && t > l.leave.t) {
+    const k = easeInOut(clamp((t - l.leave.t) / 0.9));
+    p = { x: lerp(p.x, l.leave.x, k), y: lerp(p.y, l.leave.y, k) };
+    landed = false;
+  }
   const wing = landed ? 0 : Math.sin(t * 80) * 25;
   const size = l.size ?? 80;
   return <Fly size={size} wing={wing} style={{ position: 'absolute', left: p.x - size / 2, top: p.y - size * 0.375 }} />;
@@ -163,6 +171,8 @@ const LayerView: React.FC<{ l: Layer; t: number }> = ({ l, t }) => {
     case 'choice': return <Choice {...l} time={t} at={at} />;
     case 'comment': return <Comment {...l} time={t} at={at} />;
     case 'impact': return <Impact {...l} time={t} at={at} />;
+    case 'icon': return <Icon {...l} time={t} at={at} />;
+    case 'particles': return <Particles {...l} time={t} at={at} />;
   }
 };
 
@@ -178,7 +188,7 @@ const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
   return (
     <AbsoluteFill style={{ overflow: 'hidden', transform: `translate(${sh.dx}px, ${sh.dy}px) rotate(${sh.r}deg) scale(${enter})` }}>
       <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(540px, 960px) scale(${cam.zoom}) translate(${-cam.x}px, ${-cam.y}px)` }}>
-        {scene.bg.type === 'room' ? <Room time={t} /> : <Rays color={scene.bg.color} time={t} />}
+        {scene.bg.type === 'room' ? <Room time={t} /> : scene.bg.type === 'bathroom' ? <Bathroom time={t} /> : <Rays color={scene.bg.color} time={t} />}
         {world.map((l, i) => <LayerView key={i} l={l} t={t} />)}
       </AbsoluteFill>
       {screen.map((l, i) => <LayerView key={i} l={l} t={t} />)}
@@ -228,6 +238,7 @@ const autoSfx = (scene: Scene, index: number): Fx[] => {
       case 'sticker': case 'arrowLabel': case 'choice': case 'bigText': case 'comment': case 'progressBar':
         out.push({ t: at, name: 'pop', volume: 0.5 }); break;
       case 'question': out.push({ t: at, name: 'boing', volume: 0.4 }); break;
+      case 'icon': out.push({ t: at, name: l.name === 'razorBroken' ? 'punch' : 'pop', volume: l.name === 'razorBroken' ? 0.6 : 0.5 }); break;
       case 'phone': l.messages.forEach((m) => m.t >= 0 && out.push({ t: m.t, name: 'message', volume: 0.6 })); break;
       case 'desk': out.push({ t: l.punchAt, name: 'punch', volume: 1 }); break;
       case 'beachPhoto':

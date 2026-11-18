@@ -27,6 +27,12 @@ export type GoshaProps = {
   showStink?: boolean;
   /** 'full' — в полный рост, 'bust' — по пояс */
   crop?: 'full' | 'bust' | 'head';
+  /** борода: full — как в 1 серии, stubble — щетина после бритья, none — гладко */
+  beard?: 'full' | 'stubble' | 'none';
+  /** волосы: long — до плеч, short — после барбера */
+  hair?: 'long' | 'short';
+  /** накидка парикмахера */
+  cape?: boolean;
   style?: React.CSSProperties;
   width?: number | string;
   height?: number | string;
@@ -62,6 +68,19 @@ const PIMPLES: [number, number, number?][] = [
   [536, 703, 7], [604, 700, 6], [656, 692, 11], [668, 657, 8], [638, 722, 9],
 ];
 
+const STUBBLE: [number, number][] = (() => {
+  const out: [number, number][] = [];
+  for (let y = 748; y <= 885; y += 13)
+    for (let x = 372; x <= 660; x += 15) {
+      const j = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+      const r = j - Math.floor(j);
+      const xx = x + ((y / 13) % 2 ? 7 : 0) + (r - 0.5) * 9;
+      const dx = (xx - 515) / 165, dy = (y - 700) / 200;
+      if (dx * dx + dy * dy < 1 && r > 0.18 && !(Math.abs(xx - 515) < 60 && y > 770 && y < 820)) out.push([xx, y + (r - 0.5) * 7]);
+    }
+  return out;
+})();
+
 const CURLS: [number, number][] = [
   [397, 745], [455, 738], [575, 735], [612, 748], [390, 785], [440, 792], [640, 785], [600, 806],
   [520, 815], [545, 820], [580, 820], [630, 818], [470, 862], [495, 852], [520, 875], [520, 890],
@@ -89,6 +108,9 @@ export const Gosha: React.FC<GoshaProps> = ({
   showMug = true,
   showStink = false,
   crop = 'full',
+  beard = 'full',
+  hair = 'long',
+  cape = false,
   style,
   width = '100%',
   height = '100%',
@@ -221,18 +243,22 @@ export const Gosha: React.FC<GoshaProps> = ({
       </g>
 
       {/* ========== ВОЛОСЫ СЗАДИ ========== */}
+      {hair === 'short' ? (
+        <path id="hair-back" d="M 305 662 C 285 450 395 360 515 360 C 640 360 748 450 728 662 Z" fill={HAIR} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+      ) : (
       <path
         id="hair-back"
         d="M 298 640 C 280 450 390 358 515 358 C 640 358 748 450 735 640 C 732 720 742 800 735 860 C 730 890 718 915 708 930 L 690 880 L 668 935 L 640 885 L 615 935 L 515 940 L 418 935 L 395 885 L 372 935 L 350 880 L 326 930 C 310 900 298 860 295 800 C 292 740 300 700 298 640 Z"
         fill={HAIR} stroke={INK} strokeWidth={SW} strokeLinejoin="round"
       />
+      )}
 
       {/* ========== МАЙКА ========== */}
       <g id="shirt">
         <path d="M 333 945 L 700 945 C 745 1010 775 1100 785 1195 L 245 1195 C 255 1100 285 1010 333 945 Z" fill={SHIRT} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
         {/* шея и горловина */}
         <path d="M 385 945 Q 400 1012 515 1012 Q 630 1012 642 945 Z" fill={SKIN_D} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
-        <path d="M 425 910 L 425 958 Q 515 990 605 958 L 605 910 Z" fill={SKIN_D} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+        <path d="M 445 850 L 440 958 Q 515 990 590 958 L 585 850 Z" fill={SKIN_D} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
         {[[462, 985], [478, 995], [520, 995], [535, 1000], [550, 1010], [568, 1005], [485, 1015], [545, 1020]].map(([x, y], i) => (
           <line key={i} x1={x} y1={y} x2={x + (i % 2 ? 7 : -7)} y2={y + 14} stroke="#6B3E22" strokeWidth={4} strokeLinecap="round" />
         ))}
@@ -252,19 +278,45 @@ export const Gosha: React.FC<GoshaProps> = ({
         <path d="M 503 1398 C 498 1385 515 1378 525 1386 C 532 1394 522 1408 508 1405" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
       </g>
 
+      {/* ========== НАКИДКА ПАРИКМАХЕРА ========== */}
+      {cape && (
+        <g id="cape">
+          <path d="M 400 930 Q 515 975 630 930 C 760 990 860 1150 900 1600 L 130 1600 C 170 1150 270 990 400 930 Z" fill="#F4F6FA" stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+          {[260, 380, 515, 650, 770].map((x) => (
+            <path key={x} d={`M ${x} 1050 L ${x + (x - 515) * 0.25} 1600`} stroke="#C8D3E6" strokeWidth={14} />
+          ))}
+          <path d="M 400 930 Q 515 975 630 930" fill="none" stroke={INK} strokeWidth={SW} />
+        </g>
+      )}
+
       {/* ========== ГОЛОВА ========== */}
       <g id="head">
         {/* лицо */}
-        <path d="M 340 650 C 340 545 420 500 515 500 C 610 500 695 545 695 650 C 695 700 690 730 680 750 L 350 750 C 342 730 340 700 340 650 Z" fill={SKIN} stroke={INK} strokeWidth={SW} />
-        {/* борода */}
-        <path
-          id="beard"
-          d="M 345 700 C 360 720 380 740 405 742 C 440 745 470 730 515 728 C 560 730 600 745 630 742 C 655 740 675 720 690 700 C 690 820 620 925 515 925 C 410 925 345 820 345 700 Z"
-          fill={BEARD} stroke={INK} strokeWidth={SW} strokeLinejoin="round"
-        />
-        {CURLS.map(([x, y], i) => (
-          <path key={i} d={`M ${x - 8} ${y} q 8 12 16 0`} fill="none" stroke={BEARD_D} strokeWidth={5} strokeLinecap="round" />
-        ))}
+        {beard === 'full' ? (
+          <>
+            <path d="M 340 650 C 340 545 420 500 515 500 C 610 500 695 545 695 650 C 695 700 690 730 680 750 L 350 750 C 342 730 340 700 340 650 Z" fill={SKIN} stroke={INK} strokeWidth={SW} />
+            {/* борода */}
+            <path
+              id="beard"
+              d="M 345 700 C 360 720 380 740 405 742 C 440 745 470 730 515 728 C 560 730 600 745 630 742 C 655 740 675 720 690 700 C 690 820 620 925 515 925 C 410 925 345 820 345 700 Z"
+              fill={BEARD} stroke={INK} strokeWidth={SW} strokeLinejoin="round"
+            />
+            {CURLS.map(([x, y], i) => (
+              <path key={i} d={`M ${x - 8} ${y} q 8 12 16 0`} fill="none" stroke={BEARD_D} strokeWidth={5} strokeLinecap="round" />
+            ))}
+          </>
+        ) : (
+          <>
+            <path id="face" d="M 340 650 C 340 545 420 500 515 500 C 610 500 695 545 695 650 C 695 800 625 905 515 905 C 405 905 340 800 340 650 Z" fill={SKIN} stroke={INK} strokeWidth={SW} />
+            {/* подбородок и щёки */}
+            <path d="M 470 880 Q 515 892 560 880" fill="none" stroke={SKIN_D} strokeWidth={8} strokeLinecap="round" />
+            {beard === 'stubble' && (
+              <g id="stubble" fill="#7D7487" opacity={0.55}>
+                {STUBBLE.map(([x, y], i) => <circle key={i} cx={x} cy={y} r={3.2} />)}
+              </g>
+            )}
+          </>
+        )}
         {/* пот */}
         {sweat && (
           <g id="sweat">
@@ -284,10 +336,18 @@ export const Gosha: React.FC<GoshaProps> = ({
         <path id="nose" d="M 515 660 C 500 680 482 702 487 720 C 492 740 538 740 543 720 C 548 702 530 680 515 660 Z" fill="#E8877A" stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
         <Pimple x={536} y={703} r={7} />
         {/* усы */}
-        <path id="mustache" d="M 432 776 C 450 750 495 748 515 765 C 535 748 580 750 598 776 C 575 770 545 772 515 782 C 485 772 455 770 432 776 Z" fill={BEARD_D} stroke={INK} strokeWidth={8} strokeLinejoin="round" />
+        {beard === 'full' && <path id="mustache" d="M 432 776 C 450 750 495 748 515 765 C 535 748 580 750 598 776 C 575 770 545 772 515 782 C 485 772 455 770 432 776 Z" fill={BEARD_D} stroke={INK} strokeWidth={8} strokeLinejoin="round" />}
         <g id="mouth">{mouthEl}</g>
 
         {/* чёлка и верх волос */}
+        {hair === 'short' ? (
+          <path
+            id="hair-front"
+            d="M 330 640 C 320 520 410 470 515 470 C 625 470 712 520 705 640 C 692 600 660 572 610 566 C 570 562 548 582 515 580 C 478 578 452 556 410 566 C 372 576 345 602 330 640 Z"
+            fill={HAIR} stroke={INK} strokeWidth={SW} strokeLinejoin="round"
+          />
+        ) : (
+          <>
         <path
           id="hair-front"
           d="M 330 640 C 320 520 410 470 515 470 C 625 470 712 520 705 640 C 700 620 690 600 680 580 C 670 610 650 610 640 590 C 625 580 610 595 600 575 C 585 565 570 590 560 565 C 545 555 530 575 520 565 C 505 555 490 580 480 565 C 465 560 455 585 445 570 C 430 590 420 590 405 600 C 395 580 375 570 360 580 C 350 600 340 620 330 640 Z"
@@ -295,6 +355,8 @@ export const Gosha: React.FC<GoshaProps> = ({
         />
         {/* прядь на брови */}
         <path d="M 425 575 C 430 590 438 600 452 606 C 442 592 440 584 445 572 Z" fill={HAIR} stroke={INK} strokeWidth={6} strokeLinejoin="round" />
+          </>
+        )}
         {/* блики на волосах */}
         <path d="M 415 445 Q 450 430 490 432" fill="none" stroke="#6E4A36" strokeWidth={8} strokeLinecap="round" />
         <path d="M 550 437 Q 595 445 625 465" fill="none" stroke="#6E4A36" strokeWidth={8} strokeLinecap="round" />

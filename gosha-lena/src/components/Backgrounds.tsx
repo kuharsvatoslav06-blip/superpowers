@@ -97,3 +97,23 @@ export const Room: React.FC<{ time: number }> = ({ time }) => {
     </svg>
   );
 };
+
+/** Ванная: плитка, зеркало, раковина */
+export const Bathroom: React.FC<{ time: number }> = () => (
+  <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+    <rect width={1080} height={1920} fill="#BFE3E8" />
+    {Array.from({ length: 12 }).map((_, i) => <line key={'v' + i} x1={i * 100} y1={0} x2={i * 100} y2={1500} stroke="#A6D0D6" strokeWidth={6} />)}
+    {Array.from({ length: 16 }).map((_, i) => <line key={'h' + i} x1={0} y1={i * 100} x2={1080} y2={i * 100} stroke="#A6D0D6" strokeWidth={6} />)}
+    {/* зеркало */}
+    <rect x={250} y={250} width={580} height={520} rx={30} fill="#E9F6F8" stroke={INK} strokeWidth={14} />
+    <path d="M 330 330 L 450 290 M 330 420 L 560 330" stroke="#fff" strokeWidth={22} strokeLinecap="round" opacity={0.8} />
+    {/* полка с пеной */}
+    <rect x={250} y={790} width={580} height={26} rx={8} fill="#fff" stroke={INK} strokeWidth={8} />
+    <rect x={300} y={700} width={60} height={92} rx={12} fill="#E3477E" stroke={INK} strokeWidth={8} />
+    <rect x={720} y={720} width={50} height={72} rx={10} fill="#2F6FD6" stroke={INK} strokeWidth={8} />
+    {/* пол */}
+    <rect x={0} y={1500} width={1080} height={420} fill="#E6E9EE" />
+    {Array.from({ length: 8 }).map((_, i) => <line key={'f' + i} x1={i * 160} y1={1500} x2={i * 160 - 200} y2={1920} stroke="#CDD2DA" strokeWidth={6} />)}
+    <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
+  </svg>
+);
