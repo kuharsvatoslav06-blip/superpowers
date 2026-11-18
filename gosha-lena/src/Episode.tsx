@@ -214,17 +214,59 @@ const HudTrack: React.FC<{ props: EpisodeProps; starts: number[] }> = ({ props, 
   return <Hud days={lerp(prev.days, cur.days, k)} progress={lerp(prev.progress, cur.progress, k)} opacity={visible ? 1 : 0} />;
 };
 
-/* ---------- звуковые эффекты из слоёв ---------- */
-const autoSfx = (scene: Scene) => {
-  const out: { t: number; name: string; volume?: number }[] = [...(scene.sfx ?? [])];
+/* ---------- звуковые эффекты: из слоёв сцены + явные scene.sfx ---------- */
+type Fx = { t: number; name: string; volume?: number };
+const autoSfx = (scene: Scene, index: number): Fx[] => {
+  const out: Fx[] = [...(scene.sfx ?? [])];
+  if (index > 0) out.push({ t: -0.05, name: 'whoosh', volume: 0.3 }); // смена сцены
+  // наезд камеры
+  const cam = scene.camera ?? [];
+  for (let i = 0; i < cam.length - 1; i++) if (cam[i + 1].zoom - cam[i].zoom >= 0.3) out.push({ t: cam[i].t, name: 'whoosh', volume: 0.55 });
   for (const l of scene.layers) {
     const at = l.t ?? 0;
-    if (['sticker', 'arrowLabel', 'choice', 'bigText', 'exclaim', 'comment'].includes(l.type)) out.push({ t: at, name: 'pop' });
-    if (l.type === 'phone') l.messages.forEach((m) => out.push({ t: m.t, name: 'message' }));
-    if (l.type === 'desk') out.push({ t: l.punchAt, name: 'punch' });
-    if (l.type === 'fly') out.push({ t: at, name: 'buzz', volume: 0.4 });
+    switch (l.type) {
+      case 'sticker': case 'arrowLabel': case 'choice': case 'bigText': case 'comment': case 'progressBar':
+        out.push({ t: at, name: 'pop', volume: 0.5 }); break;
+      case 'question': out.push({ t: at, name: 'boing', volume: 0.4 }); break;
+      case 'phone': l.messages.forEach((m) => m.t >= 0 && out.push({ t: m.t, name: 'message', volume: 0.6 })); break;
+      case 'desk': out.push({ t: l.punchAt, name: 'punch', volume: 1 }); break;
+      case 'fly': out.push({ t: at, name: 'buzz', volume: 0.3 }); break;
+      case 'beachPhoto':
+        out.push({ t: at, name: 'whoosh', volume: 0.5 });
+        if (l.stamp && l.stampAt !== undefined) out.push({ t: l.stampAt, name: 'stamp', volume: 0.8 });
+        break;
+      case 'gosha':
+        if (l.pop) out.push({ t: at, name: 'boing', volume: 0.45 });
+        (l.poses ?? []).forEach((p) => p.eyes === 'shock' && out.push({ t: p.t, name: 'shock', volume: 0.5 }));
+        break;
+    }
   }
   return out;
+};
+
+/* ---------- музыка: приглушение под голосом и паузы ---------- */
+const voiceSpans = (scenes: Scene[], starts: number[]) =>
+  scenes.flatMap((s, i) => {
+    if (!s.voice || !s.caption) return [];
+    const parts = s.caption.parts ?? [{ start: s.caption.start ?? 0, end: s.caption.end ?? 0 }];
+    return parts.map((p) => [starts[i] + p.start, starts[i] + p.end] as const);
+  });
+
+const musicVolume = (t: number, base: number, duck: number, spans: (readonly [number, number])[], stops: { t: number; dur: number }[]) => {
+  let near = 0;
+  for (const [a, b] of spans) {
+    const d = t < a ? a - t : t > b ? t - b : 0;
+    near = Math.max(near, 1 - clamp(d / 0.3)); // плавно 0.3 с до/после фразы
+  }
+  let stop = 1;
+  for (const st of stops) {
+    if (t >= st.t && t <= st.t + st.dur) {
+      const fadeOut = 1 - clamp((t - st.t) / 0.08); // глушим за 0.08 с
+      const fadeIn = clamp((t - (st.t + st.dur - 0.6)) / 0.6); // возвращаем за последние 0.6 с
+      stop = Math.min(stop, Math.max(fadeOut, fadeIn));
+    }
+  }
+  return base * (1 - duck * near) * stop;
 };
 
 export const EpisodeComp: React.FC<EpisodeProps> = (props) => {
@@ -233,6 +275,8 @@ export const EpisodeComp: React.FC<EpisodeProps> = (props) => {
   const { episode } = props;
   const starts = sceneStarts(episode.scenes);
   const sfxFiles = new Set(props.availableSfx ?? []);
+  const spans = voiceSpans(episode.scenes, starts);
+  const stops = episode.scenes.flatMap((s, i) => (s.musicStop ?? []).map((m) => ({ t: starts[i] + m.t, dur: m.dur })));
   return (
     <AbsoluteFill style={{ background: '#000' }}>
       <style>{FONT_CSS}</style>
@@ -244,21 +288,28 @@ export const EpisodeComp: React.FC<EpisodeProps> = (props) => {
               <Audio src={staticFile(props.voiceSrc)} trimBefore={Math.round(s.voice.from * fps)} trimAfter={Math.round(s.voice.to * fps)} volume={episode.voice.volume ?? 1} />
             </Sequence>
           )}
-          {autoSfx(s).map((fx, j) => {
-            const file = [...sfxFiles].find((f) => f.replace(/\.[a-z0-9]+$/, '') === fx.name);
-            if (!file) return null;
-            return (
-              <Sequence key={j} from={Math.round(fx.t * fps)} name={`sfx:${fx.name}`}>
-                <Audio src={staticFile(`sfx/${file}`)} volume={(fx.volume ?? 1) * 0.6} />
-              </Sequence>
-            );
-          })}
         </Sequence>
       ))}
       <HudTrack props={props} starts={starts} />
+      {/* эффекты в глобальном времени — длинные звуки не обрезаются на смене сцены */}
+      {episode.scenes.flatMap((s, i) => autoSfx(s, i).map((fx, j) => {
+        const file = [...sfxFiles].find((f) => f.replace(/\.[a-z0-9]+$/, '') === fx.name);
+        if (!file) return null;
+        return (
+          <Sequence key={`${s.id}-${j}`} from={Math.max(0, Math.round((starts[i] + fx.t) * fps))} name={`sfx:${fx.name}`}>
+            <Audio src={staticFile(`sfx/${file}`)} volume={(fx.volume ?? 1) * (episode.sfxVolume ?? 0.5)} />
+          </Sequence>
+        );
+      }))}
       {/* без нарезки по сценам — файл озвучки целиком (или тишина-заглушка) */}
       {!(props.voiceSrc && episode.scenes.some((s) => s.voice)) && <Audio src={staticFile(props.voiceSrc ?? episode.voice.stub)} volume={episode.voice.volume ?? 1} />}
-      {props.musicSrc && <Audio src={staticFile(props.musicSrc)} volume={episode.music?.volume ?? 0.18} loop />}
+      {props.musicSrc && (
+        <Audio
+          src={staticFile(props.musicSrc)}
+          loop
+          volume={(f) => musicVolume(f / fps, episode.music?.volume ?? 0.15, episode.music?.duck ?? 0.5, spans, stops)}
+        />
+      )}
     </AbsoluteFill>
   );
 };

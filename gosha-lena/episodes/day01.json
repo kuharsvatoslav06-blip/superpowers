@@ -11,8 +11,10 @@
   },
   "music": {
     "src": "music/theme.mp3",
-    "volume": 0.18
+    "volume": 0.15,
+    "duck": 0.5
   },
+  "sfxVolume": 0.5,
   "hud": {
     "days": 30,
     "progress": 0
@@ -559,7 +561,13 @@
         "from": 21.776,
         "to": 25.61,
         "at": 0.6
-      }
+      },
+      "musicStop": [
+        {
+          "t": 0.45,
+          "dur": 4.75
+        }
+      ]
     },
     {
       "id": "07-punch",
@@ -781,7 +789,14 @@
         "from": 33.954,
         "to": 37.237,
         "at": 0
-      }
+      },
+      "sfx": [
+        {
+          "t": 1.25,
+          "name": "fail",
+          "volume": 0.7
+        }
+      ]
     },
     {
       "id": "09-choice",

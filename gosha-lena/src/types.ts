@@ -48,6 +48,8 @@ export type Scene = {
   voice?: { from: number; to: number; at: number };
   layers: Layer[];
   sfx?: { t: number; name: string; volume?: number }[];
+  /** пауза музыки (с, от начала сцены): глушится за 0.08 с, возвращается за 0.6 с */
+  musicStop?: { t: number; dur: number }[];
 };
 
 export type Episode = {
@@ -57,7 +59,8 @@ export type Episode = {
   width: number;
   height: number;
   voice: { src: string; stub: string; volume?: number };
-  music?: { src: string; volume?: number } | null;
+  music?: { src: string; volume?: number; duck?: number } | null;
+  sfxVolume?: number;
   hud: { days: number; progress: number };
   /** тексты обложек TikTok/YouTube (scripts/render-covers.mjs) */
   cover?: { badge?: string; title?: string; subtitle?: string; bubble?: string; photoCaption?: string; stamp?: string; color?: string };

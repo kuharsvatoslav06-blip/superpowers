@@ -34,7 +34,9 @@ node scripts/render.mjs day01
 Пока файла нет, рендер подставляет тишину `assets/voice/day01_silence.mp3`.
 
 ## Звуки и музыка
-Подхватываются автоматически, если положить файлы в `assets/sfx/` с именами `pop`, `message`, `punch`, `buzz` (mp3/wav/ogg) и музыку в `assets/music/theme.mp3`.
+Всё синтезировано кодом (без чужих сэмплов, без проблем с авторскими правами): `python3 scripts/make-audio.py` → `assets/music/theme.mp3` и `assets/sfx/*.wav` (pop, message, punch, buzz, whoosh, boing, shock, fail, stamp). Любой файл можно заменить своим с тем же именем.
+Эффекты расставляются сами по слоям сцены (наклейки → pop, сообщения → message, удар → punch, муха → buzz, шок → shock, фото → whoosh + stamp, смена сцены и наезд камеры → whoosh); дополнительные — в `scene.sfx: [{t, name, volume}]`.
+Музыка (`music.volume`, `music.duck`) приглушается под голосом; пауза — `scene.musicStop: [{t, dur}]`. Общая громкость эффектов — `sfxVolume`. Итог нормализуется до −14 LUFS.
 
 ## Персонажи
 `src/characters/Gosha.tsx` — векторный Гоша по референсу `assets/characters/gosha_skuf2_fullbody_bg.png`, разобранный на группы (глаза, веки, рот, антенна, пот, рука). `npx tsx scripts/export-svgs.tsx` выгружает `gosha_skuf2_fullbody.svg` и `gosha_skuf2.svg`. Аватарки `gosha_skuf2_avatar.png` и `lena_avatar.png` вырезаны из присланных картинок.
