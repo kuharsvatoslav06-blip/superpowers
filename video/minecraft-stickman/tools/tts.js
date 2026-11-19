@@ -1,6 +1,6 @@
 // Voice-over generator: synthesizes every line of the script with an offline TTS engine (Festival + MBROLA us2),
 // post-processes it with ffmpeg and writes build/voice/<id>.wav plus src/generated/voice.js (durations for subtitles).
-// To use a real voice actor instead: drop recordings named <line id>.wav into voice/ — they take precedence.
+// To use a real voice (e.g. ElevenLabs): drop files named <line id>.wav/.mp3 into voice/ — they take precedence.
 import fs from 'node:fs'; import path from 'node:path'; import { execFileSync } from 'node:child_process';
 import { LINES, sceneById } from '../src/story/script.js';
 import { ROOT } from './server.js';
@@ -23,8 +23,8 @@ const STYLE = {
 const manifest = {};
 for (const l of LINES) {
   const out = path.join(OUT, l.id + '.wav'); const st = STYLE[l.kind] || STYLE.dia;
-  const custom = path.join(CUSTOM, l.id + '.wav');
-  if (fs.existsSync(custom)) { ff(['-i', custom, '-ac', '1', '-ar', '48000', out]); }
+  const custom = ['.wav', '.mp3', '.m4a', '.flac'].map(e => path.join(CUSTOM, l.id + e)).find(f => fs.existsSync(f));
+  if (custom) { const extra = l.kind === 'entity' ? 'aresample=48000,asetrate=40800,aresample=48000,atempo=1.0,aecho=0.8:0.7:120|260:0.35|0.2,' : ''; ff(['-i', custom, '-af', extra + 'silenceremove=start_periods=1:start_threshold=-50dB:stop_periods=-1:stop_threshold=-50dB:stop_duration=0.3,loudnorm=I=-16:TP=-1.5:LRA=7', '-ac', '1', '-ar', '48000', out]); }
   else {
     if (!hasFestival) { console.error('festival not installed: sudo apt-get install festival festvox-us2 (or put recordings into voice/)'); process.exit(1); }
     const raw = path.join(TMP, l.id + '.raw.wav'); const scm = path.join(TMP, l.id + '.scm');
