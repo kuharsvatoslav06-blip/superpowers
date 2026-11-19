@@ -223,7 +223,7 @@ function drawCaption(ctx, c, t) {
 const CHAPTERS = window.CHAPTERS_CFG;
 function drawHeart(ctx, x, y, s, col) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, 8); ctx.bezierCurveTo(-22, -6, -14, -24, 0, -12); ctx.bezierCurveTo(14, -24, 22, -6, 0, 8); ctx.fill(); ctx.restore(); }
 function drawHUD(ctx, t) {
-  const a = sm(window.HUD_START, window.HUD_START + 0.6, t) * (1 - sm(89.3, 89.9, t)); if (a <= 0) return;
+  const a = sm(window.HUD_START, window.HUD_START + 0.6, t) * (1 - sm(window.DUR_TOTAL - 0.7, window.DUR_TOTAL - 0.1, t)); if (a <= 0) return;
   ctx.save(); ctx.globalAlpha = a;
   const x0 = 96, x1 = 984, gap = 16, sw = (x1 - x0 - gap * 3) / 4, y = 176;
   ctx.font = '700 31px Oswald'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

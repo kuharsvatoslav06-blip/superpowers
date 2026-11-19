@@ -56,7 +56,7 @@ def chord_at(tt):
 
 # ---- bass: pumping 8ths (16ths in builds) ----
 tt = 0.0
-while tt < 90:
+while tt < DUR:
     on = k(BASS_ON, tt)
     sixteenth = (16 <= tt < 22) or (33.5 <= tt < 46)
     step = S16 if sixteenth else BEAT / 2
@@ -76,7 +76,7 @@ while tt < 90:
 def lerp_cut(x): return float(np.interp(x, [0, 22, 46, 65, 72, 90], [500, 800, 1300, 900, 1400, 1400]))
 # ---- pad: dark detuned saws, chord per bar ----
 PAD_ON = [(0, 0.55), (22, 0.6), (46, 0.8), (65, 0.6), (70, 0.9), (88, 1.0), (90, 0.5)]
-for b in range(int(90 / BAR) + 1):
+for b in range(int(DUR / BAR) + 1):
     t0 = b * BAR; root, tri = chord_at(t0 + 0.01)
     notes = [root + 12] + [x - 12 for x in tri]
     n = int((BAR + 0.6) * SR); tau = np.arange(n) / SR
@@ -92,7 +92,7 @@ for b in range(int(90 / BAR) + 1):
 # ---- triplet pluck arp ----
 TRIP = BEAT * 2 / 3
 tt = 0.0; i = 0
-while tt < 90:
+while tt < DUR:
     on = k(ARP_ON, tt)
     if on > 0:
         root, tri = chord_at(tt)
@@ -108,7 +108,7 @@ while tt < 90:
 
 # ---- bells: FM, one 8-step pattern per bar ----
 BELL_PAT = [0, None, 2, None, 1, None, 2, 3]
-for b in range(int(90 / BAR) + 1):
+for b in range(int(DUR / BAR) + 1):
     t0 = b * BAR; root, tri = chord_at(t0 + 0.01)
     tones = [tri[0] + 24, tri[1] + 24, tri[2] + 24, tri[0] + 36]
     for j, p in enumerate(BELL_PAT):
@@ -121,7 +121,7 @@ for b in range(int(90 / BAR) + 1):
         put(PL, PR, at, s * a * 0.045, 0.3 + 0.4 * ((j // 2) % 2))
 
 # ---- gliding lead (the "chirp" tone of the reference), every 2 bars ----
-for b in range(0, int(90 / BAR), 2):
+for b in range(0, int(DUR / BAR), 2):
     t0 = b * BAR + BEAT
     if t0 < 4 or t0 > 86: continue
     root, tri = chord_at(t0)
@@ -151,7 +151,7 @@ def kick(at, a):
     put(KL, KR, at, np.tanh(s * 1.5) * a * 0.35, 0.5)
 
 tt = 0.0; j = 0
-while tt < 90:
+while tt < DUR:
     ha = k(HAT_ON, tt)
     if ha > 0: hat(tt, ha * (1.0 if j % 4 == 2 else 0.55), open_=(j % 8 == 6))
     ca = k(CLAP_ON, tt)
@@ -177,7 +177,7 @@ SL += dr * 0.16; SR_ += dr * 0.16
 
 # ---- light shimmer pad for ВЫХОД ----
 SH = env_pts([(0, 0), (66, 0), (72, 1), (88, 1), (90, 0.4)])
-for b in range(int(65 / BAR), int(90 / BAR) + 1):
+for b in range(int(65 / BAR), int(DUR / BAR) + 1):
     t0 = b * BAR; root, tri = chord_at(t0 + 0.01)
     n = int((BAR + 1.0) * SR); tau = np.arange(n) / SR
     e = np.minimum(1, tau / 0.8) * np.where(tau < BAR, 1, np.exp(-(tau - BAR) / 0.4))

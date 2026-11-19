@@ -4,7 +4,7 @@ import numpy as np
 from timeline import beat_times, bpm_at
 
 SR = 44100
-DUR = 90.0
+DUR = 93.0
 N = int(SR * DUR)
 t = np.arange(N) / SR
 
@@ -52,7 +52,7 @@ def sfx_layer():
         for off in (0, 0.14):
             n = int(0.12 * SR); tau = np.arange(n) / SR
             add_at(clack, tt + off, fft_filter(noise(n), lo=200, hi=1500) * np.exp(-tau / 0.02) * 0.6)
-    me = env_pts([(0, 0.0), (0.3, 1), (9.5, 0.9), (12, 0.25), (22, 0.1), (65, 0.1), (77, 0.4), (87, 0.6), (90, 0)])
+    me = env_pts([(0, 0.0), (0.3, 1), (9.5, 0.9), (12, 0.25), (22, 0.1), (65, 0.1), (77, 0.4), (90, 0.6), (93, 0)])
     L += (rum * 0.09 + clack * 0.05) * me; R += (np.roll(rum, 800) * 0.09 + np.roll(clack, 300) * 0.05) * me
     # door chime + doors closing
     for at, f in ((4.35, 880), (4.75, 698.5)):
@@ -82,7 +82,7 @@ def sfx_layer():
             add_at(L, tt + off, s); add_at(R, tt + off, s)
         tt += rate
     # slow breath in the exhale scene (inhale 2 s, exhale 3 s, cycle starts at 77.8)
-    for c0 in (77.8, 82.8):
+    for c0 in (77.8,):
         for off, d, a, hi in ((0, 2.0, 0.04, 3000), (2.0, 3.0, 0.06, 1800)):
             n = int(d * SR); tau = np.arange(n) / SR
             s = fft_filter(noise(n), lo=200, hi=hi) * np.sin(np.pi * tau / d) ** 1.5 * a
@@ -102,7 +102,7 @@ def sfx_layer():
         add_at(L, at, s); add_at(R, at, s)
     for at, a in ((0.0, 0.3), (4.0, 0.35), (16.0, 0.5), (22.0, 0.55), (46.0, 0.6), (65.0, 0.35)):
         boom(at, a)
-    for c in [9.5, 27.5, 33.5, 40, 52, 58.5, 71, 77, 83, 87]:
+    for c in [9.5, 27.5, 33.5, 40, 52, 58.5, 71, 77, 83.9, 88.4]:
         n = int(0.7 * SR); tau = np.arange(n) / SR
         s = norm(fft_filter(noise(n), lo=300, hi=3000)) * np.sin(np.pi * tau / 0.7) ** 3 * 0.045
         add_at(L, c - 0.45, s); add_at(R, c - 0.45, np.roll(s, 200))
@@ -144,7 +144,7 @@ if len(sys.argv) > 3:
     for a_, b_ in spans:
         pts += [(a_ - 0.25, 0), (a_ - 0.05, 1), (b_ + 0.2, 1), (b_ + 0.5, 0)]
         act[int(a_ * SR):int(b_ * SR)] = True
-    pts.append((90, 0))
+    pts.append((DUR, 0))
     g = np.clip(env_pts(pts), 0, 1)
     mL *= 1 - 0.1 * g; mR *= 1 - 0.1 * g
     xL *= 1 - 0.25 * g; xR *= 1 - 0.25 * g
@@ -157,7 +157,7 @@ if len(sys.argv) > 3:
     xL += nar; xR += nar
 
 L = mL + xL; R = mR + xR
-fade = env_pts([(0, 1), (88.7, 1), (90, 0)])
+fade = env_pts([(0, 1), (91.7, 1), (93, 0)])
 L *= fade; R *= fade
 st = np.stack([L, R], 1)
 st = np.tanh(st * 1.15) / np.tanh(1.15)

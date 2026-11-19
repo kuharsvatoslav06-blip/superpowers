@@ -41,7 +41,7 @@ function render(t) {
   ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.13; ctx.drawImage(GRAIN[Math.floor(t * 24) % 4], 0, 0, W, H); ctx.restore();
   for (const c of CAPS) drawCaption(ctx, c, t);
   drawHUD(ctx, t); drawChapterStamp(ctx, t);
-  if (t > 89.4) { ctx.fillStyle = `rgba(0,0,0,${sm(89.4, 90, t)})`; ctx.fillRect(0, 0, W, H); }
+  if (t > DUR_TOTAL - 0.6) { ctx.fillStyle = `rgba(0,0,0,${sm(DUR_TOTAL - 0.6, DUR_TOTAL, t)})`; ctx.fillRect(0, 0, W, H); }
 }
 window.ready = (async () => { await document.fonts.load('700 50px Oswald'); await document.fonts.load('700 50px Oswald', 'ЖЖ'); await document.fonts.ready; return true; })();
 window.frame = (t, q = 0.92) => { render(t); return cv.toDataURL('image/jpeg', q); };

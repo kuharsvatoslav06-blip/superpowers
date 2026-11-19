@@ -7,7 +7,7 @@ const [,, outDir, mode, ...rest] = process.argv;
   fs.mkdirSync(outDir, { recursive: true });
   let times;
   if (mode === 'probe') times = rest.map(Number);
-  else { const n = 90 * 30; times = [...Array(n).keys()].map(i => i / 30); }
+  else { const n = 93 * 30; times = [...Array(n).keys()].map(i => i / 30); }
   const N = mode === 'probe' ? 1 : 4;
   let done = 0; const t0 = Date.now();
   await Promise.all([...Array(N).keys()].map(async w => {
