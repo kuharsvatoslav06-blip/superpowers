@@ -63,7 +63,7 @@ export default function s3(W) {
     const sst = shadowMan.state(t); sst.visible = silOn && (glitchOut < 0.01 || Math.sin(t * 90) > 0); sst.opacity = smooth(prog(t, B.silhouette, B.silhouette + 1.2)); sst.shadow = 0;
     if (glitchOut > 0) sst.pos = [sst.pos[0] + (Math.sin(t * 77) * 0.3), sst.pos[1], sst.pos[2]];
     C.shadowMan.apply(sst);
-    C.eerie.position.set(-52.5, 7.5, zp(-53)); C.eerie.position.x += 1.6; C.eerie.intensity = silOn ? 7 * sst.opacity : t > B.crumble ? 4 * smooth(prog(t, B.crumble, B.crumbleEnd)) : 0;
+    C.eerie.position.set(-55.4, 6.6, zp(-55)); C.eerie.intensity = silOn ? 9 * sst.opacity : t > B.crumble ? 4 * smooth(prog(t, B.crumble, B.crumbleEnd)) : 0;
     // the wall crumbles block by block
     C.passageBlocks.forEach((m, i) => {
       const d = B.crumble + (i / C.passageBlocks.length) * (B.crumbleEnd - B.crumble - 0.4) + (i % 3) * 0.05; const k = prog(t, d, d + 0.4);
@@ -101,7 +101,7 @@ export default function s3(W) {
       { t: [B.enter, 70.5], pos: [() => behind(2.6, 1.8), () => behind(2.6, 1.8)], look: () => off(P, [-3, 1.2, 0]), fov: 55 },
     ]);
     W.cam.apply({ ...c, t });
-    const post = { vignette: 1.1, saturation: 0.85, contrast: 1.1, grain: 0.05 };
+    const post = { vignette: 1.1, saturation: 0.85, contrast: 1.1, grain: 0.02 };
     if (t > B.stop && t < B.run) post.vignette = 1.5;
     if (t > B.run && t < B.spin) { post.saturation = 0.7; post.rgb = 0.2; }
     if (t > B.vanish - 0.25 && t < B.vanish + 0.3) { post.glitch = 0.9; post.rgb = 1; }

@@ -26,7 +26,7 @@ export const G = (scene, t) => sceneById[scene].start + t;
 // *word* = highlighted in the subtitle.
 export const LINES = [
   { id: 'c1', scene: 'cold', t: 0.25, who: 'hero', kind: 'nar', text: 'Everyone says Minecraft is *relaxing*.' },
-  { id: 'c2', scene: 'cold', t: 2.55, who: 'hero', kind: 'nar', text: 'Nobody warned me about *this*.' },
+  { id: 'c2', scene: 'cold', t: 2.85, who: 'hero', kind: 'nar', text: 'Nobody warned me about *this*.' },
 
   { id: 's1a', scene: 's1', t: 0.9, who: 'hero', kind: 'nar', text: '*Day one.* A brand-new Minecraft world.' },
   { id: 's1b', scene: 's1', t: 4.1, who: 'hero', kind: 'nar', text: 'No tools, no shelter, and absolutely *no idea* what I\'m doing.' },

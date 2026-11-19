@@ -39,14 +39,14 @@ export default function s7(W) {
     S.glowParticles.add(burst({ t0: B.ender, pos: [0.5, g(0.5, -1.8) + 1.5, -1.8], n: 30, colors: ['#c040ff', '#e070ff'], speed: 1.2, up: 0.5, gravity: 0, life: 0.8, size: 0.08, seed: 170 }));
     S.particles.add(motes({ center: [0.5, 22, 1], extent: [16, 5, 16], n: 50, colors: ['#fff6c8', '#ffffff'], size: 0.04, alpha: 0.5, seed: 71 }));
     // camera
-    const H = head(st); const P = st.pos; const sitH = [P[0], P[1] + 1.0, P[2]];
+    const H = head(st); const P = st.pos; const sitH = [P[0], P[1] + 0.85, P[2]];
     const c = shot(t, [
       { t: [0, B.sitUp], pos: [[0.5, 23.5, 0.8], [0.5, 21.9, 1.0]], look: [[0.5, 19.5, 0.5], [0.4, 19.6, 0.2]], fov: [60, 45], ease: 'out' },
       { t: [B.sitUp, B.sky], pos: [() => off(sitH, [0.4, 0.1, 1.4]), () => off(sitH, [0.35, 0.1, 1.2])], look: () => sitH, fov: 42 },
       { t: [B.sky, B.stand], pos: [[1.2, 19.4, 2.6], [1.0, 19.4, 2.4]], look: [[6.0, 25.0, 6.5], [5.0, 28.5, 5.0]], fov: 75, ease: 'linear' },
       { t: [B.stand, B.sit], pos: [[3.5, 20.4, 3.4], [3.2, 22.2, 2.8]], look: [() => off(P, [0, 0.9, 0]), () => off(P, [0, 0.4, 0])], fov: 52 },
       { t: [B.sit, B.back], pos: [() => off(sitH, [0.5, 0.1, 1.6]), () => off(sitH, [0.4, 0.1, 1.4])], look: () => sitH, fov: 42 },
-      { t: [B.back, B.black], pos: [() => off(sitH, [0, 0.55, 3.8]), () => off(sitH, [0, 0.12, 0.85])], look: [() => off(sitH, [0, 0.9, -1.4]), () => sitH], fov: [36, 62], ease: 'in' },
+      { t: [B.back, B.black], pos: [() => off(sitH, [0, 0.15, 3.6]), () => off(sitH, [0, 0.05, 0.9])], look: [() => off(sitH, [0, 0.45, -1.8]), () => off(sitH, [0, -0.1, 0])], fov: [36, 62], ease: 'in' },
     ]);
     W.cam.apply({ ...c, t, handheld: 0.01 });
     const post = { vignette: t > B.inv ? 0.8 : 0.45, saturation: t > B.back ? 0.85 : 1.1 };

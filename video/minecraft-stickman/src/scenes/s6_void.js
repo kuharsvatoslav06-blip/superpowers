@@ -71,7 +71,7 @@ export default function s6(W) {
       { t: [B.sprint, B.flash + 1], pos: [[6.4, 31.4, 27.4], [5.0, 31.3, 26.3]], look: [() => off(P, [0, 1.0, 0]), () => [3.5, 31.2, 24.8]], fov: [55, 45], ease: 'in', shake: () => shakeEnv(t, [[B.press, 1.0, 0.4]]) },
     ]);
     W.cam.apply({ ...c, t });
-    const post = { vignette: 1.0, saturation: 1.0, contrast: 1.1, grain: 0.05 };
+    const post = { vignette: 1.0, saturation: 1.0, contrast: 1.1, grain: 0.02 };
     if (t > B.count && t < B.flash) { post.vignette = 1.3; post.tint = [1, 0.5, 0.5]; post.tintAmt = 0.12 * (1 - ((t - B.count) % 1)); }
     if (t > B.detected && t < B.detected + 0.3) post.glitch = 0.6;
     if (HITS.some(h => t > h && t < h + 0.18)) { post.glitch = 0.5; post.rgb = 1; }

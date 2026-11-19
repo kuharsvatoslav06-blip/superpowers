@@ -18,8 +18,8 @@ export default function s2(W) {
   const appear = new Float32Array(N); order.forEach((bi, n) => { appear[bi] = B.buildStart + (n / N) * (B.buildEnd - B.buildStart); });
   const hero = new Actor(S.hero, {
     ground: g, talk: talker('s2'), blinkSeed: 1.1,
-    path: [[0, [4.5, -0.6]], [0.9, [8.5, 6.2], 'out'], [B.toBed, [8.5, 6.2]], [11.8, [8.4, 6.6], 'linear'], [B.lie, [8.0, 7.5]], [B.getUp, [8.0, 7.5]], [B.window - 0.1, [9.45, 6.5]],
-      [B.slam + 0.4, [9.45, 6.5]], [B.slam + 1.8, [8.1, 6.9], 'out'], [B.tiptoe, [8.1, 6.9]], [B.open - 0.5, [8.5, 5.1], 'linear'], [B.out, [8.5, 5.1]], [B.out + 1.0, [8.5, 3.45], 'inOut'],
+    path: [[0, [4.5, -0.6]], [0.9, [8.5, 6.2], 'out'], [B.toBed, [8.5, 6.2]], [11.8, [8.4, 6.6], 'linear'], [B.lie, [8.0, 7.5]], [B.getUp, [8.0, 7.5]], [B.window - 0.1, [9.4, 6.2]],
+      [B.slam + 0.4, [9.4, 6.2]], [B.slam + 1.8, [8.1, 6.9], 'out'], [B.tiptoe, [8.1, 6.9]], [B.open - 0.5, [8.5, 5.1], 'linear'], [B.out, [8.5, 5.1]], [B.out + 1.0, [8.5, 3.45], 'inOut'],
       [B.leave, [8.5, 3.45]], [53.5, [-2.0, 0.2], 'in']],
     yaw: [[0, 0.6], [0.9, 0.6], [B.buildEnd, 0.6 + Math.PI * 6], [B.buildEnd + 0.4, Math.PI * 6 + Math.PI], [B.toBed, Math.PI * 7], [11.8, Math.PI * 6 + 0.3], [B.lie, Math.PI * 6 - Math.PI / 2],
       [B.getUp, Math.PI * 6 - Math.PI / 2], [B.getUp + 0.3, Math.PI * 6 + Math.PI / 2], [B.slam + 0.5, Math.PI * 6 + Math.PI / 2], [B.tiptoe, Math.PI * 6 + Math.PI / 2], [B.tiptoe + 0.4, Math.PI * 7],
@@ -74,17 +74,17 @@ export default function s2(W) {
     // ---------- camera
     const H = head(st);
     const c = shot(t, [
-      { t: [0, 8.4], pos: [(tt) => orbit([8.5, 22, 6.2], 8.0, 3.0 + tt * 0.32, 3.0 + tt * 0.38), (tt) => orbit([8.5, 22, 6.2], 8.0, 3.0 + tt * 0.32, 3.0 + tt * 0.38)], look: [8.5, 22.6, 6.2], fov: 54, ease: 'linear' },
+      { t: [0, 8.4], pos: [(tt) => orbit([8.5, 22, 6.2], 8.0, 0.6 + tt * 0.32, 3.0 + tt * 0.38), (tt) => orbit([8.5, 22, 6.2], 8.0, 0.6 + tt * 0.32, 3.0 + tt * 0.38)], look: [8.5, 22.6, 6.2], fov: 54, ease: 'linear' },
       { t: [8.4, B.toBed], pos: [[8.5, 27.5, -4.0], [8.5, 26.5, -3.0]], look: [8.5, 22.5, 6.5], fov: 45 },
       { t: [B.toBed, B.window], pos: [[8.5, 24.9, 2.4], [8.4, 24.4, 3.4]], look: [() => off(st.pos, [0, 0.6, 0.6]), () => off(st.pos, [0, 0.6, 0.6])], fov: 48 },
-      { t: [B.window, B.turn], pos: [[8.55, 22.98, 6.15], [8.65, 22.95, 6.2]], look: [[17, 22.3, 6.8], [17, 22.4, 6.8]], fov: [50, 40] },
+      { t: [B.window, B.turn], pos: [[8.85, 22.78, 6.86], [9.05, 22.74, 6.85]], look: [[17, 22.3, 6.6], [17, 22.4, 6.6]], fov: [50, 40] },
       { t: [B.turn, B.turn + 3.3], pos: [[13.6, 22.6, 6.6], [14.6, 22.6, 6.6]], look: [[17.1, 22.6, 6.6], [17.1, 22.65, 6.6]], fov: [46, 38], ease: 'sine' },
       { t: [B.turn + 3.3, B.slam - 0.35], pos: [[11.9, 22.85, 6.55], [11.3, 22.8, 6.55]], look: () => H, fov: 34 },
       { t: [B.slam - 0.35, B.knocks[0] - 0.3], pos: [[7.6, 22.7, 5.4], [7.4, 22.6, 5.3]], look: [9.8, 22.4, 6.6], fov: 55, shake: () => shakeEnv(t, [[B.slam, 0.6, 0.3]]) },
       { t: [B.knocks[0] - 0.3, B.tiptoe], pos: [[8.5, 22.5, 7.2], [8.5, 22.4, 6.6]], look: [8.5, 22.0, 4.4], fov: 50, ease: 'linear', shake: () => shakeEnv(t, B.knocks.map(k => [k, 0.35, 0.2])) },
       { t: [B.tiptoe, B.open], pos: [[6.6, 23.2, 7.6], [6.9, 23.1, 7.2]], look: [() => off(st.pos, [0, 1.1, -0.4]), () => off(st.pos, [0, 1.1, -0.4])], fov: 50 },
       { t: [B.open, B.sign], pos: [[8.95, 23.4, 6.95], [8.85, 23.3, 6.6]], look: [[8.5, 22.3, 0.5], [8.5, 22.1, 1.0]], fov: 52 },
-      { t: [B.sign, B.face], pos: [[10.2, 23.0, 4.7], [9.55, 22.55, 3.85]], look: [[8.5, 22.05, 2.6], [8.5, 22.05, 2.6]], fov: [50, 40], ease: 'out3' },
+      { t: [B.sign, B.face], pos: [[10.2, 23.0, 4.7], [9.55, 22.55, 3.85]], look: [[8.9, 22.1, 2.6], [8.85, 22.1, 2.6]], fov: [50, 40], ease: 'out3' },
       { t: [B.face, B.leave], pos: [() => off(H, [-1.0, 0.0, -1.35]), () => off(H, [-0.85, 0.0, -1.15])], look: () => H, fov: 40 },
       { t: [B.leave, 53], pos: [[10.5, 23.5, 0.5], [12.5, 30.0, 3.0]], look: [[6, 22, 1], [-12, 23, 0]], fov: [50, 55], ease: 'inOut3' },
     ]);

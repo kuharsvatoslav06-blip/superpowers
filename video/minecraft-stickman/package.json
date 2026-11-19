@@ -10,5 +10,14 @@
     "@fontsource/montserrat": "^5.0.0",
     "@fontsource/silkscreen": "^5.0.0",
     "@fontsource/vt323": "^5.0.0"
+  },
+  "description": "Animated YouTube video 'I Survived 100 Days in Minecraft, But Something Was Wrong' \u2014 Three.js voxel engine, stickman rig, procedural audio, offline renderer",
+  "scripts": {
+    "preview": "node tools/server.js 8080",
+    "tts": "node tools/tts.js",
+    "audio": "node tools/audio.js",
+    "render": "node tools/render.js",
+    "build": "npm run tts && npm run audio && npm run render",
+    "probe": "node tools/probe.js build/probe"
   }
 }

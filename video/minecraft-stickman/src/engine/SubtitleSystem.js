@@ -25,7 +25,8 @@ export function lineTiming(line) {
   let acc = 0; words.forEach((w, i) => { w.t = (acc / total) * dur * 0.92; acc += chars[i]; });
   return { words, dur };
 }
-const SUBS = globalize(LINES).map(l => ({ ...l, ...lineTiming(l) }));
+const SUBS = globalize(LINES).map(l => ({ ...l, ...lineTiming(l) })).sort((a, b) => a.gt - b.gt);
+SUBS.forEach((l, i) => { l.until = Math.min(l.dur + 0.6, i + 1 < SUBS.length ? SUBS[i + 1].gt - l.gt - 0.02 : 99); });
 export function speaking(t, who = 'hero') { // 0..1 talk intensity for lip flap (dialogue only, not narration)
   for (const l of SUBS) if (l.who === who && l.kind !== 'nar' && t >= l.gt && t <= l.gt + l.dur) return 1;
   return 0;
@@ -37,10 +38,10 @@ function chunkWords(words) { // break into readable chunks (max ~34 chars)
 }
 function drawSubtitles(ctx, t) {
   for (const l of SUBS) {
-    const lt = t - l.gt; if (lt < 0 || lt > l.dur + 0.6) continue;
+    const lt = t - l.gt; if (lt < 0 || lt > l.until) continue;
     const chunks = chunkWords(l.words);
     let ci = 0; for (let i = 0; i < chunks.length; i++) if (lt >= chunks[i][0].t - 0.02) ci = i;
-    const chunk = chunks[ci]; const end = ci + 1 < chunks.length ? chunks[ci + 1][0].t : l.dur + 0.6;
+    const chunk = chunks[ci]; const end = ci + 1 < chunks.length ? chunks[ci + 1][0].t : l.until;
     const fadeOut = clamp((end - lt) / 0.15);
     const italic = l.kind === 'whisper' || l.kind === 'read' || l.kind === 'nar';
     const size = l.kind === 'whisper' ? 46 : 52;

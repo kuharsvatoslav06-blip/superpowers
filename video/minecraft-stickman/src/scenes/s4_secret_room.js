@@ -70,7 +70,7 @@ export default function s4(W) {
       { t: [B.run, 60.5], pos: [[-61.4, 6.6, 1.2], [-58.4, 6.6, 0.9]], look: [() => off(P, [0, 1.2, 0]), () => off(P, [0, 1.2, 0])], fov: 62, shake: 0.12 },
     ]);
     W.cam.apply({ ...c, t });
-    const post = { vignette: 1.0, saturation: 0.9, contrast: 1.08, grain: 0.05 };
+    const post = { vignette: 1.0, saturation: 0.9, contrast: 1.08, grain: 0.02 };
     if (t > B.ender && t < B.gone) { post.vignette = 1.2 + prog(t, B.ender, B.gone) * 0.6; post.saturation = 0.7; post.letterbox = smooth(prog(t, B.ender, B.ender + 1)); }
     if (t > B.gone && t < B.gone + 0.12) post.flash = 0.8, post.flashColor = [0.8, 0.5, 1];
     if (t > B.gone && t < B.gone + 0.4) post.glitch = 0.6 * (1 - prog(t, B.gone, B.gone + 0.4));

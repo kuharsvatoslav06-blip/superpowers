@@ -8,6 +8,19 @@ uniform float vignette, grain, glitch, rgb, flash, fade, wipe, warp, letterbox, 
 uniform vec3 tint, wipeColor, flashColor;
 varying vec2 vUv;
 float h1(float n){ return fract(sin(n*127.1)*43758.5453); }
+// FXAA (Lottes, simplified) — replaces MSAA, which is very expensive in software rendering
+vec3 fxaa(vec2 uv){ vec2 px = 1.0 / res; vec3 L = vec3(0.299, 0.587, 0.114);
+  vec3 cNW = texture2D(tDiffuse, uv + vec2(-1.0,-1.0)*px).rgb, cNE = texture2D(tDiffuse, uv + vec2(1.0,-1.0)*px).rgb;
+  vec3 cSW = texture2D(tDiffuse, uv + vec2(-1.0,1.0)*px).rgb, cSE = texture2D(tDiffuse, uv + vec2(1.0,1.0)*px).rgb, cM = texture2D(tDiffuse, uv).rgb;
+  float lNW = dot(cNW,L), lNE = dot(cNE,L), lSW = dot(cSW,L), lSE = dot(cSE,L), lM = dot(cM,L);
+  float lMin = min(lM, min(min(lNW,lNE), min(lSW,lSE))), lMax = max(lM, max(max(lNW,lNE), max(lSW,lSE)));
+  if (lMax - lMin < max(0.0312, lMax * 0.125)) return cM;
+  vec2 dir = vec2(-((lNW + lNE) - (lSW + lSE)), ((lNW + lSW) - (lNE + lSE)));
+  float red = max((lNW + lNE + lSW + lSE) * 0.03125, 1.0/128.0); float rcp = 1.0 / (min(abs(dir.x), abs(dir.y)) + red);
+  dir = clamp(dir * rcp, -8.0, 8.0) * px;
+  vec3 a = 0.5 * (texture2D(tDiffuse, uv + dir * (1.0/3.0 - 0.5)).rgb + texture2D(tDiffuse, uv + dir * (2.0/3.0 - 0.5)).rgb);
+  vec3 b = a * 0.5 + 0.25 * (texture2D(tDiffuse, uv - dir * 0.5).rgb + texture2D(tDiffuse, uv + dir * 0.5).rgb);
+  float lB = dot(b, L); return (lB < lMin || lB > lMax) ? a : b; }
 float h2(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 void main(){
   vec2 uv = vUv; float tt = floor(time*24.0);
@@ -24,7 +37,7 @@ void main(){
   float split = rgb * 0.012 + glitch * 0.01;
   if (zoomBlur > 0.001) { vec3 acc = vec3(0.0); for (int i=0;i<8;i++){ float s = 1.0 - float(i)*zoomBlur*0.02; acc += texture2D(tDiffuse, (uv-0.5)*s+0.5).rgb; } col = acc/8.0; }
   else if (split > 0.0001) { col.r = texture2D(tDiffuse, uv + vec2(split, 0.0)).r; col.g = texture2D(tDiffuse, uv).g; col.b = texture2D(tDiffuse, uv - vec2(split, 0.0)).b; }
-  else col = texture2D(tDiffuse, uv).rgb;
+  else col = fxaa(uv);
   if (glitch > 0.5 && h2(vec2(floor(uv.y*40.0), tt)) < (glitch-0.5)*0.15) col = vec3(col.r*0.2, col.g, 1.0-col.b);
   // grading
   col = (col - 0.5) * contrast + 0.5 + brightness;
@@ -50,13 +63,13 @@ void main(){
 }`;
 const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 
-export const POST_DEFAULTS = { vignette: 0.55, grain: 0.035, glitch: 0, rgb: 0, flash: 0, fade: 0, wipe: 0, warp: 0, letterbox: 0, saturation: 1.08, contrast: 1.06,
+export const POST_DEFAULTS = { vignette: 0.55, grain: 0.012, glitch: 0, rgb: 0, flash: 0, fade: 0, wipe: 0, warp: 0, letterbox: 0, saturation: 1.08, contrast: 1.06,
   brightness: 0, tintAmt: 0, zoomBlur: 0, scan: 0, invert: 0, tint: [1, 1, 1], wipeColor: [0, 0, 0], flashColor: [1, 1, 1] };
 
 export class PostFX {
   constructor(renderer, w, h) {
     this.renderer = renderer;
-    this.rt = new THREE.WebGLRenderTarget(w, h, { samples: 4, type: THREE.UnsignedByteType, colorSpace: THREE.SRGBColorSpace });
+    this.rt = new THREE.WebGLRenderTarget(w, h, { samples: 0, type: THREE.UnsignedByteType, colorSpace: THREE.SRGBColorSpace });
     const u = { tDiffuse: { value: this.rt.texture }, res: { value: new THREE.Vector2(w, h) }, time: { value: 0 } };
     for (const [k, v] of Object.entries(POST_DEFAULTS)) u[k] = { value: Array.isArray(v) ? new THREE.Vector3(...v) : v };
     this.uniforms = u;
