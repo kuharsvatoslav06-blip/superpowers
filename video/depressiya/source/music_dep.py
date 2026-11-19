@@ -143,7 +143,7 @@ if len(sys.argv) > 3:
     xL += nar; xR += nar
 
 L = mL + xL; R = mR + xR
-fade = env_pts([(0, 1), (94.7, 1), (96, 0)])
+fade = env_pts([(0, 1), (95.3, 1), (96, 0)])
 L *= fade; R *= fade
 st = np.stack([L, R], 1)
 st = np.tanh(st * 1.15) / np.tanh(1.15)
