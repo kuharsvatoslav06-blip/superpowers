@@ -1,0 +1,14 @@
+{
+  "name": "minecraft-stickman-animation",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@fontsource/montserrat": "^5.0.0",
+    "@fontsource/silkscreen": "^5.0.0",
+    "@fontsource/vt323": "^5.0.0"
+  }
+}

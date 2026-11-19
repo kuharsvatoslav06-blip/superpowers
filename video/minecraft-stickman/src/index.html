@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>I Survived 100 Days in Minecraft, But Something Was Wrong — preview</title>
+<style>
+  @font-face { font-family: 'Montserrat'; font-weight: 800; src: url('fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Montserrat'; font-weight: 900; src: url('fonts/montserrat-latin-900-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Montserrat'; font-weight: 700; font-style: italic; src: url('fonts/montserrat-latin-700-italic.woff2') format('woff2'); }
+  @font-face { font-family: 'Silkscreen'; font-weight: 400; src: url('fonts/silkscreen-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Silkscreen'; font-weight: 700; src: url('fonts/silkscreen-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'VT323'; font-weight: 400; src: url('fonts/vt323-latin-400-normal.woff2') format('woff2'); }
+  html, body { margin: 0; background: #0b0b0e; color: #ddd; font: 14px system-ui, sans-serif; }
+  #gl { display: none; }
+  #out { display: block; width: 100%; max-width: 1280px; aspect-ratio: 16/9; margin: 0 auto; background: #000; }
+  body.render #out { width: 1920px; height: 1080px; max-width: none; }
+  body.render #ui { display: none; }
+  #ui { max-width: 1280px; margin: 8px auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #ui input[type=range] { flex: 1; min-width: 300px; }
+  button { background: #2b2b33; color: #eee; border: 1px solid #444; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+  #status { opacity: .7; }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
+</head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+<canvas id="out" width="1920" height="1080"></canvas>
+<div id="ui">
+  <button id="play">▶ Play</button>
+  <input id="seek" type="range" min="0" max="1" step="0.001" value="0">
+  <span id="time">0:00.0</span>
+  <select id="jump"></select>
+  <label><input id="subs" type="checkbox" checked> subtitles</label>
+  <span id="status">loading…</span>
+</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>
