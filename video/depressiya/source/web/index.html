@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: 'Oswald'; font-weight: 700; src: url(oswald-cyrillic-700-normal.woff2) format('woff2'); unicode-range: U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: 'Oswald'; font-weight: 700; src: url(oswald-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Oswald'; font-weight: 400; src: url(oswald-cyrillic-700-normal.woff2) format('woff2'); unicode-range: U+0400-045F; }
+@font-face { font-family: 'Oswald'; font-weight: 400; src: url(oswald-latin-700-normal.woff2) format('woff2'); }
+body { margin: 0; background: #000; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="beats.js"></script><script src="dots.js"></script>
+<script src="config.js"></script><script src="core.js"></script><script src="scenes_base.js"></script><script src="scenes2_base.js"></script><script src="scenes3.js"></script>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const bufA = mk(), bufB = mk();
+const GRAIN = [0, 1, 2, 3].map(k => { const c = mk(540, 960), g = c.getContext('2d'), d = g.createImageData(540, 960), r = rng(k + 100); for (let i = 0; i < d.data.length; i += 4) { const v = r() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } g.putImageData(d, 0, 0); return c; });
+const XF = 0.35;
+function drawScene(c, i, t) { const [s, e, fn] = SCENES[i]; c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over'; fn(c, t - s, t); c.restore(); }
+function render(t) {
+  let i = SCENES.findIndex(([s, e]) => t >= s && t < e); if (i < 0) i = SCENES.length - 1;
+  const lt = t - SCENES[i][0];
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (i > 0 && lt < XF) {
+    drawScene(bufA.getContext('2d'), i - 1, t); drawScene(bufB.getContext('2d'), i, t);
+    const k = sm(0, XF, lt); ctx.drawImage(bufA, 0, 0);
+    ctx.save(); ctx.globalAlpha = k; const z = 1 + (1 - k) * 0.08; ctx.translate(540, 960); ctx.scale(z, z); ctx.translate(-540, -960); ctx.drawImage(bufB, 0, 0); ctx.restore();
+  } else drawScene(ctx, i, t);
+  // grade
+  const [gc, ga] = gradeCol(t); ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = ga; ctx.fillStyle = gc; ctx.fillRect(0, 0, W, H); ctx.restore();
+  // chapter-change flash
+  for (const cs of CHAPTERS.map(c => c[1])) { const d = t - cs; if (d >= 0 && d < 0.25) { ctx.fillStyle = `rgba(255,255,255,${0.55 * (1 - d / 0.25)})`; ctx.fillRect(0, 0, W, H); } }
+  if (t < 0.25) { ctx.fillStyle = `rgba(255,255,255,${1 - t / 0.25})`; ctx.fillRect(0, 0, W, H); }
+  // vignette
+  ctx.fillStyle = radial(ctx, 540, 960, 1150, [[0.45, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0.7)']]); ctx.fillRect(0, 0, W, H);
+  // top/bottom shade for HUD & captions legibility
+  ctx.fillStyle = linear(ctx, 0, 0, 0, 380, [[0, 'rgba(0,0,0,0.55)'], [1, 'rgba(0,0,0,0)']]); ctx.fillRect(0, 0, W, 380);
+  // heartbeat red pulse at screen edges in tense parts
+  const bp = beatPulse(t), tense = 0.5 * sm(26, 32, t) * (1 - sm(70, 74, t));
+  if (tense > 0) { ctx.fillStyle = radial(ctx, 540, 960, 1150, [[0.6, 'rgba(255,0,30,0)'], [1, `rgba(255,0,30,${0.35 * bp * tense})`]]); ctx.fillRect(0, 0, W, H); }
+  // grain
+  ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.13; ctx.drawImage(GRAIN[Math.floor(t * 24) % 4], 0, 0, W, H); ctx.restore();
+  for (const c of CAPS) drawCaption(ctx, c, t);
+  drawHUD(ctx, t); drawChapterStamp(ctx, t);
+  if (t > DUR_TOTAL - 0.6) { ctx.fillStyle = `rgba(0,0,0,${sm(DUR_TOTAL - 0.6, DUR_TOTAL, t)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.ready = (async () => { await document.fonts.load('700 50px Oswald'); await document.fonts.load('700 50px Oswald', 'ЖЖ'); await document.fonts.ready; return true; })();
+window.frame = (t, q = 0.92) => { render(t); return cv.toDataURL('image/jpeg', q); };
+</script></body></html>
