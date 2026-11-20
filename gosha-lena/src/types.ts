@@ -15,7 +15,7 @@ export type Pose = {
 type Base = { t?: number; screen?: boolean; until?: number };
 
 export type Layer = Base & (
-  | { type: 'gosha'; x: number; y: number; h: number; crop?: 'full' | 'bust' | 'head'; poses?: Pose[]; wave?: boolean; stink?: boolean; mug?: boolean; pop?: boolean; flip?: boolean; beard?: 'full' | 'stubble' | 'none'; hair?: 'long' | 'short'; cape?: boolean }
+  | { type: 'gosha'; x: number; y: number; h: number; crop?: 'full' | 'bust' | 'head'; poses?: Pose[]; wave?: boolean; stink?: boolean; mug?: boolean; pop?: boolean; flip?: boolean; beard?: 'full' | 'stubble' | 'none'; hair?: 'long' | 'short'; cape?: boolean; holding?: 'dumbbell'; lift?: boolean; rot?: number; bounce?: number }
   | { type: 'fly'; orbit: { cx: number; cy: number; rx: number; ry: number; speed?: number }; land?: { t: number; x: number; y: number }; leave?: { t: number; x: number; y: number }; size?: number }
   | { type: 'sticker'; text: string; x: number; y: number; color?: string; textColor?: string; rot?: number; size?: number; pad?: number; maxWidth?: number }
   | { type: 'arrowLabel'; text: string; x: number; y: number; tx: number; ty: number; color?: string; rot?: number; size?: number }

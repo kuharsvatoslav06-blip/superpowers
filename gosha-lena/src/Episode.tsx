@@ -81,11 +81,14 @@ const GoshaLayer: React.FC<{ l: Extract<Layer, { type: 'gosha' }>; t: number }> 
   const blink = pose.eyes === 'shock' || pose.eyes === 'happy' ? 0 : bt < 0.12 ? 1 : 0;
   const antennaWiggle = pose.antenna === 'up' ? Math.sin(t * 45) * 6 * Math.max(0.3, 1 - shockAge) : Math.sin(t * 2.2) * 5;
   const breathe = 1 + Math.sin(t * 2.4) * 0.008;
-  const armSwing = l.wave ? Math.sin(t * 9) * 14 : 0;
+  // взмах рукой / подъём гантели (медленные повторы)
+  const armSwing = l.wave ? Math.sin(t * 9) * 14 : l.lift ? -35 + 45 * (0.5 + 0.5 * Math.sin(t * 3.2)) : 0;
+  // бег: подпрыгивание
+  const bob = l.bounce ? -Math.abs(Math.sin(t * 9)) * l.bounce : 0;
   // подпрыгивание при шоке
   const jump = shockAge < 0.35 ? -Math.sin((shockAge / 0.35) * Math.PI) * 40 : 0;
   return (
-    <div style={{ position: 'absolute', left: l.x - w / 2, top: l.y + jump, width: w, height: l.h, transform: `scale(${s}) scaleX(${l.flip ? -1 : 1}) scaleY(${breathe})`, transformOrigin: '50% 100%' }}>
+    <div style={{ position: 'absolute', left: l.x - w / 2, top: l.y + jump + bob, width: w, height: l.h, transform: `rotate(${l.rot ?? 0}deg) scale(${s}) scaleX(${l.flip ? -1 : 1}) scaleY(${breathe})`, transformOrigin: l.rot ? '50% 50%' : '50% 100%' }}>
       <Gosha
         crop={crop}
         eyes={pose.eyes}
@@ -101,6 +104,7 @@ const GoshaLayer: React.FC<{ l: Extract<Layer, { type: 'gosha' }>; t: number }> 
         beard={l.beard}
         hair={l.hair}
         cape={l.cape}
+        holding={l.holding}
         style={{ position: 'absolute', inset: 0 }}
       />
       {l.stink && (

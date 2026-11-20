@@ -8,7 +8,7 @@ import React from 'react';
 
 export type Eyes = 'sleepy' | 'shock' | 'happy' | 'angry' | 'worried';
 export type Mouth = 'flat' | 'open' | 'smile' | 'grit' | 'o';
-export type Antenna = 'curl' | 'up';
+export type Antenna = 'curl' | 'up' | 'droop';
 export type ArmPose = 'down' | 'wave' | 'raise';
 
 export type GoshaProps = {
@@ -33,6 +33,8 @@ export type GoshaProps = {
   hair?: 'long' | 'short';
   /** накидка парикмахера */
   cape?: boolean;
+  /** предмет в левой руке */
+  holding?: 'dumbbell';
   style?: React.CSSProperties;
   width?: number | string;
   height?: number | string;
@@ -111,6 +113,7 @@ export const Gosha: React.FC<GoshaProps> = ({
   beard = 'full',
   hair = 'long',
   cape = false,
+  holding,
   style,
   width = '100%',
   height = '100%',
@@ -206,6 +209,8 @@ export const Gosha: React.FC<GoshaProps> = ({
 
   const antennaPath = antenna === 'up'
     ? 'M 513 410 L 520 360 L 500 330 L 525 290 L 505 250'
+    : antenna === 'droop'
+    ? 'M 513 408 C 512 375 540 352 570 362 C 595 372 602 400 596 430 C 593 445 585 452 578 448'
     : 'M 513 408 C 505 360 520 325 555 322 C 585 322 585 352 563 356 C 548 358 545 340 558 336';
 
   return (
@@ -234,6 +239,13 @@ export const Gosha: React.FC<GoshaProps> = ({
       <g id="arm-left" transform={`rotate(${armAngle} 268 1000)`}>
         <ellipse cx={262} cy={1015} rx={50} ry={46} fill={SKIN} stroke={INK} strokeWidth={SW} />
         <path d="M 248 975 C 205 1050 160 1180 152 1300 C 148 1380 152 1440 160 1470 L 238 1470 C 230 1400 232 1290 245 1200 C 255 1120 280 1050 300 1000 Z" fill={SKIN} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+        {holding === 'dumbbell' && (
+          <g id="dumbbell" stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <rect x={110} y={1474} width={176} height={22} rx={8} fill="#9AA6B8" />
+            <rect x={92} y={1435} width={40} height={100} rx={10} fill="#2F2F3A" />
+            <rect x={264} y={1435} width={40} height={100} rx={10} fill="#2F2F3A" />
+          </g>
+        )}
         <circle cx={198} cy={1485} r={45} fill={SKIN} stroke={INK} strokeWidth={SW} />
         <path d="M 176 1500 Q 198 1518 220 1500" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
       </g>

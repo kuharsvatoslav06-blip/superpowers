@@ -1,0 +1,750 @@
+{
+  "id": "day03",
+  "title": "Гоша и Лена — День 3",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "voice": {
+    "src": "voice/day03.mp3",
+    "stub": "voice/day03_silence.mp3",
+    "volume": 1
+  },
+  "music": {
+    "src": "music/theme.mp3",
+    "volume": 0.15,
+    "duck": 0.5
+  },
+  "sfxVolume": 0.5,
+  "hud": {
+    "days": 29,
+    "progress": 10
+  },
+  "cover": {
+    "badge": "ДЕНЬ 3 / 30",
+    "title": "ПЕРВАЯ ТРЕНИРОВКА",
+    "subtitle": "ВЕС: 2 КГ.\nПОТ: 100%",
+    "bubble": "Ого! Горжусь ❤️",
+    "color": "green",
+    "gosha": {
+      "beard": "stubble",
+      "hair": "short",
+      "eyes": "worried",
+      "mouth": "grit",
+      "antenna": "droop",
+      "sweat": true
+    },
+    "fly": false
+  },
+  "scenes": [
+    {
+      "id": "01-intro",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "День третий. Вы выбрали: **тренировка**. Гоша нашёл кроссовки.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 3.3,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 0.2,
+          "text": "ДЕНЬ 3",
+          "x": 800,
+          "y": 300,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 84,
+          "rot": 4
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.3,
+          "text": "ВЫ ВЫБРАЛИ: 2 💪",
+          "x": 540,
+          "y": 1180,
+          "color": "#2F6FD6",
+          "size": 68,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 3.3,
+          "text": "КРОССОВКИ: НАЙДЕНЫ",
+          "x": 540,
+          "y": 1310,
+          "color": "#2FA55A",
+          "size": 58,
+          "rot": 2
+        }
+      ],
+      "hud": {
+        "days": 28
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        }
+      ]
+    },
+    {
+      "id": "02-dumbbell",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "orange"
+      },
+      "caption": {
+        "text": "Первое упражнение — гантели. Вес: **два килограмма**. Гоша вспотел.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 620,
+          "y": 500,
+          "h": 1250,
+          "beard": "stubble",
+          "hair": "short",
+          "mug": false,
+          "holding": "dumbbell",
+          "lift": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "grit",
+              "leftArm": "raise"
+            },
+            {
+              "t": 3.8,
+              "sweat": true,
+              "mouth": "open"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 2.2,
+          "text": "ВЕС: 2 КГ",
+          "x": 820,
+          "y": 380,
+          "color": "#FF3B47",
+          "size": 76,
+          "rot": 5
+        },
+        {
+          "type": "sticker",
+          "t": 4.0,
+          "text": "ПОТ: 100%",
+          "x": 820,
+          "y": 1250,
+          "color": "#45B6FF",
+          "size": 60,
+          "rot": -4
+        }
+      ]
+    },
+    {
+      "id": "03-pushup",
+      "duration": 6,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "Отжимания. Один… Пузо коснулось пола **раньше** носа. Засчитано.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 830,
+          "h": 900,
+          "beard": "stubble",
+          "hair": "short",
+          "rot": 90,
+          "mug": false,
+          "bounce": 18,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "grit",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "bigText",
+          "t": 0.3,
+          "text": "ОТЖИМАНИЯ: 1",
+          "x": 540,
+          "y": 470,
+          "size": 96,
+          "color": "#FFD23A",
+          "rot": -2
+        },
+        {
+          "type": "sticker",
+          "t": 1.9,
+          "text": "ПУЗО > НОС",
+          "x": 540,
+          "y": 640,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": 3
+        },
+        {
+          "type": "sticker",
+          "t": 4.6,
+          "text": "ЗАСЧИТАНО ✓",
+          "x": 540,
+          "y": 800,
+          "color": "#2FA55A",
+          "size": 64,
+          "rot": -4
+        }
+      ],
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 6,
+          "zoom": 1.06,
+          "x": 540,
+          "y": 1000
+        }
+      ]
+    },
+    {
+      "id": "04-run",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Пробежка. Двести метров — до **ларька** и обратно. С шаурмой.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1250,
+          "beard": "stubble",
+          "hair": "short",
+          "mug": false,
+          "stink": true,
+          "bounce": 30,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "open",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 1.5,
+          "text": "ЛАРЁК 24/7",
+          "x": 820,
+          "y": 380,
+          "color": "#1E1E2A",
+          "size": 70,
+          "rot": 4
+        },
+        {
+          "type": "sticker",
+          "t": 3.6,
+          "text": "+ ШАУРМА",
+          "x": 300,
+          "y": 1250,
+          "color": "#F7943A",
+          "size": 70,
+          "rot": -5
+        }
+      ]
+    },
+    {
+      "id": "05-collapse",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "Через десять минут Гоша лёг. Сказал: «Это **растяжка**».",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 4.51
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 830,
+          "h": 900,
+          "beard": "stubble",
+          "hair": "short",
+          "rot": 90,
+          "mug": false,
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 3.0,
+          "text": "«ЭТО РАСТЯЖКА»",
+          "x": 540,
+          "y": 700,
+          "color": "#fff",
+          "textColor": "#1E1E2A",
+          "size": 72,
+          "rot": -3
+        }
+      ],
+      "shake": [
+        {
+          "t": 0.2,
+          "dur": 0.3,
+          "amp": 18
+        }
+      ],
+      "sfx": [
+        {
+          "t": 0.2,
+          "name": "punch",
+          "volume": 0.5
+        }
+      ]
+    },
+    {
+      "id": "06-chat",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "text": "Лена спросила: «Чем занят?» Гоша гордо ответил: «**Тренируюсь**». Почти правда.",
+        "accent": "pink",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": 0,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "typing": [
+            0.2,
+            1.0,
+            3.6,
+            4.7
+          ],
+          "messages": [
+            {
+              "t": 1.0,
+              "from": "her",
+              "text": "Чем занят? 😊"
+            },
+            {
+              "t": 2.8,
+              "from": "me",
+              "text": "тренируюсь 💪"
+            },
+            {
+              "t": 4.7,
+              "from": "her",
+              "text": "Ого! Горжусь ❤️"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "07-pain",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "Утром болело всё. Даже **антенна** поникла. Впервые.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o",
+              "sweat": true
+            },
+            {
+              "t": 2.0,
+              "antenna": "droop"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.0,
+          "text": "ВСЁ БОЛИТ",
+          "x": 540,
+          "y": 1345,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": -3
+        },
+        {
+          "type": "arrowLabel",
+          "screen": true,
+          "t": 2.2,
+          "text": "ПОНИКЛА",
+          "x": 850,
+          "y": 330,
+          "tx": 680,
+          "ty": 440,
+          "color": "#8A5A3A",
+          "rot": 4
+        }
+      ],
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        },
+        {
+          "t": 0.7,
+          "zoom": 2,
+          "x": 513,
+          "y": 700
+        },
+        {
+          "t": 5,
+          "zoom": 2.05,
+          "x": 513,
+          "y": 700
+        }
+      ],
+      "sfx": [
+        {
+          "t": 2.0,
+          "name": "fail",
+          "volume": 0.45
+        }
+      ]
+    },
+    {
+      "id": "08-progress",
+      "duration": 4.5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Прогресс: **восемнадцать** процентов. Лень побеждена… частично.",
+        "accent": "green",
+        "start": 0.2,
+        "end": 4.2
+      },
+      "layers": [
+        {
+          "type": "progressBar",
+          "t": 0.1,
+          "x": 540,
+          "y": 800,
+          "w": 860,
+          "value": 18,
+          "from": 10,
+          "label": "ПРОКАЧКА"
+        },
+        {
+          "type": "sticker",
+          "t": 2.0,
+          "text": "+1 ОТЖИМАНИЕ",
+          "x": 280,
+          "y": 1250,
+          "color": "#2F6FD6",
+          "size": 54,
+          "rot": -4
+        },
+        {
+          "type": "sticker",
+          "t": 2.8,
+          "text": "200 М БЕГА",
+          "x": 810,
+          "y": 1250,
+          "color": "#1E1E2A",
+          "size": 54,
+          "rot": 4
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1090,
+          "h": 300,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "sweat": true
+            }
+          ]
+        }
+      ],
+      "hud": {
+        "progress": 18
+      }
+    },
+    {
+      "id": "09-choice",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "text": "Что **дальше**? Наконец выбросить мусор… или сесть на диету? Решаете вы.",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ЧТО\nДАЛЬШЕ?",
+          "x": 540,
+          "y": 450,
+          "size": 116,
+          "color": "#FFD23A"
+        },
+        {
+          "type": "choice",
+          "t": 1.0,
+          "x": 540,
+          "y": 690,
+          "w": 920,
+          "num": "1",
+          "text": "ВЫБРОСИТЬ МУСОР\n(НАКОНЕЦ-ТО)",
+          "color": "#E3477E",
+          "rot": -1.5
+        },
+        {
+          "type": "bigText",
+          "t": 2.2,
+          "text": "ИЛИ",
+          "x": 540,
+          "y": 862,
+          "size": 74,
+          "color": "#fff"
+        },
+        {
+          "type": "choice",
+          "t": 2.5,
+          "x": 540,
+          "y": 1030,
+          "w": 920,
+          "num": "2",
+          "text": "СЕСТЬ\nНА ДИЕТУ",
+          "color": "#2F6FD6",
+          "rot": 1.5
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1150,
+          "h": 290,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "question",
+          "t": 1.0,
+          "x": 690,
+          "y": 1175,
+          "size": 120
+        }
+      ]
+    },
+    {
+      "id": "10-cta",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Пиши в **комменты**: один или два. Итоги — в четвёртой серии.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 5.3
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ПИШИ\nВ КОММЕНТЫ",
+          "x": 540,
+          "y": 440,
+          "size": 110,
+          "color": "#fff"
+        },
+        {
+          "type": "sticker",
+          "t": 1.4,
+          "text": "1 — МУСОР",
+          "x": 400,
+          "y": 650,
+          "color": "#E3477E",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 1.9,
+          "text": "2 — ДИЕТА",
+          "x": 400,
+          "y": 770,
+          "color": "#2F6FD6",
+          "size": 60,
+          "rot": 2
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "ИТОГИ → СЕРИЯ 4",
+          "x": 400,
+          "y": 890,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 54,
+          "rot": -2
+        },
+        {
+          "type": "comment",
+          "t": 3.4,
+          "x": 50,
+          "y": 990,
+          "w": 640,
+          "name": "vanya_p",
+          "text": "1!!! мусор уже голосует сам",
+          "likes": 341,
+          "avatarColor": "#F2994A"
+        },
+        {
+          "type": "comment",
+          "t": 4.1,
+          "x": 50,
+          "y": 1170,
+          "w": 640,
+          "name": "nastya.food",
+          "text": "2, шаурма должна уйти",
+          "likes": 298,
+          "avatarColor": "#9B6BF2"
+        },
+        {
+          "type": "gosha",
+          "x": 860,
+          "y": 900,
+          "h": 560,
+          "beard": "stubble",
+          "hair": "short",
+          "wave": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "leftArm": "wave"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
