@@ -18,6 +18,8 @@
     "audio": "node tools/audio.js",
     "render": "node tools/render.js",
     "build": "npm run tts && npm run audio && npm run render",
-    "probe": "node tools/probe.js build/probe"
+    "probe": "node tools/probe.js build/probe",
+    "preview:ep2": "echo 'open http://localhost:8080/?ep=2' && node tools/server.js 8080",
+    "build:ep2": "EP=2 npm run tts && EP=2 npm run audio && EP=2 npm run render"
   }
 }

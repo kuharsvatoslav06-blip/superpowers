@@ -35,15 +35,19 @@ function woodBoard(x, w, h) {
 export class Sign {
   constructor(lines, { post = true } = {}) {
     this.group = new THREE.Group();
-    const { tex } = textCanvas(512, 256, (x, w, h) => {
-      woodBoard(x, w, h); x.fillStyle = '#1a1209'; x.textAlign = 'center'; x.textBaseline = 'middle';
-      const size = lines.length > 2 ? 50 : 62; x.font = `700 ${size}px Silkscreen`;
-      lines.forEach((l, i) => x.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * size * 1.15));
-    });
+    const { tex, ctx } = textCanvas(512, 256, () => {}); this.tex = tex; this.ctx = ctx; this.setText(lines);
     const side = lam(0x8a6a3a);
     this.board = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.5, 0.08), [side, side, side, side, new THREE.MeshLambertMaterial({ map: tex, emissive: 0x222222, emissiveMap: tex }), side]);
     this.board.position.y = post ? 1.05 : 0; this.group.add(this.board);
     if (post) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.85, 0.09), lam(0x6e5230)); p.position.y = 0.42; this.group.add(p); }
+  }
+  /** Redraw the sign text (lines array). Cached: does nothing if unchanged. */
+  setText(lines) {
+    const key = lines.join('|'); if (key === this.key) return; this.key = key;
+    const x = this.ctx, w = 512, h = 256; woodBoard(x, w, h); x.fillStyle = '#1a1209'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    const longest = Math.max(...lines.map(l => l.length)); const size = Math.min(lines.length > 3 ? 40 : lines.length > 2 ? 50 : 62, Math.floor(540 / Math.max(longest, 1)));
+    x.font = `700 ${size}px Silkscreen`; lines.forEach((l, i) => x.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * size * 1.15));
+    this.tex.needsUpdate = true;
   }
 }
 

@@ -11,9 +11,7 @@ const FONT = { sub: '800 52px Montserrat', subI: 'italic 700 52px Montserrat', p
 function parseWords(text) {
   const out = []; let hl = false;
   for (const raw of text.split(/\s+/)) {
-    let w = raw; let on = hl;
-    if (w.startsWith('*')) { on = true; w = w.slice(1); }
-    let close = false; if (w.endsWith('*')) { close = true; w = w.slice(0, -1); } else if (/\*[^a-z]*$/i.test(w)) { close = true; w = w.replace('*', ''); }
+    const on = hl || /^[^A-Za-z0-9]*\*/.test(raw); const close = /\*[^A-Za-z0-9]*$/.test(raw); const w = raw.replace(/\*/g, '');
     out.push({ w, hl: on }); hl = on && !close;
   }
   return out;
@@ -76,13 +74,15 @@ const ICONS = {
   goldenApple: ['.....dg.....', '.....d.gg...', '...yyddyy...', '..yYYYYYYy..', '.yYWYYYYYYy.', '.yYWYYYYYYy.', '.yYYYYYYYYy.', '.yYYYYYYYYy.', '.yYYYYYYYYy.', '..yYYYYYYy..', '...yyyyyy...', '............'],
   book: ['..bbbbbbbbb.', '.bRRRRRRRRwb', '.bRRRRRRRRwb', '.bRRggggRRwb', '.bRRgRRgRRwb', '.bRRggggRRwb', '.bRRRRRRRRwb', '.bRRRRRRRRwb', '.bRRRRRRRRwb', '.bRRRRRRRRwb', '.bbbbbbbbbwb', '..wwwwwwwww.'],
   map: ['mmmmmmmmmmmm', 'mMMMMMMMMMMm', 'mMgggMMMMMMm', 'mMggggMbbMMm', 'mMMgMMMbbbMm', 'mMMMMMMMbMMm', 'mMMMxMMMMMMm', 'mMMMMMgggMMm', 'mMbbMMggggMm', 'mMbbbMMMMMMm', 'mMMMMMMMMMMm', 'mmmmmmmmmmmm'],
+  originalPickaxe: ['..ccccccc...', '.cCCCCCCCc..', 'cCc..dsdCCc.', 'cc...dsd.cCc', '.....dsd..cc', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....ddd....'],
+  fish: ['............', '..........b.', '...bbbbb.bb.', '..bFFFFFbFb.', '.bFwFFFFFFb.', '.bFFFFfFFFb.', '..bFFFFFbFb.', '...bbbbb.bb.', '..........b.', '............', '............', '............'],
   iron: ['............', '....oooo....', '...oIIIIo...', '..oIiIIIIo..', '.oIIIIIiIIo.', '.oIiIIIIIIo.', '.oIIIIiIIo..', '..oIIIIIIo..', '...ooIIo....', '.....oo.....', '............', '............'],
 };
-const ICOL = { b: '#3d2a12', L: '#b08d59', l: '#c9a46a', r: '#8a6a3a', B: '#6b4f2a', d: '#3d2a12', p: '#6e5230', P: '#b48a55', n: '#5b4326', k: '#5b4326',
+const ICOL = { F: '#6a9ed8', f: '#3a6ea8',  b: '#3d2a12', L: '#b08d59', l: '#c9a46a', r: '#8a6a3a', B: '#6b4f2a', d: '#3d2a12', p: '#6e5230', P: '#b48a55', n: '#5b4326', k: '#5b4326',
   g: '#9a9a9a', s: '#8f6538', h: '#3d2a12', H: '#b48a55', c: '#0f4d48', C: '#7ff5ea', y: '#a0761a', Y: '#f5c542', W: '#fff6c8', R: '#7a2e1a', w: '#efe6cc', m: '#6b5a3a', M: '#e2d3a6', x: '#d8322a', o: '#6e4e3a', I: '#d8a77e', i: '#f0d0b0' };
 export function drawIcon(ctx, name, x, y, size) {
   const rows = ICONS[name]; if (!rows) return; const p = size / 12;
-  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') return; ctx.fillStyle = (name === 'book' && ch === 'g') ? '#e6c24a' : ICOL[ch]; ctx.fillRect(Math.round(x + c * p), Math.round(y + r * p), Math.ceil(p), Math.ceil(p)); }));
+  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') return; ctx.fillStyle = (name === 'book' && ch === 'g') ? '#e6c24a' : name === 'originalPickaxe' && (ch === 'c' || ch === 'C') ? (ch === 'c' ? '#3a0f66' : '#d38cff') : name === 'fish' && ch === 'w' ? '#ffffff' : ICOL[ch]; ctx.fillRect(Math.round(x + c * p), Math.round(y + r * p), Math.ceil(p), Math.ceil(p)); }));
 }
 
 // ------------------------------------------------------------- UI primitives
@@ -117,13 +117,14 @@ R.title = (ctx, lt, o, t) => {
   ctx.save(); ctx.globalAlpha = a * 0.55; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore();
   const s1 = 1 + 0.9 * (1 - Ease.out3(clamp(lt / 0.22)));
   ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2, 470); ctx.scale(s1, s1); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = `900 96px ${FONT.big}`; ctx.lineWidth = 16; ctx.strokeStyle = '#000'; ctx.lineJoin = 'round'; ctx.strokeText('I SURVIVED 100 DAYS', 0, -58); ctx.strokeText('IN MINECRAFT', 0, 52);
-  ctx.fillStyle = '#ffffff'; ctx.fillText('I SURVIVED 100 DAYS', 0, -58); ctx.fillStyle = '#5fd35a'; ctx.fillText('IN MINECRAFT', 0, 52); ctx.restore();
+  const L1 = o.lines ? o.lines[0] : 'I SURVIVED 100 DAYS', L2 = o.lines ? o.lines[1] : 'IN MINECRAFT';
+  ctx.font = `900 96px ${FONT.big}`; ctx.lineWidth = 16; ctx.strokeStyle = '#000'; ctx.lineJoin = 'round'; ctx.strokeText(L1, 0, -58); ctx.strokeText(L2, 0, 52);
+  ctx.fillStyle = '#ffffff'; ctx.fillText(L1, 0, -58); ctx.fillStyle = '#5fd35a'; ctx.fillText(L2, 0, 52); ctx.restore();
   const k2 = clamp((lt - 0.85) / 0.12);
   if (k2 > 0) {
     const jit = (hash(Math.floor(t * 24)) - 0.5) * 14 * (lt < 1.4 ? 1 : 0.25);
     ctx.save(); ctx.globalAlpha = a * k2; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `900 74px ${FONT.big}`;
-    const y = 660; const txt = '...BUT SOMETHING WAS WRONG';
+    const y = 660; const txt = o.lines ? o.lines[2] : '...BUT SOMETHING WAS WRONG';
     ctx.lineWidth = 14; ctx.strokeStyle = '#000'; ctx.strokeText(txt, W / 2 + jit, y);
     ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(255,0,60,0.9)'; ctx.fillText(txt, W / 2 + jit - 6, y); ctx.fillStyle = 'rgba(0,200,255,0.7)'; ctx.fillText(txt, W / 2 + jit + 6, y);
     ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#ff2b3a'; ctx.fillText(txt, W / 2 + jit, y); ctx.restore();
@@ -319,12 +320,94 @@ R.theEnd = (ctx, lt, o, t) => {
   const jx = g * (hash(t * 50) - 0.5) * 30;
   ctx.fillStyle = '#f2f2f2'; ctx.fillText('THE END', W / 2 - 60 + jx, H / 2);
   const q = lt > 1.6; if (q) { ctx.fillStyle = g ? '#ffffff' : '#ff1e3c'; ctx.fillText('?', W / 2 + 330 + jx * 2, H / 2); }
+  if (o.text) { ctx.font = `400 64px ${FONT.pixel}`; ctx.fillStyle = '#9a9a9a'; ctx.fillText(o.text, W / 2, H / 2 - 170); }
   if (g) { ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(255,0,80,0.6)'; ctx.fillText('THE END', W / 2 - 66 + jx, H / 2 + 4); ctx.fillStyle = 'rgba(0,200,255,0.5)'; ctx.fillText('THE END', W / 2 - 54 + jx, H / 2 - 4); }
   ctx.restore();
   // two glowing eyes in the dark, very late
   if (lt > 4.2) { const e = clamp((lt - 4.2) / 0.6) * (lt % 2.3 < 0.12 ? 0 : 1); ctx.save(); ctx.globalAlpha = e * 0.9; ctx.shadowColor = '#c040ff'; ctx.shadowBlur = 30; ctx.fillStyle = '#e070ff'; ctx.fillRect(W / 2 - 120, 860, 70, 16); ctx.fillRect(W / 2 + 50, 860, 70, 16); ctx.restore(); }
 };
 R.theEnd.cues = o => [{ t: o.gt + 1.6, id: 'glitchShort', gain: 0.6 }];
+
+// ---- episode 2 overlays
+const GLYPH = { I: ['111', '010', '010', '010', '010', '010', '111'], S: ['0111', '1000', '1000', '0110', '0001', '0001', '1110'], E: ['1111', '1000', '1000', '1110', '1000', '1000', '1111'],
+  Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'], O: ['0110', '1001', '1001', '1001', '1001', '1001', '0110'], U: ['1001', '1001', '1001', '1001', '1001', '1001', '0110'], ' ': ['00', '00', '00', '00', '00', '00', '00'],
+  4: ['0010', '0110', '1010', '1111', '0010', '0010', '0010'], 7: ['1111', '0001', '0010', '0100', '0100', '0100', '0100'] };
+R.starText = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const out = clamp((dur - lt) / 0.6); const cell = 40; const letters = [...o.text];
+  const width = letters.reduce((a, ch) => a + (GLYPH[ch][0].length + 1) * cell, 0); let x0 = W / 2 - width / 2; let shown = 0;
+  letters.forEach((ch, li) => { const g = GLYPH[ch]; if (ch !== ' ') shown++; const k = clamp((lt - (shown - 1) * 0.75) / 0.3);
+    if (ch !== ' ' && k > 0) g.forEach((row, r) => [...row].forEach((v, c) => { if (v !== '1') return; const tw = 0.75 + 0.25 * Math.sin(t * 6 + r * 3 + c * 7 + li);
+      ctx.save(); ctx.globalAlpha = k * out * tw; ctx.shadowColor = '#cfe0ff'; ctx.shadowBlur = 24; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x0 + c * cell, 170 + r * cell, 8, 0, TAU); ctx.fill(); ctx.restore(); }));
+    x0 += (g[0].length + 1) * cell; });
+};
+R.starText.cues = o => [...o.text].filter(c => c !== ' ').map((c, i) => ({ t: o.gt + i * 0.75, id: 'sparkle1', gain: 0.6 }));
+R.cloudText = (ctx, lt, o) => {
+  const dur = o.gend - o.gt; const a = clamp(lt / 1.2) * clamp((dur - lt) / 1.0) * 0.85; const cell = 34; let x0 = W / 2 - 160;
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#ffffff'; ctx.shadowColor = 'rgba(255,255,255,0.6)'; ctx.shadowBlur = 25;
+  for (const ch of o.text) { GLYPH[ch].forEach((row, r) => [...row].forEach((v, c) => { if (v === '1') ctx.fillRect(x0 + c * cell + lt * 6, 110 + r * cell * 0.62, cell + 2, cell * 0.62 + 2); })); x0 += 5 * cell; }
+  ctx.restore();
+};
+R.cloudText.cues = o => [{ t: o.gt + 1.0, id: 'stinger', gain: 0.5 }];
+R.dayCounter = (ctx, lt, o) => {
+  const dur = o.gend - o.gt; const n = Math.min(o.to, o.from + Math.floor(lt / dur * (o.to - o.from + 1)));
+  const step = dur / (o.to - o.from + 1); const since = lt - (n - o.from) * step; const s = 1 + 0.35 * Math.exp(-since * 8);
+  const a = clamp(lt / 0.3) * clamp((dur - lt) / 0.3);
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(40, 40, 330, 130); ctx.fillStyle = n >= 90 ? '#ff2b3a' : '#5fd35a'; ctx.fillRect(40, 40, 10, 130);
+  pixelText(ctx, 'DAY', 80, 122, 52, '#ffffff', 'left', true, FONT.pixel, 700);
+  ctx.translate(270, 105); ctx.scale(s, s); pixelText(ctx, String(n), 0, 30, 84, n >= 90 ? '#ff4a4a' : '#ffd23a', 'center', true, FONT.pixel, 700); ctx.restore();
+};
+R.dayCounter.cues = o => { const out = []; const step = (o.gend - o.gt) / (o.to - o.from + 1); for (let i = 1; i <= o.to - o.from; i++) out.push({ t: o.gt + i * step, id: o.to >= 90 ? 'beepHigh' : 'tick', gain: 0.6 }); return out; };
+R.inventoryCopy = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const a = Ease.outBack(clamp(lt / 0.3)) * clamp((dur - lt) / 0.3);
+  const px = 1000, py = 230, S = 92; const items = ['log', 'planks', 'table', 'woodPickaxe'];
+  ctx.save(); ctx.globalAlpha = clamp(a); ctx.translate(px + 380, py + 150); ctx.scale(a, a); ctx.translate(-(px + 380), -(py + 150));
+  panel(ctx, px, py, 760, 300); pixelText(ctx, 'Inventory', px + 28, py + 48, 30, '#404040', 'left', false);
+  items.forEach((ic, i) => { const x = px + 40 + i * (S + 80), y = py + 90; slot(ctx, x, y, S); drawIcon(ctx, ic, x + 14, y + 14, 64);
+    const k = clamp((lt - 0.6 - i * 0.45) / 0.15); if (k > 0) { ctx.save(); ctx.translate(x + S / 2, y + S + 40); ctx.rotate(-0.15); ctx.scale(1.6 - 0.6 * k, 1.6 - 0.6 * k); ctx.globalAlpha = k; pixelText(ctx, '(COPY)', 0, 0, 28, '#ff2b3a', 'center', true, FONT.pixel, 700); ctx.restore(); } });
+  ctx.restore();
+  const k2 = clamp((lt - 2.6) / 0.2); if (k2 > 0) { ctx.save(); ctx.globalAlpha = k2 * clamp((dur - lt) / 0.3); pixelText(ctx, 'EVERYTHING IS A COPY.', px + 380, py + 380, 40, '#ff4a4a', 'center', true, FONT.pixel, 700); ctx.restore(); }
+  void t;
+};
+R.inventoryCopy.cues = o => [{ t: o.gt, id: 'click', gain: 0.6 }, ...[0, 1, 2, 3].map(i => ({ t: o.gt + 0.6 + i * 0.45, id: 'stamp', gain: 0.8 })), { t: o.gt + 2.6, id: 'stinger', gain: 0.5 }];
+R.caption = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const a = clamp(lt / 0.15) * clamp((dur - lt) / 0.3); const s = 0.8 + 0.2 * Ease.outBack(clamp(lt / 0.25));
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2 + (o.red ? (hash(Math.floor(t * 20)) - 0.5) * 8 : 0), o.red ? H / 2 : 900); ctx.scale(s, s);
+  ctx.font = `900 ${o.red ? 150 : 64}px ${FONT.big}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  ctx.lineWidth = o.red ? 22 : 12; ctx.strokeStyle = '#000'; ctx.strokeText(o.text, 0, 0); ctx.fillStyle = o.red ? '#ff1e2e' : '#ffffff'; ctx.fillText(o.text, 0, 0); ctx.restore();
+};
+R.caption.cues = o => (o.red ? [{ t: o.gt, id: 'stinger', gain: 0.6 }] : []);
+R.layer = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const a = clamp(lt / 0.15) * clamp((dur - lt) / 0.2); const y = 560 + (1 - Ease.out3(clamp(lt / 0.3))) * -60;
+  const jx = o.glitch ? (hash(Math.floor(t * 24)) - 0.5) * 24 : 0;
+  ctx.save(); ctx.globalAlpha = a; pixelText(ctx, '▼', 120 + jx, y - 70, 60, '#ffd23a', 'left', true, FONT.pixel, 700);
+  pixelText(ctx, o.text, 120 + jx, y + 20, 110, o.glitch ? '#ff4dff' : '#ffffff', 'left', true, FONT.pixel, 700); ctx.restore();
+};
+R.layer.cues = o => [{ t: o.gt, id: 'breakStone', gain: 0.6 }];
+R.craftExit = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const a = Ease.outBack(clamp(lt / 0.3)); const out = clamp((dur - lt) / 0.25);
+  const px = 1040, py = 230, S = 92;
+  ctx.save(); ctx.globalAlpha = out; ctx.translate(px + 360, py + 180); ctx.scale(a, a); ctx.translate(-(px + 360), -(py + 180));
+  panel(ctx, px, py, 720, 380); pixelText(ctx, 'Crafting', px + 30, py + 52, 30, '#404040', 'left', false);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) slot(ctx, px + 40 + c * S, py + 80 + r * S, S);
+  if (lt > 0.6) drawIcon(ctx, 'originalPickaxe', px + 40 + S + 10, py + 80 + S + 10, S - 20);
+  ctx.fillStyle = '#8b8b8b'; ctx.fillRect(px + 360, py + 205, 90, 26); ctx.beginPath(); ctx.moveTo(px + 450, py + 185); ctx.lineTo(px + 500, py + 218); ctx.lineTo(px + 450, py + 251); ctx.fill();
+  const rx = px + 540, ry = py + 170; slot(ctx, rx, ry, S + 20, lt > 1.2 ? 0.5 + 0.5 * Math.sin(t * 8) : 0);
+  if (lt > 1.2) { const s = popScale(lt - 1.2); ctx.save(); ctx.translate(rx + 56, ry + 62); ctx.scale(s, s); ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 20; pixelText(ctx, 'EXIT', 0, 0, 40, '#ffffff', 'center', true, FONT.pixel, 700); ctx.restore(); }
+  ctx.restore();
+};
+R.craftExit.cues = o => [{ t: o.gt + 0.6, id: 'click', gain: 0.8 }, { t: o.gt + 1.2, id: 'shine', gain: 0.8 }];
+R.achievement = (ctx, lt, o) => {
+  const dur = o.gend - o.gt; const k = Ease.out3(clamp(lt / 0.4)) - Ease.in3(clamp((lt - dur + 0.4) / 0.4)); const x = W - 40 - 640 * k;
+  ctx.save(); ctx.fillStyle = '#212121'; ctx.fillRect(x, 40, 640, 140); ctx.strokeStyle = '#555'; ctx.lineWidth = 6; ctx.strokeRect(x + 3, 43, 634, 134);
+  drawIcon(ctx, 'goldenApple', x + 24, 60, 100); pixelText(ctx, 'Advancement Made!', x + 150, 100, 34, '#ffd23a', 'left', true); pixelText(ctx, o.text, x + 150, 150, 34, '#ffffff', 'left', true); ctx.restore();
+};
+R.achievement.cues = o => [{ t: o.gt + 0.1, id: 'achievement', gain: 0.9 }];
+R.chat = (ctx, lt, o) => {
+  const dur = o.gend - o.gt; const a = clamp(lt / 0.1) * clamp((dur - lt) / 0.8);
+  ctx.save(); ctx.globalAlpha = a; ctx.font = `400 40px ${FONT.pixel}`; const w = ctx.measureText(o.text).width + 40;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(40, 860, w, 64); pixelText(ctx, o.text, 60, 906, 40, '#ffe14a', 'left', true); ctx.restore();
+};
+R.chat.cues = o => [{ t: o.gt, id: 'pop', gain: 0.8 }];
 
 const OVS = globalize(OVERLAYS);
 export class SubtitleSystem {

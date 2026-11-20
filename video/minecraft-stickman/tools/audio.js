@@ -4,9 +4,10 @@
 import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
 import { LINES, MUSIC, AMBIENCE, DURATION, G, sceneById } from '../src/story/script.js';
 import { ROOT, startServer } from './server.js';
+import { BUILD as BUILD_DIR, QUERY } from './paths.js';
 
 const SR = 48000; const LEN = Math.ceil((DURATION + 1) * SR);
-const BUILD = path.join(ROOT, 'build');
+const BUILD = BUILD_DIR; void ROOT;
 
 // ------------------------------------------------------------------ cues from the animation
 async function getCues() {
@@ -14,7 +15,7 @@ async function getCues() {
   const srv = await startServer(0);
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-  await page.goto(`http://127.0.0.1:${srv.address().port}/?render`);
+  await page.goto(`http://127.0.0.1:${srv.address().port}/${QUERY}`);
   await page.waitForFunction(() => window.ready || window.bootError, null, { timeout: 300000 });
   const cues = await page.evaluate(() => window.collectCues());
   await browser.close(); srv.close(); return cues;
@@ -126,6 +127,19 @@ const SFX = {
   birds: (c) => { const d = c.dur || 10; const b = buf(d); for (let k = 0; k < d * 2.2; k++) { const t0 = rnd() * (d - 0.5); const f = 2500 + rnd() * 2000; for (let j = 0; j < 2 + Math.floor(rnd() * 3); j++) add(b, tone(0.07, f, f * (1.2 + rnd() * 0.5), { decay: 0.03 }), t0 + j * 0.09, 0.25); } return b; },
   blink: () => tone(0.05, 2000, 2400, { decay: 0.015 }).map(v => v * 0.2),
   bodyFall: () => mix([thump(70, 0.1), 1.2], [lp(noiseBuf(0.25, t => Math.exp(-t * 20)), 1200), 0.6]),
+  gasp: () => mix([biquad(noiseBuf(0.45, t => Math.sin(Math.PI * t / 0.45) ** 0.5), 'bp', 1400, 1.2, 2200), 0.9], [hp(noiseBuf(0.45, t => Math.sin(Math.PI * t / 0.45)), 3000), 0.3]),
+  stamp: () => mix([thump(110, 0.05), 1.2], [biquad(noiseBuf(0.08, t => Math.exp(-t * 60)), 'bp', 900, 1), 0.8]),
+  tick: () => tone(0.05, 1800, 1800, { decay: 0.015 }).map(v => v * 0.5),
+  cluck: () => { const b = buf(0.5); for (let k = 0; k < 3; k++) add(b, biquad(noiseBuf(0.07, t => Math.exp(-t * 40)), 'bp', 1100 + k * 200, 4), k * 0.12, 1.3); return b; },
+  splash: () => mix([lp(noiseBuf(1.2, t => Math.exp(-t * 3) * (0.7 + 0.3 * Math.sin(t * 60))), 2500), 1.2], [thump(80, 0.1), 0.8]),
+  shatter: () => { const b = buf(1.0); for (let k = 0; k < 40; k++) add(b, hp(tone(0.08, 2000 + rnd() * 4000, 1500, { decay: 0.03 }), 500), rnd() * 0.6, 0.3); return mix([b, 1], [hp(noiseBuf(0.5, t => Math.exp(-t * 8)), 2500), 0.6], [thump(90, 0.06), 0.8]); },
+  grind: () => mix([biquad(noiseBuf(1.6, t => Math.sin(Math.PI * t / 1.6) * (0.6 + 0.4 * Math.sin(t * 37))), 'bp', 300, 2), 1.6], [lp(noiseBuf(1.6, t => Math.sin(Math.PI * t / 1.6)), 120), 1]),
+  campfire: (c) => { const d = c.dur || 10; const b = lp(noiseBuf(d, t => 0.25 * Math.min(1, t, d - t)), 900); for (let k = 0; k < d * 6; k++) add(b, hp(noiseBuf(0.02, t => Math.exp(-t * 200)), 1500), rnd() * d, 0.5 * rnd()); return b; },
+  signFlip: () => mix([tone(0.12, 520, 780, { decay: 0.05 }), 0.5], [biquad(noiseBuf(0.1, t => Math.exp(-t * 40)), 'bp', 2000, 1), 0.4]),
+  thunderEcho: () => mix([SFX.impactDeep(), 1.1], [lp(noiseBuf(4, t => Math.exp(-t * 0.9) * (0.5 + 0.5 * Math.sin(t * 7))), 900), 0.9], [metal(2.5, 140), 0.25]),
+  bigTeleport: () => mix([SFX.teleport(), 1.2], [tone(1.5, 60, 30, { decay: 0.5 }), 1.0], [biquad(noiseBuf(1.2, t => Math.exp(-t * 2)), 'bp', 800, 0.8, 150), 0.6]),
+  sparkle1: () => sparkle(0.6, 5),
+  achievement: () => { const b = buf(1.4); [72, 76, 79, 84].forEach((n, i) => add(b, tone(0.6, 440 * Math.pow(2, (n - 69) / 12), 440 * Math.pow(2, (n - 69) / 12), { type: 'tri', decay: 0.25 }), i * 0.11, 0.35)); return b; },
   riser: (c) => { const d = c.dur || 1.5; return mix([biquad(noiseBuf(d, t => Math.pow(t / d, 2)), 'bp', 300, 1, 6000), 0.8], [tone(d, 100, 800, { type: 'saw', att: d * 0.8, rel: 0.02 }), 0.12]); },
 };
 function shift(b, sec) { const o = new Float32Array(b.length + Math.round(sec * SR)); o.set(b, Math.round(sec * SR)); return o; }

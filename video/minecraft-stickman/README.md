@@ -16,6 +16,16 @@ npm run preview              # open http://localhost:8080 (scrub, play, jump to 
 The preview player renders live in the browser. With a GPU it runs in real time; sound plays once
 `build/soundtrack.wav` exists (see below).
 
+## Episodes
+
+| Episode | Title | Preview | Build |
+|---------|-------|---------|-------|
+| 1 | I Survived 100 Days in Minecraft, But Something Was Wrong | `http://localhost:8080/` | `npm run build` → `build/video.mp4` |
+| 2 | I Survived 100 Days in a Minecraft World That Remembered Me | `http://localhost:8080/?ep=2` | `npm run build:ep2` → `build/ep2/video.mp4` |
+
+Every tool takes the episode from the `EP` environment variable (default 1), e.g. `EP=2 node tools/render.js --from 100 --to 160`.
+Episode data lives in `src/story/ep<N>/` (script, stages, index) and `src/scenes/ep2/`; voice clips in `voice/` (ep1) and `voice/ep2/`.
+
 ## Producing the final video
 
 ```bash

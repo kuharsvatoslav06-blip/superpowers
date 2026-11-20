@@ -1,6 +1,7 @@
 // Render individual frames for inspection: node tools/probe.js <outDir> t1 t2 ...  (times in seconds, or scene:local e.g. s1:12.5)
 import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
 import { startServer } from './server.js';
+import { QUERY } from './paths.js';
 import { sceneById } from '../src/story/script.js';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const [outDir, ...times] = process.argv.slice(2);
@@ -9,7 +10,7 @@ const srv = await startServer(0); const port = srv.address().port;
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 const errs = []; page.on('pageerror', e => errs.push('pageerror: ' + e.message)); page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.type() + ': ' + m.text()); });
-await page.goto(`http://127.0.0.1:${port}/?render`);
+await page.goto(`http://127.0.0.1:${port}/${QUERY}`);
 const t0 = Date.now();
 await page.waitForFunction(() => window.ready || window.bootError, null, { timeout: 300000 });
 const be = await page.evaluate(() => window.bootError); if (be) { console.error('BOOT ERROR', be); }

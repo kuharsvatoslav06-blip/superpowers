@@ -44,8 +44,8 @@ export class Enderman {
   constructor() {
     this.root = new THREE.Group();
     const black = lam(0x0c0b10, 0x050308);
-    this.eyeMat = new THREE.MeshBasicMaterial({ color: 0xe070ff, transparent: true });
-    this.eyeGlowMat = new THREE.MeshBasicMaterial({ color: 0xc040ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
+    this.eyeMat = new THREE.MeshBasicMaterial({ color: 0xe070ff, transparent: true, fog: false });
+    this.eyeGlowMat = new THREE.MeshBasicMaterial({ color: 0xc040ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
     this.mats = [black, this.eyeMat];
     this.hips = new THREE.Group(); this.hips.position.y = 1.55; this.root.add(this.hips);
     this.body = box(0.5, 0.8, 0.26, black); this.body.position.y = 0.4; this.hips.add(this.body);
@@ -64,10 +64,10 @@ export class Enderman {
   apply(st) {
     this.root.visible = st.visible !== false && (st.opacity ?? 1) > 0.01;
     this.root.position.set(...st.pos); this.root.rotation.y = st.yaw || 0;
-    const sq = st.stretch || 0; this.root.scale.set(1 - sq * 0.6, 1 + sq * 1.2, 1 - sq * 0.6);
+    const sq = st.stretch || 0, sc = st.scale || 1; this.root.scale.set((1 - sq * 0.6) * sc, (1 + sq * 1.2) * sc, (1 - sq * 0.6) * sc);
     this.head.rotation.set(st.headPitch || 0, st.headYaw || 0, st.headRoll || 0, 'YXZ');
     const sway = Math.sin((st.t || 0) * 0.8) * 0.03; this.lArm.rotation.x = sway; this.rArm.rotation.x = -sway; this.lArm.rotation.z = 0.04; this.rArm.rotation.z = -0.04;
-    const op = st.opacity ?? 1; this.mats[0].opacity = op; this.mats[0].depthWrite = op > 0.99; this.eyeMat.opacity = op; this.eyeGlowMat.opacity = 0.35 * op * (st.glow ?? 1);
+    const op = st.opacity ?? 1; this.mats[0].emissive.setHex(st.rim ?? 0x050308); this.mats[0].opacity = op; this.mats[0].depthWrite = op > 0.99; this.eyeMat.opacity = op; this.eyeGlowMat.opacity = 0.35 * op * (st.glow ?? 1);
   }
 }
 

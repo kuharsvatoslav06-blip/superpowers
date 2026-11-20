@@ -9,6 +9,7 @@ export const HIP_HEIGHT = UPPER_LEG + LOWER_LEG;
 
 // ---------------------------------------------------------------- items
 const PAL = {
+  original: ['#d38cff', '#9a3cf0', '#3a0f66'],
   wood: ['#b48a55', '#7d5a2e', '#3d2a12'], diamond: ['#7ff5ea', '#2fb5a8', '#0f4d48'], stone: ['#a8a8a8', '#6f6f6f', '#333333'],
   iron: ['#e8e8e8', '#b0b0b0', '#555555'], stick: ['#8f6538', '#5d3d1c'],
 };
@@ -61,6 +62,9 @@ function shieldItem() {
   g.add(face, rim, boss); return g;
 }
 const ITEM_FACTORY = {
+  originalPickaxe: () => { const m = pickaxe('original'); m.material.emissive = new THREE.Color(0x5a1a9a); return m; },
+  rod: () => pixelItem(['......l', '.....s.', '....s..', '...s...', '..s....', '.s.....', 's......'], { s: '#8f6538', l: '#dddddd' }, 0.06, [0, 0]),
+  sign: () => boxItem(0.06, 0.4, 0.62, 0xb8925a),
   woodPickaxe: () => pickaxe('wood'), diamondPickaxe: () => pickaxe('diamond'), stonePickaxe: () => pickaxe('stone'),
   sword: () => sword('stone'), diamondSword: () => sword('diamond'), torch: torchItem,
   book: () => boxItem(0.06, 0.3, 0.24, 0x5a2d12, 0xf2e8cf), map: () => boxItem(0.03, 0.34, 0.34, 0xd9c79a),
@@ -70,7 +74,7 @@ const ITEM_FACTORY = {
 // Orientation of each item inside the hand socket (forearm points along -Y of the socket).
 function mountItem(name) {
   const mesh = ITEM_FACTORY[name](); const g = new THREE.Group(); g.add(mesh); g.name = name;
-  if (['woodPickaxe', 'diamondPickaxe', 'stonePickaxe', 'sword', 'diamondSword', 'torch'].includes(name)) {
+  if (['woodPickaxe', 'diamondPickaxe', 'stonePickaxe', 'originalPickaxe', 'rod', 'sword', 'diamondSword', 'torch'].includes(name)) {
     // sprite +Y (tool head) points forward out of the fist, sprite plane is vertical (right-handed basis).
     mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(
       new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(-1, 0, 0)));
@@ -237,6 +241,12 @@ export class Stickman {
       if (!this._watch) { this._watch = mountItem('watch'); this._watch.position.set(0, 0.1, 0); this.lFore.add(this._watch); this._watch.position.set(0, -LOWER_ARM * 0.75, 0); }
       this._watch.visible = !!it.lw; this._lw = true;
     }
+    if (st.dark !== undefined || this._dark) { // gradual turn into a shadow stickman
+      const d = st.dark || 0; this._dark = d > 0;
+      this.headMat.color.setRGB(1 - d * 0.97, 1 - d * 0.97, 1 - d * 0.96); this.headMat.emissive.setScalar(0.29 * (1 - d));
+      this.limbMat.color.setRGB(0.07 * (1 - d) + 0.02 * d, 0.07 * (1 - d) + 0.02 * d, 0.07 * (1 - d) + 0.03 * d);
+      this.faceVariant = d > 0.6 ? 'shadow' : null;
+    }
     const op = st.opacity ?? 1;
     if (op !== this.opacity) { this.opacity = op; for (const m of [this.limbMat, this.headMat, this.faceMat, this.outlineMat]) { m.opacity = op * (m === this.outlineMat && this.variant === 'shadow' ? 0.35 : 1); m.depthWrite = op > 0.99 && m !== this.faceMat; } }
     this.shadow.material.opacity = 0.35 * op * (st.shadow ?? 1);
@@ -245,9 +255,9 @@ export class Stickman {
     if (st.face) this.updateFace(st.face);
   }
   updateFace(f) {
-    const key = Object.values(f).map(v => (typeof v === 'number' ? v.toFixed(2) : v)).join(',');
+    const key = (this.faceVariant || '') + Object.values(f).map(v => (typeof v === 'number' ? v.toFixed(2) : v)).join(',');
     if (key === this.faceKey) return;
-    this.faceKey = key; drawFace(this.faceCtx, f, this.variant); this.faceTex.needsUpdate = true;
+    this.faceKey = key; drawFace(this.faceCtx, f, this.faceVariant || this.variant); this.faceTex.needsUpdate = true;
   }
   handWorld(slot = 'r', out = new THREE.Vector3()) { this.root.updateMatrixWorld(true); return (slot === 'r' ? this.rHand : this.lHand).getWorldPosition(out); }
   headWorld(out = new THREE.Vector3()) { this.root.updateMatrixWorld(true); return this.head.localToWorld(out.set(0, HEAD_R + 0.03, 0)); }

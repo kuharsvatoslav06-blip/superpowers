@@ -1,16 +1,8 @@
 // Entry point: builds stages + scenes, exposes window.frame(t) for the offline renderer and runs the preview player.
 import { SceneManager } from './engine/SceneManager.js';
 import { AudioManager } from './engine/AudioManager.js';
-import { buildOverworld, buildCave, buildVoid, buildFresh } from './story/stages.js';
-import { SCENES, DURATION } from './story/script.js';
-import cold from './scenes/cold.js';
-import s1 from './scenes/s1_spawn.js';
-import s2 from './scenes/s2_watching.js';
-import s3 from './scenes/s3_mines.js';
-import s4 from './scenes/s4_secret_room.js';
-import s5 from './scenes/s5_collapse.js';
-import s6 from './scenes/s6_void.js';
-import s7 from './scenes/s7_twist.js';
+import { SCENES, DURATION, EP } from './story/script.js';
+const episode = await import(`./story/ep${EP}/index.js`);
 
 const params = new URLSearchParams(location.search);
 const renderMode = params.has('render');
@@ -18,8 +10,8 @@ if (renderMode) document.body.classList.add('render');
 
 async function boot() {
   await Promise.all(['800 20px Montserrat', '900 20px Montserrat', 'italic 700 20px Montserrat', '400 20px Silkscreen', '700 20px Silkscreen', '400 20px VT323'].map(f => document.fonts.load(f)));
-  const stages = { over: buildOverworld(), cave: buildCave(), void: buildVoid(), fresh: buildFresh() };
-  const mgr = new SceneManager({ canvas: document.getElementById('gl'), output: document.getElementById('out'), stages, sceneFactories: { cold, s1, s2, s3, s4, s5, s6, s7 } });
+  const stages = episode.buildStages();
+  const mgr = new SceneManager({ canvas: document.getElementById('gl'), output: document.getElementById('out'), stages, sceneFactories: episode.scenes });
   window.mgr = mgr;
   window.DURATION = DURATION;
   window.frame = (t, quality = 0.92) => { mgr.frame(t); return mgr.output.toDataURL('image/jpeg', quality); };
@@ -33,7 +25,7 @@ async function boot() {
 }
 
 function player(mgr) {
-  const audio = new AudioManager();
+  const audio = new AudioManager(EP === '1' ? '/build/soundtrack.wav' : `/build/ep${EP}/soundtrack.wav`);
   const $ = id => document.getElementById(id);
   const fmt = t => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
   for (const s of SCENES) { const o = document.createElement('option'); o.value = s.start; o.textContent = `${fmt(s.start)}  ${s.name}`; $('jump').appendChild(o); }
