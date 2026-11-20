@@ -1,1 +1,1 @@
-Put ElevenLabs recordings here as <line id>.mp3 (see VOICEOVER.md).
+ElevenLabs voice-over ("Jon - Children's Storyteller"), one file per script line (<line id>.mp3).
