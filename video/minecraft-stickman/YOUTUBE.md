@@ -49,3 +49,56 @@ minecraft, minecraft animation, stickman, stickman animation, 100 days minecraft
 - Audience: if the video is for children, YouTube requires choosing "Made for kids". With jump scares, "Not made for kids" is more accurate
 - Subtitles: upload `build/subtitles.srt` (English)
 - Altered or synthetic content: the voice is AI-generated (ElevenLabs). In YouTube Studio, answer "Yes" to the AI-content question if the voice sounds realistic
+
+---
+
+# Episode 2 upload
+
+## Title (main)
+I Survived 100 Days in a Minecraft World That Remembered Me
+
+Alternatives for A/B testing:
+- I Reset My Minecraft World... But It Remembered Me
+- Minecraft Kept a Copy of My Old World (100 Days)
+- I Found Player 47 in Minecraft... He Never Left
+
+## Thumbnail
+`build/ep2/thumbnail_A.jpg` (main): "IT REMEMBERS ME", the Watcher's face
+`build/ep2/thumbnail_B.jpg`: "HE NEVER LEFT", Player 47 with the sign "I STOPPED AT 99. FOREVER."
+`build/ep2/thumbnail_C.jpg`: "MINECRAFT KEPT MY OLD WORLD", the snow globe
+Regenerate (after the frames are rendered): `node tools/thumbnail_ep2.js`
+
+## Description
+Last time, I pressed RESET WORLD. A brand-new world, a fresh start... except it wasn't new. It was a copy. My house. My chest. My footprints. 🌍
+
+So I tried to survive 100 days again, like nothing happened. Then I found a frozen village where every villager was a copy of me, a silent stickman with a sign called Player 47, and a staircase that went all the way down to the Archive: a place where Minecraft keeps every world it ever deleted.
+
+Including mine.
+
+Who is Player 47? What does the Watcher want? And what happens on Day 100? Watch till the very end. 👀
+
+⏱️ Chapters
+0:00 Last Time...
+0:14 The Copy
+1:00 Normal Days
+1:52 The Frozen Village
+2:52 Player Zero
+3:50 The Way Down
+4:56 The Archive
+5:52 The Watcher Speaks
+6:48 The Choice
+7:24 Day 100
+
+💬 What would YOU take from the Archive? Comment below.
+👍 Like if you want Part 3, and subscribe so you don't miss what Player 48 finds.
+
+🎧 Voices: ElevenLabs. Animation, music and sound effects: original, made for this channel.
+This is an unofficial fan animation, not affiliated with or endorsed by Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.
+
+#minecraft #stickman #animation #100days #minecraftanimation #minecrafthorror
+
+## Tags
+minecraft, minecraft animation, stickman, stickman animation, 100 days minecraft, i survived 100 days, minecraft horror, minecraft mystery, minecraft story, minecraft creepypasta, minecraft part 2, reset world, player 47, the watcher, minecraft archive
+
+## Settings
+Same as Episode 1. Subtitles: upload `build/ep2/subtitles.srt`. Add Episode 1 as an end screen / card and put both episodes in one playlist.
