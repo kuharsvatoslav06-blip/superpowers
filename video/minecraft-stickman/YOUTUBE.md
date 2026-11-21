@@ -66,7 +66,7 @@ Alternatives for A/B testing:
 `build/ep2/thumbnail_A.jpg` (main): "IT REMEMBERS ME", the Watcher's face
 `build/ep2/thumbnail_B.jpg`: "HE NEVER LEFT", Player 47 with the sign "I STOPPED AT 99. FOREVER."
 `build/ep2/thumbnail_C.jpg`: "MINECRAFT KEPT MY OLD WORLD", the snow globe
-Regenerate (after the frames are rendered): `node tools/thumbnail_ep2.js`
+Regenerate (after the frames are rendered): `node tools/thumbnail_frames.js`
 
 ## Description
 Last time, I pressed RESET WORLD. A brand-new world, a fresh start... except it wasn't new. It was a copy. My house. My chest. My footprints. 🌍
@@ -102,3 +102,56 @@ minecraft, minecraft animation, stickman, stickman animation, 100 days minecraft
 
 ## Settings
 Same as Episode 1. Subtitles: upload `build/ep2/subtitles.srt`. Add Episode 1 as an end screen / card and put both episodes in one playlist.
+
+---
+
+# Episode 3 upload
+
+## Title (main)
+I Survived 100 Days on ONE BLOCK in Minecraft... But It Could Talk
+
+Alternatives for A/B testing:
+- Minecraft, But My One Block Can Talk (100 Days)
+- I Spawned on One Block in the Sky... and It Spoke to Me
+- 100 Days on One Block: The Block Had a Secret
+
+## Thumbnail
+`build/ep3/thumbnail_A.jpg` (main): "IT CAN TALK", Origin's face and the terrified stickman
+`build/ep3/thumbnail_B.jpg`: "I FELL OFF THE WORLD", the fall under the nether island and the ghast
+`build/ep3/thumbnail_C.jpg`: "100 DAYS / 1 BLOCK", the lone block in the sky
+Regenerate: `EP=3 node tools/thumbnail_frames.js`
+
+## Description
+Day one. I spawned on ONE grass block. In the sky. No trees, no ground... just a very, very long way down. 🌤️
+
+Every time I broke the block, it came back. Free dirt, forever! Then logs, stone, a chest, a spider (out of the block?!)... and on day 21, the block said: "Ow."
+
+Its name is Origin. It's the first block of this world. It saved my life in the Nether phase, it warned me about a sign that said DON'T TRUST THE FIRST BLOCK... and on day 80 I found out what every block it gave me really cost.
+
+Can you survive 100 days on one block without destroying the only friend you have? Watch till the very end. 👀
+
+⏱️ Chapters
+0:00 Don't Jump
+0:15 One Block
+1:01 Days 2-20
+1:49 The Block Speaks
+2:31 Friends
+3:09 The Nether Phase
+3:43 The Sign
+4:19 The End Phase
+4:51 The Choice
+5:23 Day 100
+
+💬 What would YOU ask a talking block? Comment below.
+👍 Like if Origin deserved better, and subscribe for more stickman Minecraft stories!
+
+🎧 Voices: ElevenLabs. Animation, music and sound effects: original, made for this channel.
+This is an unofficial fan animation, not affiliated with or endorsed by Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.
+
+#minecraft #stickman #animation #100days #oneblock #minecraftanimation
+
+## Tags
+minecraft, minecraft animation, stickman, stickman animation, 100 days minecraft, i survived 100 days, one block, minecraft one block, skyblock, minecraft skyblock, talking block, minecraft story, minecraft mystery, ghast, minecraft nether, minecraft end
+
+## Settings
+Same as Episode 1. Subtitles: upload `build/ep3/subtitles.srt`.
