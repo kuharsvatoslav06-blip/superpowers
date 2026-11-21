@@ -140,6 +140,24 @@ const SFX = {
   bigTeleport: () => mix([SFX.teleport(), 1.2], [tone(1.5, 60, 30, { decay: 0.5 }), 1.0], [biquad(noiseBuf(1.2, t => Math.exp(-t * 2)), 'bp', 800, 0.8, 150), 0.6]),
   sparkle1: () => sparkle(0.6, 5),
   achievement: () => { const b = buf(1.4); [72, 76, 79, 84].forEach((n, i) => add(b, tone(0.6, 440 * Math.pow(2, (n - 69) / 12), 440 * Math.pow(2, (n - 69) / 12), { type: 'tri', decay: 0.25 }), i * 0.11, 0.35)); return b; },
+  // ---- episode 3
+  breakDirt: () => mix([lp(noiseBuf(0.3, t => Math.exp(-t * 14)), 900), 1.1], [thump(80, 0.07), 0.9]),
+  blockRegen: () => mix([tone(0.12, 500, 1300, { decay: 0.06 }), 0.35], [sparkle(0.5, 5), 0.35], [thump(120, 0.03), 0.4]),
+  recordStop: () => { const b = buf(0.7); let ph = 0; for (let i = 0; i < b.length; i++) { const t = i / SR; const f = 420 * Math.pow(1 - t / 0.7, 2) + 20; ph += f / SR; b[i] = (2 * (ph % 1) - 1) * 0.3 * (1 - t / 0.7); } return lp(b, 2500); },
+  originChime: () => mix(...[523.3, 659.3, 784, 1046.5].map((f, i) => [shift(tone(1.6, f, f, { type: 'tri', decay: 0.5 }), i * 0.07), 0.16]), [pad(1.6, [261.6, 392], { att: 0.05, rel: 1.2, cutoff: 1800 }), 0.25]),
+  spiderHiss: () => mix([biquad(noiseBuf(0.7, t => Math.sin(Math.PI * t / 0.7) * (0.6 + 0.4 * Math.sin(t * 70))), 'bp', 3800, 1.5), 0.9], [crush(tone(0.4, 300, 220, { type: 'saw', decay: 0.2 }), 4, 6), 0.2]),
+  netherFlip: () => mix([SFX.impact(), 0.8], [lp(noiseBuf(2.5, t => Math.exp(-t * 1.2)), 300), 1.0], [biquad(noiseBuf(1.5, t => Math.sin(Math.PI * t / 1.5)), 'bp', 200, 1, 1200), 0.5]),
+  ghastCry: () => { const b = buf(1.6); let ph = 0; for (let i = 0; i < b.length; i++) { const t = i / SR; const f = 520 + 260 * Math.sin(t * 3.2) - t * 180 + 30 * Math.sin(t * 40); ph += f / SR; b[i] = (Math.sin(TAU * ph) * 0.6 + Math.sin(TAU * ph * 2.01) * 0.25) * Math.sin(Math.PI * t / 1.6) ** 0.6; } return mix([freeverb(b, 0.7, 0.4)[0], 1], [b, 0.6]); },
+  fireball: () => mix([biquad(noiseBuf(0.9, t => Math.exp(-t * 2.5) * Math.min(1, t * 30)), 'bp', 900, 0.8, 300), 1.2], [thump(90, 0.06), 0.8]),
+  explosion: () => mix([SFX.impactDeep(), 1.2], [lp(noiseBuf(1.8, t => Math.exp(-t * 3)), 1800), 1.2], [hp(noiseBuf(0.6, t => Math.exp(-t * 8)), 2500), 0.5]),
+  fallWind: (c) => { const d = c.dur || 5; return mix([biquad(noiseBuf(d, t => Math.min(1, t * 2) * Math.min(1, (d - t) * 3) * (0.7 + 0.3 * Math.sin(t * 5))), 'bp', 600, 0.7, 1400), 0.9], [lp(noiseBuf(d, t => Math.min(1, t, d - t)), 150), 0.8]); },
+  elevator: (c) => { const d = c.dur || 3.5; return mix([tone(d, 110, 330, { type: 'tri', att: 0.3, rel: 0.4 }), 0.25], [sparkle(d, 20), 0.35], [pad(d, [261.6, 329.6, 392], { att: 0.6, rel: 0.6, cutoff: 1400 }), 0.25]); },
+  flashback: () => mix([biquad(noiseBuf(1.2, t => Math.sin(Math.PI * t / 1.2) ** 2), 'bp', 2000, 1, 400), 0.7], [metal(1.6, 330), 0.25]),
+  gulp: () => mix([tone(0.18, 300, 140, { decay: 0.07 }), 0.6], [lp(noiseBuf(0.15, t => Math.exp(-t * 30)), 600), 0.4]),
+  boneMeal: () => mix([sparkle(0.6, 6), 0.5], [tone(0.2, 900, 1600, { decay: 0.08 }), 0.15]),
+  grow: () => mix([biquad(noiseBuf(1.0, t => Math.sin(Math.PI * t)), 'bp', 600, 1.2, 3000), 0.5], [sparkle(1.0, 10), 0.5]),
+  worldRegrow: (c) => { const d = c.dur || 5; return mix([pad(d, [130.8, 196, 261.6, 329.6, 392], { att: d * 0.5, rel: 1.5, cutoff: 2000 }), 0.9], [lp(noiseBuf(d, t => Math.min(1, t / d * 1.5) * Math.exp(-Math.max(0, t - d * 0.8))), 300), 1.0], [sparkle(d, 40), 0.5]); },
+  phaseChange: () => mix([tone(0.15, 660, 660, { type: 'square', rel: 0.05 }), 0.12], [shift(tone(0.2, 990, 990, { type: 'square', rel: 0.08 }), 0.12), 0.12], [thump(100, 0.05), 0.5]),
   riser: (c) => { const d = c.dur || 1.5; return mix([biquad(noiseBuf(d, t => Math.pow(t / d, 2)), 'bp', 300, 1, 6000), 0.8], [tone(d, 100, 800, { type: 'saw', att: d * 0.8, rel: 0.02 }), 0.12]); },
 };
 function shift(b, sec) { const o = new Float32Array(b.length + Math.round(sec * SR)); o.set(b, Math.round(sec * SR)); return o; }
@@ -218,6 +236,17 @@ const MOODS = {
     add(b, pad(d, [NOTE(38), NOTE(45)], { att: 0.5, rel: 0.1, cutoff: 400 }), 0, 0.5);
     const r = buf(d); let p = 0; for (let i = 0; i < r.length; i++) { const t = i / SR; p += NOTE(57 + 12 * t / d) / SR; r[i] = (2 * (p % 1) - 1) * 0.05 * (t / d); } add(b, lp(r, 2500), 0, 1); return b; },
   glitch(d) { const b = buf(d); for (let t = 0; t < d; t += 0.12) if (rnd() < 0.5) add(b, glitchBurst(0.1), t, 0.6); add(b, pad(d, [NOTE(30), NOTE(31)], { att: 0.05, rel: 0.1, cutoff: 300 }), 0, 0.8); return b; },
+  hope(d) { const b = buf(d); const beat = 60 / 84; const chords = [[48, 55, 64], [43, 50, 59], [45, 52, 60], [41, 48, 57]]; const mel = [76, 79, 81, 79, 76, 74, 72, 74];
+    for (let bar = 0, t = 0; t < d; bar++, t += beat * 4) { const ch = chords[bar % 4]; add(b, pad(beat * 4.3, ch.map(NOTE), { att: 0.6, rel: 1.2, cutoff: 1100 }), t, 0.2 + Math.min(0.15, t / d * 0.2));
+      add(b, pianoNote(NOTE(ch[0] - 12), beat * 4), t, 0.3); for (let k = 0; k < 4; k++) add(b, pianoNote(NOTE(ch[k % 3] + 12), beat * 1.5), t + k * beat + beat / 2, 0.12);
+      if (bar % 2 === 1) for (let k = 0; k < 4; k++) add(b, pianoNote(NOTE(mel[(bar * 2 + k) % 8]), beat * 2), t + k * beat, 0.2); }
+    return b; },
+  wonder(d) { const b = buf(d); const beat = 60 / 72; const chords = [[48, 55, 60, 64, 67], [41, 48, 57, 60, 65], [45, 52, 57, 60, 64], [43, 50, 55, 59, 62]];
+    for (let bar = 0, t = 0; t < d; bar++, t += beat * 4) { const ch = chords[bar % 4]; const sw = Math.min(1, t / (d * 0.5) + 0.3);
+      add(b, pad(beat * 4.4, ch.map(NOTE), { att: 0.4, rel: 1.4, formant: bar > 0, cutoff: 1600 }), t, 0.3 * sw); add(b, drum('taiko'), t, 0.35 * sw);
+      for (let k = 0; k < 8; k++) add(b, tone(beat / 2, NOTE(ch[(k * 2) % 5] + 12), NOTE(ch[(k * 2) % 5] + 12), { type: 'tri', decay: 0.15 }), t + k * beat / 2, 0.1 * sw);
+      add(b, pianoNote(NOTE(ch[4] + 12), beat * 3), t, 0.25); }
+    return b; },
   end(d) { const b = buf(d); add(b, SFX.impactDeep(), 0, 0.8); add(b, pad(d, [NOTE(26), NOTE(33), NOTE(38)], { att: 0.5, rel: 2.5, cutoff: 300 }), 0, 0.8); return b; },
 };
 const AMB = {
@@ -225,6 +254,8 @@ const AMB = {
   night: d => { const b = mix([lp(noiseBuf(d, t => 0.5 + 0.3 * Math.sin(t * 0.21)), 400), 0.3]); for (let t = 0; t < d; t += 0.9 + rnd() * 0.6) { for (let j = 0; j < 3; j++) add(b, tone(0.03, 4300, 4300, { decay: 0.01 }), t + j * 0.05, 0.05); } return b; },
   cave: d => { const b = mix([lp(noiseBuf(d, t => 0.6 + 0.3 * Math.sin(t * 0.17)), 180), 0.6]); for (let t = 0.5; t < d; t += 1.5 + rnd() * 3) add(b, tone(0.12, 1400 + rnd() * 800, 700, { decay: 0.03 }), t, 0.12); return b; },
   wind: d => mix([biquad(noiseBuf(d, t => 0.5 + 0.4 * Math.sin(t * 0.4)), 'bp', 500, 0.6), 0.4], [lp(noiseBuf(d), 120), 0.4]),
+  sky: d => mix([biquad(noiseBuf(d, t => 0.5 + 0.35 * Math.sin(t * 0.37) * Math.sin(t * 0.11)), 'bp', 700, 0.5), 0.35], [lp(noiseBuf(d), 140), 0.25]),
+  nether: d => { const b = mix([lp(noiseBuf(d, t => 0.7 + 0.3 * Math.sin(t * 0.3)), 120), 0.9]); for (let t = 0.2; t < d; t += 0.15 + rnd() * 0.5) add(b, hp(noiseBuf(0.03, t2 => Math.exp(-t2 * 120)), 1200), t, 0.25 * rnd()); for (let t = 1; t < d; t += 3 + rnd() * 3) add(b, lp(noiseBuf(0.5, t2 => Math.exp(-t2 * 5)), 400), t, 0.5); return b; },
   void: d => mix([lp(noiseBuf(d, t => 0.5 + 0.4 * Math.sin(t * 0.13)), 150), 0.5], [pad(d, [NOTE(21)], { att: 3, rel: 3, cutoff: 120 }), 0.6]),
 };
 
@@ -269,7 +300,7 @@ for (const c of cues) { const fn = SFX[c.id]; if (!fn) { missing.add(c.id); cont
   add(sfxL, s, c.t, g * (1 - pan)); add(sfxR, s, c.t, g * (1 + pan)); add(sfxSend, s, c.t, g * (c.id === 'stepPhantom' || c.id === 'knock' ? 1.2 : 0.35)); }
 if (missing.size) console.warn('no sound for cue ids:', [...missing].join(', '));
 // voice
-for (const l of LINES) { const f = path.join(BUILD, 'voice', l.id + '.wav'); if (!fs.existsSync(f)) continue; const v = readWav(f); add(voice, v, G(l.scene, l.t), l.kind === 'whisper' ? 0.8 : 1.0); }
+for (const l of LINES) { const f = path.join(BUILD, 'voice', l.id + '.wav'); if (!fs.existsSync(f)) continue; const v = readWav(f); add(voice, v, G(l.scene, l.t), l.kind === 'whisper' ? 0.8 : l.kind === 'blockFar' ? 0.6 : 1.0); }
 // ducking envelope from voice
 const duck = new Float32Array(LEN); { let e = 0; const att = 1 - Math.exp(-1 / (0.03 * SR)), rel = 1 - Math.exp(-1 / (0.35 * SR)); for (let i = 0; i < LEN; i++) { const x = Math.abs(voice[i]) > 0.02 ? 1 : 0; e += (x > e ? att : rel) * (x - e); duck[i] = e; } }
 // reverbs

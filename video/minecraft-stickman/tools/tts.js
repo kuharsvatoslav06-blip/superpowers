@@ -25,7 +25,7 @@ const manifest = {};
 for (const l of LINES) {
   const out = path.join(OUT, l.id + '.wav'); const st = STYLE[l.kind] || STYLE.dia;
   const custom = ['.wav', '.mp3', '.m4a', '.flac'].map(e => path.join(CUSTOM, l.id + e)).find(f => fs.existsSync(f));
-  if (custom) { const extra = l.kind === 'entity' ? 'aresample=48000,asetrate=40800,aresample=48000,atempo=1.0,aecho=0.8:0.7:120|260:0.35|0.2,' : ''; ff(['-i', custom, '-af', extra + 'silenceremove=start_periods=1:start_threshold=-50dB:stop_periods=-1:stop_threshold=-50dB:stop_duration=0.3,loudnorm=I=-16:TP=-1.5:LRA=7', '-ac', '1', '-ar', '48000', out]); }
+  if (custom) { const extra = l.kind === 'entity' ? 'aresample=48000,asetrate=40800,aresample=48000,atempo=1.0,aecho=0.8:0.7:120|260:0.35|0.2,' : l.kind === 'block' ? 'aecho=0.8:0.5:45|95:0.18|0.1,' : l.kind === 'blockFar' ? 'highpass=f=250,lowpass=f=5000,aecho=0.8:0.85:160|330|520:0.45|0.32|0.2,volume=0.8,' : ''; ff(['-i', custom, '-af', extra + 'silenceremove=start_periods=1:start_threshold=-50dB:stop_periods=-1:stop_threshold=-50dB:stop_duration=0.3,loudnorm=I=-16:TP=-1.5:LRA=7', '-ac', '1', '-ar', '48000', out]); }
   else {
     if (!hasFestival) { console.error('festival not installed: sudo apt-get install festival festvox-us2 (or put recordings into voice/)'); process.exit(1); }
     const raw = path.join(TMP, l.id + '.raw.wav'); const scm = path.join(TMP, l.id + '.scm');

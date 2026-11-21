@@ -1,0 +1,145 @@
+// Episode 3 — "I Survived 100 Days on ONE BLOCK in Minecraft... But It Could Talk". Times inside a scene are LOCAL seconds.
+export const FPS = 30;
+export const WIDTH = 1920;
+export const HEIGHT = 1080;
+export const TITLE = 'I Survived 100 Days on ONE BLOCK in Minecraft... But It Could Talk';
+
+export const SCENES = [
+  { id: 'cold', name: 'Cold open (hook)', dur: 15.5, transition: { type: 'cut' } },
+  { id: 's1', name: 'One Block', dur: 46.0, transition: { type: 'flash', dur: 1.2 } },
+  { id: 's2', name: 'Days 2-20', dur: 48.0, transition: { type: 'blocks', dur: 1.0 } },
+  { id: 's3', name: 'The Block Speaks', dur: 42.0, transition: { type: 'blocks', dur: 1.0 } },
+  { id: 's4', name: 'Friends', dur: 38.0, transition: { type: 'fade', dur: 1.2 } },
+  { id: 's5', name: 'The Nether Phase', dur: 34.0, transition: { type: 'glitch', dur: 0.8 } },
+  { id: 's6', name: 'The Sign', dur: 36.0, transition: { type: 'blocks', dur: 1.0 } },
+  { id: 's7', name: 'The End Phase', dur: 32.0, transition: { type: 'fade', dur: 1.4 } },
+  { id: 's8', name: 'The Choice', dur: 32.0, transition: { type: 'fade', dur: 1.2 } },
+  { id: 's9', name: 'Day 100', dur: 50.0, transition: { type: 'flash', dur: 1.6 } },
+];
+let acc = 0; for (const s of SCENES) { s.start = acc; acc += s.dur; }
+export const DURATION = acc;
+export const sceneById = Object.fromEntries(SCENES.map(s => [s.id, s]));
+export const G = (scene, t) => sceneById[scene].start + t;
+
+// who: 'hero' (Jon) or 'block' (Origin, voiced by Zane). kind 'block' = Origin speaking, 'blockFar' = the distant new block.
+export const LINES = [
+  { id: 'b0', scene: 'cold', t: 0.3, who: 'block', kind: 'block', text: "*Don't jump.*" },
+  { id: 'h0', scene: 'cold', t: 1.6, who: 'hero', kind: 'nar', text: 'I spawned on *one block.* In the sky. And the block... *talks.* This is day one hundred. Let me explain.' },
+  { id: 'h1a', scene: 's1', t: 2.0, who: 'hero', kind: 'nar', text: '*Day one.* One grass block. No trees, no ground, nothing. Just a very, very long way *down.*' },
+  { id: 'h1b', scene: 's1', t: 10.6, who: 'hero', kind: 'dia', text: 'Okay. Rule number one: *don\'t look down.* ...I looked down.' },
+  { id: 'h1c', scene: 's1', t: 20.4, who: 'hero', kind: 'nar', text: 'I punched the block. It broke... and then it *came back.* Free dirt. Forever. I am *rich.*' },
+  { id: 'h1d', scene: 's1', t: 27.4, who: 'hero', kind: 'nar', text: 'Then it turned into a *log.* A whole tree, one block at a time. Day one: a house made of exactly *four planks.*' },
+  { id: 'h2a', scene: 's2', t: 0.8, who: 'hero', kind: 'nar', text: '*Day five.* Stone phase. I built a cobblestone generator and immediately *fell off it.* Twice.' },
+  { id: 'h2b', scene: 's2', t: 8.4, who: 'hero', kind: 'nar', text: '*Day nine.* The block dropped a chest. Inside: a sapling, some ice, and one *lava bucket.* Somebody wanted me to *live.*' },
+  { id: 'h2c', scene: 's2', t: 20.0, who: 'hero', kind: 'nar', text: '*Day fourteen.* Cave phase. A spider came *out of the block.* Out. Of. The. Block.' },
+  { id: 'h2d', scene: 's2', t: 30.2, who: 'hero', kind: 'nar', text: '*Day twenty.* Wheat, a tree, and two chickens named *Nugget* and *Also Nugget.* Life was good.' },
+  { id: 'h3a', scene: 's3', t: 1.0, who: 'hero', kind: 'nar', text: '*Day twenty-one.* I swung my pickaxe like always, and then...' },
+  { id: 'b3a', scene: 's3', t: 6.3, who: 'block', kind: 'block', text: '*Ow.*' },
+  { id: 'h3b', scene: 's3', t: 8.4, who: 'hero', kind: 'dia', text: '...*Who* said that?' },
+  { id: 'b3b', scene: 's3', t: 10.4, who: 'block', kind: 'block', text: 'Please. Stop. *Hitting.* Me.' },
+  { id: 'h3c', scene: 's3', t: 14.4, who: 'hero', kind: 'dia', text: 'The block. The *block* said that. I\'m not crazy. I\'ve been alone for twenty days, but I\'m *not crazy.*' },
+  { id: 'b3c', scene: 's3', t: 21.4, who: 'block', kind: 'block', text: 'You may call me *Origin.* I am the first block of this world. And you have hit me... *four thousand times.*' },
+  { id: 'h3d', scene: 's3', t: 31.0, who: 'hero', kind: 'dia', text: 'Sorry! I\'m sorry! Also... can I still have *dirt?*' },
+  { id: 'h4a', scene: 's4', t: 0.8, who: 'hero', kind: 'nar', text: 'So, Origin and I made a deal. I ask *nicely.* It gives me what I need. *No more pickaxe.*' },
+  { id: 'b4a', scene: 's4', t: 7.6, who: 'block', kind: 'block', text: 'You are the first player who ever said *please.*' },
+  { id: 'h4b', scene: 's4', t: 11.6, who: 'hero', kind: 'nar', text: 'I built a house around it, so it wouldn\'t get *cold.* Can blocks get cold? I didn\'t ask. It felt *rude.*' },
+  { id: 'b4b', scene: 's4', t: 20.0, who: 'block', kind: 'block', text: 'Below us, there was a world once. *Oceans.* *Mountains.* *Villages.* Now there is *only me.*' },
+  { id: 'h5a', scene: 's5', t: 1.0, who: 'hero', kind: 'nar', text: '*Day fifty.* Something went wrong. The block turned *red.* Netherrack. Lava. And then... *a ghast.*' },
+  { id: 'h5b', scene: 's5', t: 13.0, who: 'hero', kind: 'dia', text: 'It hit the bridge. The bridge was *gone.* And I was *falling.* This is it. This is how I...' },
+  { id: 'b5', scene: 's5', t: 18.3, who: 'block', kind: 'block', text: "*I've got you.*" },
+  { id: 'h5c', scene: 's5', t: 20.0, who: 'hero', kind: 'nar', text: 'A block. Right under my feet. In the middle of the sky. *Origin saved my life.*' },
+  { id: 'h6a', scene: 's6', t: 1.0, who: 'hero', kind: 'nar', text: '*Day sixty-eight.* I flew... okay, I *bridged...* to the edge of the world. And I found another island. *With a sign.*' },
+  { id: 'h6b', scene: 's6', t: 11.4, who: 'hero', kind: 'dia', text: "It said: *Don't trust the first block.*" },
+  { id: 'h6c', scene: 's6', t: 17.6, who: 'hero', kind: 'dia', text: 'Origin. *Who wrote this?*' },
+  { id: 'b6a', scene: 's6', t: 20.6, who: 'block', kind: 'block', text: 'The last player. He broke me *ten thousand times.* He wanted everything. He *took* everything.' },
+  { id: 'h6d', scene: 's6', t: 29.2, who: 'hero', kind: 'dia', text: 'Where is he *now?*' },
+  { id: 'b6b', scene: 's6', t: 31.0, who: 'block', kind: 'block', text: '...He *jumped.*' },
+  { id: 'h7a', scene: 's7', t: 1.0, who: 'hero', kind: 'nar', text: '*Day eighty.* The sky went black. End stone everywhere. And Origin looked... *smaller.*' },
+  { id: 'b7a', scene: 's7', t: 8.2, who: 'block', kind: 'block', text: 'Every block I give you is a *piece of me.* I have *nineteen pieces* left.' },
+  { id: 'h7b', scene: 's7', t: 14.2, who: 'hero', kind: 'dia', text: 'Wait. Every dirt block, every tree, every chicken... *that was you?* Then I\'m done. *Not one more block.*' },
+  { id: 'b7b', scene: 's7', t: 20.2, who: 'block', kind: 'block', text: 'Then you will not survive. *You need me.*' },
+  { id: 'h8a', scene: 's8', t: 1.0, who: 'hero', kind: 'nar', text: '*Day ninety.* I didn\'t mine. I *planted.* Every seed, every sapling, every bone meal I had. If Origin gave me a world, *I\'d give one back.*' },
+  { id: 'h8b', scene: 's8', t: 12.6, who: 'hero', kind: 'dia', text: 'Trees grow. Grass spreads. You just have to *wait.*' },
+  { id: 'h9a', scene: 's9', t: 1.0, who: 'hero', kind: 'nar', text: '*Day one hundred.* I placed Origin in the middle of the island. And then... *the world below us came back.*' },
+  { id: 'b9a', scene: 's9', t: 12.6, who: 'block', kind: 'block', text: '*Oceans.* *Mountains.* *Villages.* You *remembered.*' },
+  { id: 'h9b', scene: 's9', t: 17.8, who: 'hero', kind: 'dia', text: 'We did it, buddy. *One hundred days.* On one block.' },
+  { id: 'b9b', scene: 's9', t: 22.8, who: 'block', kind: 'block', text: 'Thank you, player. Now... *rest.*' },
+  { id: 'h9c', scene: 's9', t: 27.2, who: 'hero', kind: 'nar', text: 'And then it went quiet. Just a normal grass block. I still talk to it *every day.*' },
+  { id: 'b9c', scene: 's9', t: 37.4, who: 'block', kind: 'blockFar', text: "*Don't jump.*" },
+  { id: 'h9d', scene: 's9', t: 39.4, who: 'hero', kind: 'dia', text: '...Wait. *Who was that?*' },
+];
+
+export const MUSIC = [
+  { scene: 'cold', t: 0, end: 9.9, mood: 'drone', gain: 0.55, fin: 0.5, fout: 0.1 },
+  { scene: 'cold', t: 10.0, end: 15.5, mood: 'end', gain: 0.5, fin: 0.01, fout: 0.8 },
+  { scene: 's1', t: 1.0, end: 36.5, mood: 'calm', gain: 0.45, fin: 2.0, fout: 1.0 },
+  { scene: 's1', t: 36.5, end: 46.0, mood: 'night', gain: 0.4, fin: 1.0, fout: 1.0 },
+  { scene: 's2', t: 0, end: 19.6, mood: 'build', gain: 0.45, fin: 0.3, fout: 0.6 },
+  { scene: 's2', t: 19.8, end: 29.6, mood: 'chase', gain: 0.45, fin: 0.3, fout: 0.6 },
+  { scene: 's2', t: 29.8, end: 48.0, mood: 'calm', gain: 0.45, fin: 1.0, fout: 1.0 },
+  { scene: 's3', t: 0, end: 6.1, mood: 'calm', gain: 0.4, fin: 0.5, fout: 0.05 },
+  { scene: 's3', t: 10.2, end: 42.0, mood: 'mystery', gain: 0.4, fin: 1.5, fout: 1.0 },
+  { scene: 's4', t: 0.3, end: 19.4, mood: 'calm', gain: 0.45, fin: 1.0, fout: 1.0 },
+  { scene: 's4', t: 19.4, end: 38.0, mood: 'night', gain: 0.45, fin: 1.0, fout: 1.0 },
+  { scene: 's5', t: 0, end: 7.0, mood: 'tense', gain: 0.5, fin: 0.3, fout: 0.3 },
+  { scene: 's5', t: 7.0, end: 18.2, mood: 'chase', gain: 0.6, fin: 0.05, fout: 0.1 },
+  { scene: 's5', t: 18.6, end: 34.0, mood: 'hope', gain: 0.45, fin: 1.5, fout: 1.0 },
+  { scene: 's6', t: 0, end: 9.0, mood: 'build', gain: 0.4, fin: 0.5, fout: 1.0 },
+  { scene: 's6', t: 9.0, end: 20.0, mood: 'drone', gain: 0.5, fin: 0.5, fout: 1.0 },
+  { scene: 's6', t: 20.0, end: 29.0, mood: 'sad', gain: 0.5, fin: 0.5, fout: 0.8 },
+  { scene: 's6', t: 29.0, end: 36.0, mood: 'drone', gain: 0.5, fin: 0.5, fout: 1.0 },
+  { scene: 's7', t: 0, end: 32.0, mood: 'void', gain: 0.5, fin: 1.5, fout: 1.2 },
+  { scene: 's8', t: 0, end: 32.0, mood: 'hope', gain: 0.5, fin: 1.5, fout: 1.0 },
+  { scene: 's9', t: 0, end: 6.8, mood: 'drone', gain: 0.45, fin: 1.0, fout: 0.5 },
+  { scene: 's9', t: 6.8, end: 27.0, mood: 'wonder', gain: 0.55, fin: 1.0, fout: 1.5 },
+  { scene: 's9', t: 27.0, end: 33.6, mood: 'calm', gain: 0.4, fin: 1.0, fout: 1.0 },
+  { scene: 's9', t: 33.6, end: 41.2, mood: 'drone', gain: 0.5, fin: 1.0, fout: 0.05 },
+  { scene: 's9', t: 41.8, end: 50.0, mood: 'end', gain: 0.6, fin: 0.01, fout: 2.5 },
+];
+
+export const AMBIENCE = [
+  { scene: 'cold', t: 0, end: 10, kind: 'sky', gain: 0.45 },
+  { scene: 's1', t: 0.5, end: 46, kind: 'sky', gain: 0.4 },
+  { scene: 's2', t: 0, end: 48, kind: 'sky', gain: 0.35 },
+  { scene: 's3', t: 0, end: 42, kind: 'sky', gain: 0.4 },
+  { scene: 's4', t: 0, end: 38, kind: 'sky', gain: 0.35 },
+  { scene: 's5', t: 2.5, end: 29, kind: 'nether', gain: 0.5 },
+  { scene: 's5', t: 28, end: 34, kind: 'sky', gain: 0.35 },
+  { scene: 's6', t: 0, end: 36, kind: 'sky', gain: 0.45 },
+  { scene: 's7', t: 0, end: 32, kind: 'void', gain: 0.45 },
+  { scene: 's8', t: 0, end: 32, kind: 'sky', gain: 0.35 },
+  { scene: 's9', t: 0, end: 41, kind: 'sky', gain: 0.4 },
+];
+
+const COUNTER = (scene, t, end, from, to) => ({ scene, t, end, type: 'dayCounter', from, to });
+export const OVERLAYS = [
+  { scene: 'cold', t: 10.0, end: 15.5, type: 'title', lines: ['I SURVIVED 100 DAYS', 'ON ONE BLOCK', '...BUT IT COULD TALK'] },
+  { scene: 's1', t: 0.6, end: 3.8, type: 'chapter', text: 'DAY 1', sub: 'ONE BLOCK' },
+  { scene: 's1', t: 17.0, end: 18.8, type: 'pickup', text: '+1 DIRT', icon: 'dirt' },
+  { scene: 's1', t: 21.4, end: 25.2, type: 'pickup', text: '+64 DIRT', icon: 'dirt' },
+  { scene: 's1', t: 26.4, end: 29.0, type: 'phase', text: 'PHASE: WOOD' },
+  { scene: 's1', t: 29.4, end: 31.4, type: 'pickup', text: '+5 OAK LOG', icon: 'log' },
+  { scene: 's1', t: 31.6, end: 33.8, type: 'pickup', text: '+4 OAK PLANKS', icon: 'planks' },
+  COUNTER('s2', 0.2, 7.8, 2, 5), COUNTER('s2', 8.2, 19.4, 6, 9), COUNTER('s2', 19.8, 29.8, 10, 14), COUNTER('s2', 30.0, 47.0, 15, 20),
+  { scene: 's2', t: 0.4, end: 2.8, type: 'phase', text: 'PHASE: STONE' },
+  { scene: 's2', t: 12.0, end: 13.4, type: 'pickup', text: 'SAPLING', icon: 'sapling' },
+  { scene: 's2', t: 13.4, end: 14.8, type: 'pickup', text: 'ICE', icon: 'ice' },
+  { scene: 's2', t: 14.8, end: 16.6, type: 'pickup', text: 'LAVA BUCKET', icon: 'lavaBucket' },
+  { scene: 's2', t: 20.0, end: 22.4, type: 'phase', text: 'PHASE: CAVE', red: true },
+  { scene: 's3', t: 0.4, end: 3.6, type: 'chapter', text: 'DAY 21', sub: 'THE BLOCK' },
+  { scene: 's3', t: 28.2, end: 30.6, type: 'caption', text: 'HITS: 4,000' },
+  { scene: 's3', t: 35.6, end: 37.6, type: 'pickup', text: '+1 DIRT (GIFT)', icon: 'dirt' },
+  COUNTER('s4', 0.3, 37.0, 22, 45),
+  { scene: 's5', t: 0.4, end: 3.4, type: 'chapter', text: 'DAY 50', sub: 'SOMETHING WENT WRONG', glitch: true },
+  { scene: 's5', t: 3.4, end: 5.6, type: 'phase', text: 'PHASE: NETHER', red: true },
+  { scene: 's6', t: 0.4, end: 3.4, type: 'chapter', text: 'DAY 68', sub: 'THE EDGE' },
+  { scene: 's7', t: 0.4, end: 3.4, type: 'chapter', text: 'DAY 80', sub: 'THE SKY WENT BLACK', glitch: true },
+  { scene: 's7', t: 10.6, end: 14.6, type: 'pieces', from: 20, to: 19 },
+  { scene: 's8', t: 0.4, end: 3.4, type: 'chapter', text: 'DAY 90', sub: 'PLANT EVERYTHING' },
+  COUNTER('s8', 15.6, 30.6, 91, 99),
+  { scene: 's9', t: 0.4, end: 3.4, type: 'chapter', text: 'DAY 100', sub: 'ONE BLOCK' },
+  { scene: 's9', t: 18.4, end: 23.0, type: 'achievement', text: '100 Days. One Block.' },
+  { scene: 's9', t: 42.0, end: 50.0, type: 'theEnd', text: 'A NEW BLOCK — DAY 1', sub: 'THE END?' },
+];
+
+export const globalize = arr => arr.map(o => ({ ...o, gt: G(o.scene, o.t), gend: o.end !== undefined ? G(o.scene, o.end) : undefined }));

@@ -12,6 +12,7 @@ export const T = {
   bookshelf: 24, stonebrick: 25, wool_red: 26, portal: 27, void: 28, mossy: 29, door_low: 30, door_high: 31,
   crack0: 32, crack1: 33, crack2: 34, crack3: 35, crack4: 36, flower_red: 37, tallgrass: 38, flower_yellow: 39,
   metal: 40, cobweb: 41, sign: 42, bed_top: 43, glitch: 44, gold: 45, lantern: 46, stonebrick_dark: 47,
+  netherrack: 48, end_stone: 49, lava: 50, farmland: 51, wheat: 52, sapling: 53, ice: 54, quartz: 55,
 };
 
 function hexRGB(h) { return [(h >> 16) & 255, (h >> 8) & 255, h & 255]; }
@@ -74,6 +75,15 @@ function paintTiles() {
   { fill(T.bed_top, hexRGB(0xb3312c), 0.06, 281); for (let y = 0; y < 6; y++) for (let x = 1; x < 15; x++) put(T.bed_top, x, y, hexRGB(0xf0f0f0)); }
   { const r = rng(291); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) put(T.glitch, x, y, r() < 0.5 ? hexRGB(0xff00ff) : hexRGB(0x111111)); }
   { fill(T.lantern, hexRGB(0x2c2c34), 0.1, 301); for (let y = 4; y < 13; y++) for (let x = 4; x < 12; x++) put(T.lantern, x, y, shade(hexRGB(0x7fd4ff), 0.8 + (y % 3) * 0.1)); }
+  // episode 3 tiles
+  fill(T.netherrack, hexRGB(0x7a2a2a), 0.18, 311); blobs(T.netherrack, hexRGB(0x5a1a1e), 7, 312); speck(T.netherrack, hexRGB(0xa04040), 25, 313);
+  fill(T.end_stone, hexRGB(0xdedca0), 0.07, 321); blobs(T.end_stone, hexRGB(0xc4c086), 6, 322); speck(T.end_stone, hexRGB(0xf0eec0), 20, 323);
+  { const r = rng(331); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { const v = Math.sin(x * 0.7 + Math.sin(y * 0.9) * 2.2) * 0.5 + 0.5; put(T.lava, x, y, v > 0.75 ? hexRGB(0xffd34a) : shade(hexRGB(0xe8661a), 0.8 + v * 0.35 + r() * 0.05)); } }
+  { fill(T.farmland, hexRGB(0x5a3a1e), 0.12, 341); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (y % 4 === 0) put(T.farmland, x, y, hexRGB(0x3e2812)); }
+  { const r = rng(351); for (let x = 1; x < 16; x += 3) { const h = 9 + Math.floor(r() * 5); for (let y = 16 - h; y < 16; y++) put(T.wheat, x, y, y < 16 - h + 3 ? hexRGB(0xd8b84a) : hexRGB(y % 2 ? 0x9a9a2a : 0x7a8a22)); put(T.wheat, x + 1, 16 - h + 1, hexRGB(0xe8c85a)); } }
+  { for (let y = 4; y < 16; y++) put(T.sapling, 7, y, hexRGB(0x6b4f2a)); for (const [a, b] of [[5, 3], [6, 2], [8, 2], [9, 3], [7, 1], [6, 4], [8, 4], [4, 5], [10, 5], [5, 7], [9, 7], [6, 6], [8, 6]]) put(T.sapling, a, b, hexRGB(0x3f8a2a)); put(T.sapling, 7, 3, hexRGB(0x5fb03a)); }
+  fill(T.ice, hexRGB(0x9cc4f5), 0.06, 361); speck(T.ice, hexRGB(0xd8ecff), 18, 362);
+  fill(T.quartz, hexRGB(0xece6dc), 0.04, 371);
   ctx.putImageData(img, 0, 0);
   return cv;
 }
@@ -106,6 +116,8 @@ const defs = [
   ['portal', [T.portal], { glow: true }], ['void', [T.void]], ['mossy', [T.mossy]], ['metal', [T.metal]], ['gold', [T.gold]],
   ['flower_red', [T.flower_red], { cross: true }], ['flower_yellow', [T.flower_yellow], { cross: true }], ['tallgrass', [T.tallgrass], { cross: true }],
   ['cobweb', [T.cobweb], { cross: true }], ['brick_dark', [T.stonebrick_dark]], ['lantern', [T.lantern], { glow: true }], ['glitch', [T.glitch], { glow: true }],
+  ['netherrack', [T.netherrack]], ['end_stone', [T.end_stone]], ['lava', [T.lava], { glow: true }], ['farmland', [T.farmland, T.dirt, T.dirt]], ['wheat', [T.wheat], { cross: true }],
+  ['sapling', [T.sapling], { cross: true }], ['ice', [T.ice]], ['quartz', [T.quartz]],
 ];
 export const BLOCKS = [null];
 for (const [name, f, opt = {}] of defs) {

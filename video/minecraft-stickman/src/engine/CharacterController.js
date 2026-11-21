@@ -393,4 +393,6 @@ export class Actor {
   }
 }
 export { HEAD_R, TORSO };
+/** A standalone held-item mesh (e.g. a pickaxe flying through the air). */
+export const makeItem = name => mountItem(name);
 export const _ease = Ease; export const _hash = hash; export const _pose = pose;

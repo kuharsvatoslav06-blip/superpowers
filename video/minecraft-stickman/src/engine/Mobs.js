@@ -102,3 +102,45 @@ export class Bird {
   }
   apply(st) { this.root.position.set(...st.pos); this.root.rotation.set(0, st.yaw, st.bank || 0, 'YXZ'); const f = Math.sin(st.flap * TAU) * 0.8; this.lw.rotation.z = f; this.rw.rotation.z = -f; this.root.visible = st.visible !== false; }
 }
+
+export class Spider {
+  constructor() {
+    this.root = new THREE.Group(); const dark = lam(0x2a2420), dark2 = lam(0x1a1614);
+    const face = faceTex(x => { x.fillStyle = '#2a2420'; x.fillRect(0, 0, 8, 8); x.fillStyle = '#d01818'; x.fillRect(1, 3, 2, 1); x.fillRect(5, 3, 2, 1); x.fillRect(2, 2, 1, 1); x.fillRect(5, 2, 1, 1); x.fillStyle = '#ff6060'; x.fillRect(3, 4, 1, 1); x.fillRect(4, 4, 1, 1); });
+    this.body = new THREE.Group(); this.body.position.y = 0.45; this.root.add(this.body);
+    const abd = box(0.75, 0.55, 0.8, dark); abd.position.z = -0.55; this.body.add(abd);
+    const th = box(0.4, 0.35, 0.4, dark2); this.body.add(th);
+    this.head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.45, 0.4), [dark, dark, dark, dark, new THREE.MeshLambertMaterial({ map: face, emissive: 0x330000, emissiveMap: face }), dark]); this.head.position.z = 0.38; this.body.add(this.head);
+    this.legs = [];
+    for (let i = 0; i < 8; i++) { const s = i < 4 ? 1 : -1; const k = i % 4; const l = new THREE.Group(); l.position.set(s * 0.18, 0, 0.15 - k * 0.15); l.rotation.y = s * (0.5 - k * 0.33) + (s < 0 ? Math.PI : 0); const seg = box(0.9, 0.08, 0.08, dark2); seg.position.x = 0.45; l.add(seg); l.rotation.z = 0.35; this.body.add(l); this.legs.push(l); }
+  }
+  apply(st) {
+    this.root.visible = st.visible !== false; this.root.position.set(...st.pos); this.root.rotation.y = st.yaw || 0; this.root.scale.setScalar(st.scale ?? 1);
+    const w = st.walk || 0; this.legs.forEach((l, i) => { l.rotation.z = 0.35 + Math.sin(w * TAU * 2 + i * 1.3) * 0.25; });
+    this.body.position.y = 0.45 + Math.abs(Math.sin(w * TAU * 2)) * 0.03 + (st.hop || 0);
+  }
+}
+
+export class Ghast {
+  constructor() {
+    this.root = new THREE.Group();
+    this.cv = document.createElement('canvas'); this.cv.width = this.cv.height = 16; this.ctx = this.cv.getContext('2d');
+    this.tex = new THREE.CanvasTexture(this.cv); this.tex.magFilter = THREE.NearestFilter; this.tex.minFilter = THREE.NearestFilter; this.tex.colorSpace = THREE.SRGBColorSpace;
+    const white = lam(0xf0f0f0, 0x303030); const faceM = new THREE.MeshLambertMaterial({ map: this.tex, emissive: 0x303030, emissiveMap: this.tex });
+    this.body = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), [white, white, white, white, faceM, white]); this.body.position.y = 2; this.root.add(this.body);
+    this.tent = []; for (let i = 0; i < 9; i++) { const g = new THREE.Group(); g.position.set(((i % 3) - 1) * 1.2, 0, (Math.floor(i / 3) - 1) * 1.2); const len = 2 + (i * 37 % 5) * 0.4; const t = box(0.3, len, 0.3, white, true); g.add(t); this.root.add(g); this.tent.push(g); }
+    this.mode = -1; this.draw(0);
+  }
+  draw(mode) {
+    if (mode === this.mode) return; this.mode = mode; const x = this.ctx;
+    x.fillStyle = '#f0f0f0'; x.fillRect(0, 0, 16, 16); x.fillStyle = '#d8d8d8'; x.fillRect(0, 14, 16, 2);
+    if (mode === 0) { x.fillStyle = '#555'; x.fillRect(3, 6, 3, 1); x.fillRect(10, 6, 3, 1); x.fillStyle = '#a0a0a0'; x.fillRect(3, 7, 1, 3); x.fillRect(12, 7, 1, 2); x.fillStyle = '#555'; x.fillRect(6, 10, 4, 1); }
+    else { x.fillStyle = '#111'; x.fillRect(3, 5, 3, 3); x.fillRect(10, 5, 3, 3); x.fillStyle = '#c02020'; x.fillRect(4, 8, 1, 3); x.fillRect(11, 8, 1, 3); x.fillStyle = '#111'; x.fillRect(5, 10, 6, 4); x.fillStyle = '#2a0505'; x.fillRect(6, 11, 4, 2); }
+    this.tex.needsUpdate = true;
+  }
+  apply(st) {
+    this.root.visible = st.visible !== false; this.root.position.set(...st.pos); this.root.rotation.y = st.yaw || 0; this.root.scale.setScalar(st.scale ?? 1);
+    const t = st.t || 0; this.tent.forEach((g, i) => { g.rotation.x = Math.sin(t * 2.2 + i) * 0.25; g.rotation.z = Math.sin(t * 1.7 + i * 2) * 0.2; });
+    this.draw(st.angry ? 1 : 0);
+  }
+}

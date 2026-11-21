@@ -47,8 +47,9 @@ function drawSubtitles(ctx, t) {
     const space = ctx.measureText(' ').width; const widths = chunk.map(w => ctx.measureText(w.w).width);
     const total = widths.reduce((a, b) => a + b, 0) + space * (chunk.length - 1);
     let x = W / 2 - total / 2; const y = 990;
-    const base = l.kind === 'entity' ? '#ff5a5a' : l.kind === 'nar' ? '#fff3d6' : '#ffffff';
-    const hlc = l.kind === 'entity' ? '#ff1e1e' : '#ffd23a';
+    const blk = l.kind === 'block' || l.kind === 'blockFar';
+    const base = l.kind === 'entity' ? '#ff5a5a' : blk ? '#b8ff9a' : l.kind === 'nar' ? '#fff3d6' : '#ffffff';
+    const hlc = l.kind === 'entity' ? '#ff1e1e' : blk ? '#6dff4a' : '#ffd23a';
     chunk.forEach((w, i) => {
       const k = clamp((lt - w.t) / 0.14); if (k <= 0) { x += widths[i] + space; return; }
       const s = 0.55 + 0.45 * Ease.outBack(k);
@@ -76,13 +77,18 @@ const ICONS = {
   map: ['mmmmmmmmmmmm', 'mMMMMMMMMMMm', 'mMgggMMMMMMm', 'mMggggMbbMMm', 'mMMgMMMbbbMm', 'mMMMMMMMbMMm', 'mMMMxMMMMMMm', 'mMMMMMgggMMm', 'mMbbMMggggMm', 'mMbbbMMMMMMm', 'mMMMMMMMMMMm', 'mmmmmmmmmmmm'],
   originalPickaxe: ['..ccccccc...', '.cCCCCCCCc..', 'cCc..dsdCCc.', 'cc...dsd.cCc', '.....dsd..cc', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....dsd....', '.....ddd....'],
   fish: ['............', '..........b.', '...bbbbb.bb.', '..bFFFFFbFb.', '.bFwFFFFFFb.', '.bFFFFfFFFb.', '..bFFFFFbFb.', '...bbbbb.bb.', '..........b.', '............', '............', '............'],
+  dirt: ['DDDDDDDDDDDD', 'DdDDDDDDdDDD', 'DDDDdDDDDDDD', 'DDDDDDDDDDdD', 'DdDDDDdDDDDD', 'DDDDDDDDDDDD', 'DDDdDDDDDdDD', 'DDDDDDDdDDDD', 'DdDDDDDDDDDD', 'DDDDDdDDDDdD', 'DDDDDDDDDDDD', 'DDdDDDDDDDDD'],
+  sapling: ['.....GG.....', '...GgGGgG...', '..GGgGGgGG..', '...GGggGG...', '....GGGG....', '.....ee.....', '.....ee.....', '....Geeg....', '.....ee.....', '.....ee.....', '.....ee.....', '............'],
+  ice: ['QQQQQQQQQQQQ', 'QqqQQQQQQQQQ', 'QqQQQQQQqQQQ', 'QQQQQQQqQQQQ', 'QQQQQQqQQQQQ', 'QQQQQQQQQQQQ', 'QQQqQQQQQQqQ', 'QQqQQQQQQqQQ', 'QQQQQQQQqQQQ', 'QQQQQQQQQQQQ', 'QQQQqqQQQQQQ', 'QQQQQQQQQQQQ'],
+  lavaBucket: ['............', '..SSSSSSSS..', '.SAAAAAAAAS.', '.SAaAAaAAAS.', '.SAAAAAAaAS.', '..SAAAAAAS..', '..SssssssS..', '..SssssssS..', '...SssssS...', '...SssssS...', '....SSSS....', '............'],
   iron: ['............', '....oooo....', '...oIIIIo...', '..oIiIIIIo..', '.oIIIIIiIIo.', '.oIiIIIIIIo.', '.oIIIIiIIo..', '..oIIIIIIo..', '...ooIIo....', '.....oo.....', '............', '............'],
 };
 const ICOL = { F: '#6a9ed8', f: '#3a6ea8',  b: '#3d2a12', L: '#b08d59', l: '#c9a46a', r: '#8a6a3a', B: '#6b4f2a', d: '#3d2a12', p: '#6e5230', P: '#b48a55', n: '#5b4326', k: '#5b4326',
-  g: '#9a9a9a', s: '#8f6538', h: '#3d2a12', H: '#b48a55', c: '#0f4d48', C: '#7ff5ea', y: '#a0761a', Y: '#f5c542', W: '#fff6c8', R: '#7a2e1a', w: '#efe6cc', m: '#6b5a3a', M: '#e2d3a6', x: '#d8322a', o: '#6e4e3a', I: '#d8a77e', i: '#f0d0b0' };
+  g: '#9a9a9a', s: '#8f6538', h: '#3d2a12', H: '#b48a55', c: '#0f4d48', C: '#7ff5ea', y: '#a0761a', Y: '#f5c542', W: '#fff6c8', R: '#7a2e1a', w: '#efe6cc', m: '#6b5a3a', M: '#e2d3a6', x: '#d8322a', o: '#6e4e3a', I: '#d8a77e', i: '#f0d0b0',
+  D: '#7a5434', G: '#3f8a2a', e: '#6b4f2a', Q: '#9cc4f5', q: '#e0f0ff', S: '#5a5a5a', A: '#e8661a', a: '#ffd34a' };
 export function drawIcon(ctx, name, x, y, size) {
   const rows = ICONS[name]; if (!rows) return; const p = size / 12;
-  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') return; ctx.fillStyle = (name === 'book' && ch === 'g') ? '#e6c24a' : name === 'originalPickaxe' && (ch === 'c' || ch === 'C') ? (ch === 'c' ? '#3a0f66' : '#d38cff') : name === 'fish' && ch === 'w' ? '#ffffff' : ICOL[ch]; ctx.fillRect(Math.round(x + c * p), Math.round(y + r * p), Math.ceil(p), Math.ceil(p)); }));
+  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') return; ctx.fillStyle = (name === 'sapling' && ch === 'g') ? '#5fb03a' : (name === 'dirt' && ch === 'd') ? '#5c3d22' : (name === 'lavaBucket' && ch === 's') ? '#9a9a9a' : (name === 'book' && ch === 'g') ? '#e6c24a' : name === 'originalPickaxe' && (ch === 'c' || ch === 'C') ? (ch === 'c' ? '#3a0f66' : '#d38cff') : name === 'fish' && ch === 'w' ? '#ffffff' : ICOL[ch]; ctx.fillRect(Math.round(x + c * p), Math.round(y + r * p), Math.ceil(p), Math.ceil(p)); }));
 }
 
 // ------------------------------------------------------------- UI primitives
@@ -408,6 +414,23 @@ R.chat = (ctx, lt, o) => {
   ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(40, 860, w, 64); pixelText(ctx, o.text, 60, 906, 40, '#ffe14a', 'left', true); ctx.restore();
 };
 R.chat.cues = o => [{ t: o.gt, id: 'pop', gain: 0.8 }];
+
+// ---- episode 3 overlays
+R.phase = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const k = Ease.out3(clamp(lt / 0.3)) * clamp((dur - lt) / 0.4); const jx = o.red ? (hash(Math.floor(t * 20)) - 0.5) * 10 : 0;
+  ctx.save(); ctx.globalAlpha = k; ctx.font = `700 54px ${FONT.pixel}`; const w = ctx.measureText(o.text).width + 80; const y = 40 + (1 - k) * -40;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(W / 2 - w / 2 + jx, y, w, 96); ctx.fillStyle = o.red ? '#ff3b3b' : '#5fd35a'; ctx.fillRect(W / 2 - w / 2 + jx, y + 88, w, 8);
+  pixelText(ctx, o.text, W / 2 + jx, y + 68, 54, o.red ? '#ffb0b0' : '#ffffff', 'center', true, FONT.pixel, 700); ctx.restore();
+};
+R.phase.cues = o => [{ t: o.gt, id: 'phaseChange', gain: 0.8 }];
+R.pieces = (ctx, lt, o, t) => {
+  const dur = o.gend - o.gt; const a = clamp(lt / 0.3) * clamp((dur - lt) / 0.4); const n = lt > 0.9 ? o.to : o.from; const pop = lt > 0.9 ? 1 + 0.4 * Math.exp(-(lt - 0.9) * 7) : 1;
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(W - 470, 60, 410, 150); ctx.fillStyle = '#b080ff'; ctx.fillRect(W - 470, 60, 10, 150);
+  ctx.fillStyle = '#dedca0'; ctx.fillRect(W - 430, 95, 80, 80); ctx.fillStyle = '#c4c086'; ctx.fillRect(W - 418, 108, 18, 14); ctx.fillRect(W - 380, 140, 16, 18);
+  pixelText(ctx, 'PIECES LEFT', W - 320, 115, 30, '#e0d0ff', 'left', true);
+  ctx.translate(W - 230, 175); ctx.scale(pop, pop); pixelText(ctx, String(n), 0, 0, 64, n < 20 ? '#ff6a6a' : '#ffffff', 'center', true, FONT.pixel, 700); ctx.restore();
+};
+R.pieces.cues = o => [{ t: o.gt + 0.9, id: 'beepHigh', gain: 0.5 }];
 
 const OVS = globalize(OVERLAYS);
 export class SubtitleSystem {
