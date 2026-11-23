@@ -28,7 +28,8 @@ node scripts/render-covers.mjs day01   # → out/day01_cover_tiktok.png (TikTok,
 ## Озвучка
 Текст для ElevenLabs: `episodes/day01_voiceover.txt`. Готовый файл положите в `assets/voice/day01.mp3`, затем:
 ```bash
-node scripts/sync-voice.mjs day01   # находит фразы по паузам и подгоняет сцены и субтитры
+node scripts/sync-voice.mjs day01   # находит фразы по паузам и слогам и подгоняет сцены и субтитры
+# если скрипт предупредит о «подозрительном темпе» — поправьте раскладку: --groups=3,4,3,...
 node scripts/render.mjs day01
 ```
 Пока файла нет, рендер подставляет тишину `assets/voice/day01_silence.mp3`.

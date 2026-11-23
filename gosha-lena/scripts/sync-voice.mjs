@@ -7,6 +7,7 @@
 // 3) внутри фразы слова раскладываются по кускам так же — так субтитры попадают в паузы («Прыщи, борода и… антенна»);
 // 4) каждой сцене пишется scene.voice = { from, to, at }: какой отрезок файла звучит и с какой секунды сцены.
 //    Длительности сцен сохраняются (раскладка по сценарию). Если фраза не влезает — сцена удлиняется.
+//    --groups=3,4,3,… — ручная раскладка кусков речи по фразам, если автомат ошибся.
 //    С флагом --tight сцены укорачиваются до «фраза + 1.2 с» (но не короче 2.5 с).
 // Старая версия JSON сохраняется в episodes/<id>.before-sync.json.
 import { readFileSync, writeFileSync, copyFileSync } from 'node:fs';
@@ -69,7 +70,32 @@ const rate = sylls.reduce((a, b) => a + b, 0) / speech; // слогов в се�
 const gapBefore = (i) => segs[i].s - segs[i - 1].e;
 const segDur = (i, j) => segs.slice(i, j).reduce((a, g) => a + g.e - g.s, 0);
 // границы фраз = длинные паузы (теги <break>), длины фраз ≈ слоги / темп
-const segCuts = partition(segs.length, phrases.length, (i, j, g) => 0.5 * logErr(segDur(i, j), sylls[g] / rate), (i) => 8 * gapBefore(i));
+const groupsArg = process.argv.find((a) => a.startsWith('--groups='));
+let segCuts;
+if (groupsArg) {
+  // ручная раскладка: --groups=3,4,3,... — сколько кусков речи в каждой фразе
+  const counts = groupsArg.split('=')[1].split(',').map(Number);
+  if (counts.length !== phrases.length || counts.reduce((a, b) => a + b, 0) !== segs.length) {
+    console.error(`--groups: нужно ${phrases.length} чисел с суммой ${segs.length}`);
+    process.exit(1);
+  }
+  segCuts = [0];
+  counts.forEach((c) => segCuts.push(segCuts[segCuts.length - 1] + c));
+} else {
+  // границы фраз = длинные паузы (теги <break>), длины фраз ≈ слоги / темп
+  segCuts = partition(segs.length, phrases.length, (i, j, g) => 0.5 * logErr(segDur(i, j), sylls[g] / rate), (i) => 8 * gapBefore(i));
+}
+
+// проверка: темп речи каждой фразы (слогов/с) не должен сильно отличаться от среднего
+const warn = [];
+for (let g = 0; g < phrases.length; g++) {
+  const r = sylls[g] / segDur(segCuts[g], segCuts[g + 1]);
+  if (r > rate * 1.45 || r < rate / 1.45) warn.push(`  «${phrases[g].replace(/\*\*/g, '').slice(0, 40)}…» — ${r.toFixed(1)} слог/с при среднем ${rate.toFixed(1)}`);
+}
+if (warn.length) {
+  console.warn('⚠ Возможно, фразы разложены неверно (подозрительный темп):\n' + warn.join('\n'));
+  console.warn(`  Куски речи по фразам сейчас: --groups=${segCuts.slice(1).map((c, i) => c - segCuts[i]).join(',')}  (поправьте и запустите с этим флагом)\n`);
+}
 
 copyFileSync(file, file.replace(/\.json$/, '.before-sync.json'));
 console.log(`Озвучка ${total.toFixed(2)} с, кусков речи: ${segs.length}, фраз: ${phrases.length}\n`);
