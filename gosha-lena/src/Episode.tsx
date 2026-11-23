@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import type { EpisodeProps, Layer, Scene } from './types';
-import { Bathroom, Rays, Room } from './components/Backgrounds';
+import { Bathroom, Kitchen, Rays, Room } from './components/Backgrounds';
 import { ArrowLabel, BigText, Exclaim, Hud, Impact, Question, Sticker, Subtitles } from './components/Overlay';
 import { BeachPhoto, Choice, Comment, Desk, Gosha, Icon, Particles, Phone, ProgressBar } from './components/Props';
 import { Fly, VIEWBOX } from './characters/Gosha';
@@ -95,6 +95,7 @@ const GoshaLayer: React.FC<{ l: Extract<Layer, { type: 'gosha' }>; t: number }> 
         mouth={pose.mouth}
         antenna={pose.antenna}
         sweat={pose.sweat}
+        tears={pose.tears}
         leftArm={pose.leftArm}
         armSwing={armSwing}
         antennaWiggle={antennaWiggle}
@@ -192,7 +193,7 @@ const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
   return (
     <AbsoluteFill style={{ overflow: 'hidden', transform: `translate(${sh.dx}px, ${sh.dy}px) rotate(${sh.r}deg) scale(${enter})` }}>
       <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(540px, 960px) scale(${cam.zoom}) translate(${-cam.x}px, ${-cam.y}px)` }}>
-        {scene.bg.type === 'room' ? <Room time={t} /> : scene.bg.type === 'bathroom' ? <Bathroom time={t} /> : <Rays color={scene.bg.color} time={t} />}
+        {scene.bg.type === 'room' ? <Room time={t} /> : scene.bg.type === 'bathroom' ? <Bathroom time={t} /> : scene.bg.type === 'kitchen' ? <Kitchen time={t} /> : <Rays color={scene.bg.color} time={t} />}
         {world.map((l, i) => <LayerView key={i} l={l} t={t} />)}
       </AbsoluteFill>
       {screen.map((l, i) => <LayerView key={i} l={l} t={t} />)}
@@ -242,7 +243,7 @@ const autoSfx = (scene: Scene, index: number): Fx[] => {
       case 'sticker': case 'arrowLabel': case 'choice': case 'bigText': case 'comment': case 'progressBar':
         out.push({ t: at, name: 'pop', volume: 0.5 }); break;
       case 'question': out.push({ t: at, name: 'boing', volume: 0.4 }); break;
-      case 'icon': out.push({ t: at, name: l.name === 'razorBroken' ? 'punch' : 'pop', volume: l.name === 'razorBroken' ? 0.6 : 0.5 }); break;
+      case 'icon': out.push({ t: at, name: l.name === 'razorBroken' ? 'punch' : l.name === 'broccoli' ? 'boing' : 'pop', volume: l.name === 'razorBroken' ? 0.6 : 0.5 }); break;
       case 'phone': l.messages.forEach((m) => m.t >= 0 && out.push({ t: m.t, name: 'message', volume: 0.6 })); break;
       case 'desk': out.push({ t: l.punchAt, name: 'punch', volume: 1 }); break;
       case 'beachPhoto':

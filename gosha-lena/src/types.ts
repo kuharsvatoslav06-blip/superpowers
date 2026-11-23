@@ -1,5 +1,7 @@
 import type { Eyes, Mouth, Antenna, ArmPose, GoshaProps } from './characters/Gosha';
 
+export type IconName = 'razor' | 'razorBroken' | 'scissors' | 'comb' | 'broccoli' | 'shawarma' | 'scale';
+
 export type Accent = 'red' | 'green' | 'blue' | 'pink' | 'yellow';
 
 /** Время во всех полях `t`, `start`, `end` — секунды от начала сцены */
@@ -9,6 +11,7 @@ export type Pose = {
   mouth?: Mouth;
   antenna?: Antenna;
   sweat?: boolean;
+  tears?: boolean;
   leftArm?: ArmPose;
 };
 
@@ -26,7 +29,7 @@ export type Layer = Base & (
   | { type: 'beachPhoto'; x: number; y: number; w: number; rot?: number; caption?: string; stamp?: string; stampAt?: number }
   | { type: 'desk'; punchAt: number; fistX: number }
   | { type: 'progressBar'; x: number; y: number; w: number; value: number; from?: number; label?: string }
-  | { type: 'icon'; name: 'razor' | 'razorBroken' | 'scissors' | 'comb'; x: number; y: number; size?: number; rot?: number; wiggle?: number }
+  | { type: 'icon'; name: IconName; x: number; y: number; size?: number; rot?: number; wiggle?: number; label?: string }
   | { type: 'particles'; kind: 'hair' | 'sparkle'; x: number; y: number; w: number; h: number; count?: number; dur?: number }
   | { type: 'choice'; x: number; y: number; w: number; text: string; color: string; num: string; rot?: number }
   | { type: 'comment'; x: number; y: number; w: number; name: string; text: string; likes: number; avatarColor?: string }
@@ -41,7 +44,7 @@ export type CameraKey = { t: number; zoom: number; x: number; y: number };
 export type Scene = {
   id: string;
   duration: number;
-  bg: { type: 'room' } | { type: 'bathroom' } | { type: 'rays'; color: 'blue' | 'pink' | 'purple' | 'green' | 'orange' | 'dark' };
+  bg: { type: 'room' } | { type: 'bathroom' } | { type: 'kitchen' } | { type: 'rays'; color: 'blue' | 'pink' | 'purple' | 'green' | 'orange' | 'dark' };
   hud?: boolean | { days?: number; progress?: number };
   camera?: CameraKey[];
   shake?: { t: number; dur: number; amp: number }[];
@@ -71,6 +74,8 @@ export type Episode = {
     gosha?: Partial<Pick<GoshaProps, 'eyes' | 'mouth' | 'antenna' | 'sweat' | 'beard' | 'hair'>>;
     /** вместо фото качка — полароид «ДО» со старым Гошей */
     before?: boolean;
+    /** предмет вместо фото на обложке */
+    icon?: { name: IconName; label?: string };
     /** показывать муху и «!!» (по умолчанию да) */
     fly?: boolean;
     exclaim?: boolean;

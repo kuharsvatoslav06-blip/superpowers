@@ -16,6 +16,8 @@ export type GoshaProps = {
   mouth?: Mouth;
   antenna?: Antenna;
   sweat?: boolean;
+  /** слёзы (от счастья или горя) */
+  tears?: boolean;
   leftArm?: ArmPose;
   /** угол взмаха руки в градусах (добавляется к позе) */
   armSwing?: number;
@@ -103,6 +105,7 @@ export const Gosha: React.FC<GoshaProps> = ({
   mouth = 'flat',
   antenna = 'curl',
   sweat = false,
+  tears = false,
   leftArm = 'down',
   armSwing = 0,
   antennaWiggle = 0,
@@ -342,6 +345,12 @@ export const Gosha: React.FC<GoshaProps> = ({
           {eye(448, -1)}
           {eye(583, 1)}
         </g>
+        {tears && (
+          <g id="tears" fill="#8FD3FF" stroke={INK} strokeWidth={5} strokeLinejoin="round">
+            <path d="M 425 678 C 418 720 410 760 420 800 C 430 812 446 806 444 790 C 440 760 440 720 438 680 Z" />
+            <path d="M 605 678 C 612 720 620 760 610 800 C 600 812 584 806 586 790 C 590 760 590 720 592 680 Z" />
+          </g>
+        )}
         {/* прыщи */}
         <g id="pimples">{PIMPLES.map(([x, y, r], i) => <Pimple key={i} x={x} y={y} r={r} />)}</g>
         {/* нос картошкой */}

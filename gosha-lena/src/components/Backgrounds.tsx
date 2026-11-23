@@ -117,3 +117,39 @@ export const Bathroom: React.FC<{ time: number }> = () => (
     <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
   </svg>
 );
+
+/** Кухня: открытый холодильник с «содержимым» */
+export const Kitchen: React.FC<{ time: number }> = ({ time }) => (
+  <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+    <rect width={1080} height={1920} fill="#F2E3C6" />
+    {Array.from({ length: 12 }).map((_, i) => <line key={'v' + i} x1={i * 90} y1={0} x2={i * 90} y2={1500} stroke="#E6D3AE" strokeWidth={5} />)}
+    {Array.from({ length: 17 }).map((_, i) => <line key={'h' + i} x1={0} y1={i * 90} x2={1080} y2={i * 90} stroke="#E6D3AE" strokeWidth={5} />)}
+    {/* холодильник */}
+    <rect x={560} y={330} width={420} height={1180} rx={30} fill="#FFFFFF" stroke={INK} strokeWidth={14} />
+    <rect x={590} y={360} width={360} height={1120} rx={14} fill="#DDF1FA" stroke={INK} strokeWidth={8} />
+    <rect x={590} y={360} width={360} height={1120} rx={14} fill="#FFFBE0" opacity={0.25 + 0.1 * Math.sin(time * 3)} />
+    {[640, 900, 1160].map((y) => <rect key={y} x={590} y={y} width={360} height={14} fill="#B9DCEB" stroke={INK} strokeWidth={6} />)}
+    {/* пицца */}
+    <path d="M 620 630 L 760 560 L 780 630 Z" fill="#F2C94C" stroke={INK} strokeWidth={8} strokeLinejoin="round" />
+    <circle cx={720} cy={605} r={10} fill="#E35A4C" /><circle cx={752} cy={612} r={8} fill="#E35A4C" />
+    {/* майонез */}
+    <rect x={820} y={520} width={90} height={120} rx={16} fill="#FFF7D6" stroke={INK} strokeWidth={8} />
+    <rect x={832} y={505} width={66} height={24} rx={6} fill="#2F6FD6" stroke={INK} strokeWidth={6} />
+    <text x={865} y={590} fontFamily="Oswald" fontWeight={700} fontSize={20} fill="#C9302C" textAnchor="middle">МАЙОНЕЗ</text>
+    {/* торт */}
+    <path d="M 630 900 L 630 820 L 800 820 L 800 900 Z" fill="#F6B8CF" stroke={INK} strokeWidth={8} />
+    <path d="M 630 820 Q 715 790 800 820" fill="#fff" stroke={INK} strokeWidth={8} />
+    <circle cx={715} cy={800} r={14} fill="#E35A4C" stroke={INK} strokeWidth={5} />
+    {/* плесень */}
+    <ellipse cx={780} cy={1135} rx={120} ry={30} fill="#9BBF5A" stroke={INK} strokeWidth={8} />
+    {[730, 790, 840].map((x, i) => <circle key={x} cx={x} cy={1110 - i * 4} r={18 + i * 3} fill="#7FA845" stroke={INK} strokeWidth={6} />)}
+    {/* стол */}
+    <rect x={-20} y={1260} width={560} height={30} fill="#B07A4F" stroke={INK} strokeWidth={10} />
+    <rect x={20} y={1290} width={30} height={220} fill="#9A6842" stroke={INK} strokeWidth={8} />
+    <rect x={460} y={1290} width={30} height={220} fill="#9A6842" stroke={INK} strokeWidth={8} />
+    {/* пол */}
+    <rect x={0} y={1500} width={1080} height={420} fill="#C9A27A" />
+    {Array.from({ length: 9 }).map((_, i) => <line key={'f' + i} x1={i * 140} y1={1500} x2={i * 140 - 160} y2={1920} stroke="#B48B63" strokeWidth={6} />)}
+    <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
+  </svg>
+);

@@ -1,0 +1,766 @@
+{
+  "id": "day04",
+  "title": "Гоша и Лена — День 4",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "voice": {
+    "src": "voice/day04.mp3",
+    "stub": "voice/day04_silence.mp3",
+    "volume": 1
+  },
+  "music": {
+    "src": "music/theme.mp3",
+    "volume": 0.15,
+    "duck": 0.5
+  },
+  "sfxVolume": 0.5,
+  "hud": {
+    "days": 28,
+    "progress": 18
+  },
+  "cover": {
+    "badge": "ДЕНЬ 4 / 30",
+    "title": "ДИЕТА",
+    "subtitle": "БРОККОЛИ\nСМОТРИТ В ОТВЕТ",
+    "bubble": "Ты ли это?? 😳",
+    "color": "purple",
+    "gosha": {
+      "beard": "stubble",
+      "hair": "short",
+      "eyes": "worried",
+      "mouth": "o",
+      "sweat": true
+    },
+    "icon": {
+      "name": "broccoli"
+    },
+    "fly": false
+  },
+  "scenes": [
+    {
+      "id": "01-intro",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "День четвёртый. Вы выбрали: **диета**. Гоша открыл холодильник.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 0.2,
+          "text": "ДЕНЬ 4",
+          "x": 800,
+          "y": 300,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 84,
+          "rot": 4
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.3,
+          "text": "ВЫ ВЫБРАЛИ: 2 🥦",
+          "x": 540,
+          "y": 1200,
+          "color": "#2FA55A",
+          "size": 68,
+          "rot": -3
+        }
+      ],
+      "hud": {
+        "days": 27
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        }
+      ]
+    },
+    {
+      "id": "02-fridge",
+      "duration": 6,
+      "bg": {
+        "type": "kitchen"
+      },
+      "caption": {
+        "text": "Внутри: пицца, майонез и торт. Овощей нет. Только **плесень**. Зато своя.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 300,
+          "y": 520,
+          "h": 1100,
+          "beard": "stubble",
+          "hair": "short",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            },
+            {
+              "t": 2.6,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "ОВОЩИ: 0",
+          "x": 780,
+          "y": 260,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": 4
+        },
+        {
+          "type": "arrowLabel",
+          "t": 4.4,
+          "text": "ЗАТО СВОЯ",
+          "x": 800,
+          "y": 1330,
+          "tx": 790,
+          "ty": 1170,
+          "color": "#7FA845",
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "03-scale",
+      "duration": 5,
+      "bg": {
+        "type": "bathroom"
+      },
+      "caption": {
+        "text": "Взвешивание. Весы долго думали… и показали **ошибку**.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 900,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "flat"
+            },
+            {
+              "t": 3.3,
+              "eyes": "shock",
+              "mouth": "open",
+              "antenna": "up",
+              "sweat": true
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0.4,
+          "name": "scale",
+          "x": 540,
+          "y": 1250,
+          "size": 460,
+          "label": "8.8.8",
+          "until": 3.28
+        },
+        {
+          "type": "icon",
+          "t": 3.3,
+          "name": "scale",
+          "x": 540,
+          "y": 1250,
+          "size": 460,
+          "label": "ОШИБКА"
+        }
+      ],
+      "shake": [
+        {
+          "t": 3.3,
+          "dur": 0.6,
+          "amp": 22
+        }
+      ]
+    },
+    {
+      "id": "04-broccoli",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Ужин: брокколи. Гоша смотрел на неё **двадцать минут**. Брокколи смотрела в ответ.",
+        "accent": "red",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "flat"
+            },
+            {
+              "t": 4.3,
+              "eyes": "shock",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0.6,
+          "name": "broccoli",
+          "x": 540,
+          "y": 1230,
+          "size": 400
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "20 МИНУТ",
+          "x": 820,
+          "y": 380,
+          "color": "#1E1E2A",
+          "size": 70,
+          "rot": 4
+        }
+      ]
+    },
+    {
+      "id": "05-temptation",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "purple"
+      },
+      "caption": {
+        "text": "Ночью пришла скидка на шаурму. Гоша **устоял**.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.25
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 420,
+          "y": 520,
+          "h": 1000,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o",
+              "sweat": true
+            },
+            {
+              "t": 3.0,
+              "eyes": "angry",
+              "mouth": "grit"
+            }
+          ]
+        },
+        {
+          "type": "particles",
+          "t": 0.6,
+          "kind": "sparkle",
+          "x": 640,
+          "y": 520,
+          "w": 360,
+          "h": 420,
+          "count": 8
+        },
+        {
+          "type": "icon",
+          "t": 0.6,
+          "name": "shawarma",
+          "x": 820,
+          "y": 720,
+          "size": 380,
+          "rot": 12,
+          "wiggle": 4
+        },
+        {
+          "type": "sticker",
+          "t": 1.2,
+          "text": "−50% НА ШАУРМУ",
+          "x": 640,
+          "y": 370,
+          "color": "#F7943A",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 3.1,
+          "text": "УСТОЯЛ ✓",
+          "x": 540,
+          "y": 1300,
+          "color": "#2FA55A",
+          "size": 70,
+          "rot": 3
+        }
+      ]
+    },
+    {
+      "id": "06-sniff",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "orange"
+      },
+      "caption": {
+        "text": "Почти. Он только понюхал. **Дважды**. Ну ладно, трижды.",
+        "accent": "pink",
+        "start": 0.3,
+        "end": 4.25
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0,
+          "name": "shawarma",
+          "x": 820,
+          "y": 800,
+          "size": 340,
+          "rot": -10,
+          "wiggle": 6
+        },
+        {
+          "type": "sticker",
+          "t": 2.0,
+          "text": "ПОНЮХАЛ ×2",
+          "x": 540,
+          "y": 1300,
+          "color": "#E3477E",
+          "size": 70,
+          "rot": -3,
+          "until": 3.48
+        },
+        {
+          "type": "sticker",
+          "t": 3.5,
+          "text": "ПОНЮХАЛ ×3",
+          "x": 540,
+          "y": 1300,
+          "color": "#FF3B47",
+          "size": 76,
+          "rot": 3
+        }
+      ]
+    },
+    {
+      "id": "07-chat",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "text": "Лена спросила, что на ужин. Ответ «брокколи» её **напугал**.",
+        "accent": "pink",
+        "start": 0.3,
+        "end": 5.3
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": 0,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "typing": [
+            0.2,
+            1.0,
+            3.6,
+            4.4
+          ],
+          "messages": [
+            {
+              "t": 1.0,
+              "from": "her",
+              "text": "Что на ужин? 😊"
+            },
+            {
+              "t": 2.6,
+              "from": "me",
+              "text": "брокколи 🥦"
+            },
+            {
+              "t": 4.4,
+              "from": "her",
+              "text": "Ты ли это?? 😳"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "08-belly",
+      "duration": 5,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "text": "Утром пузо стало меньше. На **один сантиметр**. Гоша плакал.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 4.7
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            },
+            {
+              "t": 3.4,
+              "tears": true,
+              "mouth": "open"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "screen": true,
+          "t": 1.8,
+          "text": "ПУЗО: −1 СМ",
+          "x": 540,
+          "y": 1200,
+          "color": "#2FA55A",
+          "size": 76,
+          "rot": -3
+        }
+      ]
+    },
+    {
+      "id": "09-progress",
+      "duration": 4.5,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Прогресс: **двадцать пять** процентов. Холодильник в шоке.",
+        "accent": "green",
+        "start": 0.2,
+        "end": 3.88
+      },
+      "layers": [
+        {
+          "type": "progressBar",
+          "t": 0.1,
+          "x": 540,
+          "y": 800,
+          "w": 860,
+          "value": 25,
+          "from": 18,
+          "label": "ПРОКАЧКА"
+        },
+        {
+          "type": "sticker",
+          "t": 2.2,
+          "text": "−1 СМ ПУЗА",
+          "x": 280,
+          "y": 1250,
+          "color": "#2F6FD6",
+          "size": 54,
+          "rot": -4
+        },
+        {
+          "type": "sticker",
+          "t": 2.8,
+          "text": "0 ШАУРМ",
+          "x": 810,
+          "y": 1250,
+          "color": "#F7943A",
+          "size": 54,
+          "rot": 4
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1090,
+          "h": 300,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        }
+      ],
+      "hud": {
+        "progress": 25
+      }
+    },
+    {
+      "id": "10-choice",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "text": "Что **дальше**? Мусор, который ждёт уже четыре дня… или новая одежда?",
+        "accent": "blue",
+        "start": 0.3,
+        "end": 5.7
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ЧТО\nДАЛЬШЕ?",
+          "x": 540,
+          "y": 450,
+          "size": 116,
+          "color": "#FFD23A"
+        },
+        {
+          "type": "choice",
+          "t": 1.0,
+          "x": 540,
+          "y": 690,
+          "w": 920,
+          "num": "1",
+          "text": "ВЫБРОСИТЬ МУСОР\n(ЖДЁТ 4-Й ДЕНЬ)",
+          "color": "#E3477E",
+          "rot": -1.5
+        },
+        {
+          "type": "bigText",
+          "t": 2.6,
+          "text": "ИЛИ",
+          "x": 540,
+          "y": 862,
+          "size": 74,
+          "color": "#fff"
+        },
+        {
+          "type": "choice",
+          "t": 2.9,
+          "x": 540,
+          "y": 1030,
+          "w": 920,
+          "num": "2",
+          "text": "КУПИТЬ НОРМАЛЬНУЮ\nОДЕЖДУ",
+          "color": "#2F6FD6",
+          "rot": 1.5
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1150,
+          "h": 290,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "question",
+          "t": 1.0,
+          "x": 690,
+          "y": 1175,
+          "size": 120
+        }
+      ]
+    },
+    {
+      "id": "11-cta",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "text": "Пиши в **комменты**: один или два. Итоги — в пятой серии.",
+        "accent": "green",
+        "start": 0.3,
+        "end": 5.04
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ПИШИ\nВ КОММЕНТЫ",
+          "x": 540,
+          "y": 440,
+          "size": 110,
+          "color": "#fff"
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "1 — МУСОР",
+          "x": 400,
+          "y": 650,
+          "color": "#E3477E",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 1.9,
+          "text": "2 — ОДЕЖДА",
+          "x": 400,
+          "y": 770,
+          "color": "#2F6FD6",
+          "size": 60,
+          "rot": 2
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "ИТОГИ → СЕРИЯ 5",
+          "x": 400,
+          "y": 890,
+          "color": "#FFD23A",
+          "textColor": "#1E1E2A",
+          "size": 54,
+          "rot": -2
+        },
+        {
+          "type": "comment",
+          "t": 3.4,
+          "x": 50,
+          "y": 990,
+          "w": 640,
+          "name": "dima_ok",
+          "text": "1. мусор уже подал в суд",
+          "likes": 402,
+          "avatarColor": "#F2994A"
+        },
+        {
+          "type": "comment",
+          "t": 4.1,
+          "x": 50,
+          "y": 1170,
+          "w": 640,
+          "name": "katya.zh",
+          "text": "2, майка в пятнах устала",
+          "likes": 377,
+          "avatarColor": "#9B6BF2"
+        },
+        {
+          "type": "gosha",
+          "x": 860,
+          "y": 900,
+          "h": 560,
+          "beard": "stubble",
+          "hair": "short",
+          "wave": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "leftArm": "wave"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Img, staticFile } from 'remotion';
 import { INK, clamp, popScale } from '../anim';
 import { Gosha } from '../characters/Gosha';
+import type { IconName } from '../types';
 
 /* ---------------- Телефон с чатом ---------------- */
 export const Phone: React.FC<{
@@ -210,7 +211,7 @@ export const Comment: React.FC<{ x: number; y: number; w: number; name: string; 
 export { Gosha };
 
 /* ---------------- Иконки-предметы ---------------- */
-export const Icon: React.FC<{ name: 'razor' | 'razorBroken' | 'scissors' | 'comb'; x: number; y: number; size?: number; rot?: number; wiggle?: number; time: number; at: number }> = ({ name, x, y, size = 300, rot = 0, wiggle = 0, time, at }) => {
+export const Icon: React.FC<{ name: IconName; x: number; y: number; size?: number; rot?: number; wiggle?: number; label?: string; time: number; at: number }> = ({ name, x, y, size = 300, rot = 0, wiggle = 0, label, time, at }) => {
   const s = popScale(time, at);
   if (s <= 0) return null;
   const r = rot + (wiggle ? Math.sin(time * 18) * wiggle : 0);
@@ -251,6 +252,42 @@ export const Icon: React.FC<{ name: 'razor' | 'razorBroken' | 'scissors' | 'comb
               <path d="M 0 0 L -38 -22" stroke="#E3477E" strokeWidth={16} strokeLinecap="round" />
             </g>
             <circle cx={0} cy={0} r={9} fill={INK} />
+          </g>
+        );
+      case 'broccoli': {
+        const look = Math.sin(time * 1.3) * 6;
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <path d="M -34 40 L -44 150 Q 0 165 44 150 L 34 40 Z" fill="#9BD06A" />
+            {[[-70, -10, 55], [0, -45, 65], [70, -10, 55], [-35, 30, 50], [35, 30, 50]].map(([cx, cy, r], i) => (
+              <circle key={i} cx={cx} cy={cy} r={r} fill="#3FA34D" />
+            ))}
+            <circle cx={-30} cy={10} r={22} fill="#fff" />
+            <circle cx={30} cy={10} r={22} fill="#fff" />
+            <circle cx={-30 + look} cy={14} r={10} fill={INK} stroke="none" />
+            <circle cx={30 + look} cy={14} r={10} fill={INK} stroke="none" />
+            <path d="M -50 -22 L -12 -10 M 50 -22 L 12 -10" strokeWidth={9} strokeLinecap="round" />
+          </g>
+        );
+      }
+      case 'shawarma':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <path d="M -60 -120 C -10 -150 40 -140 70 -110 L 40 150 L -30 150 Z" fill="#F2D49B" />
+            <path d="M -55 -110 C -30 -60 30 -60 65 -105" fill="#7CC36A" />
+            <path d="M -50 -95 C -20 -70 20 -75 55 -100" fill="none" stroke="#E35A4C" strokeWidth={12} />
+            <path d="M -40 10 L 55 -20 M -35 70 L 48 40" fill="none" stroke="#D9B477" strokeWidth={6} />
+            <rect x={-36} y={90} width={80} height={62} fill="#fff" />
+          </g>
+        );
+      case 'scale':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <rect x={-150} y={-60} width={300} height={150} rx={40} fill="#E8EDF5" />
+            <rect x={-90} y={-40} width={180} height={60} rx={10} fill="#1E1E2A" />
+            <text x={0} y={2} fontFamily="Oswald" fontWeight={700} fontSize={44} fill={Math.floor(time * 4) % 2 ? '#FF3B47' : '#FF8A8F'} textAnchor="middle" stroke="none">{label ?? '---'}</text>
+            <rect x={-120} y={40} width={90} height={30} rx={10} fill="#C8D3E6" />
+            <rect x={30} y={40} width={90} height={30} rx={10} fill="#C8D3E6" />
           </g>
         );
       default:

@@ -3,7 +3,7 @@ import { AbsoluteFill, Img, staticFile } from 'remotion';
 import { FONT_CSS, useFonts } from './Episode';
 import { Rays } from './components/Backgrounds';
 import { BigText, Exclaim, Sticker } from './components/Overlay';
-import { BeachPhoto } from './components/Props';
+import { BeachPhoto, Icon } from './components/Props';
 import { Gosha, Fly } from './characters/Gosha';
 import { INK } from './anim';
 import type { EpisodeProps } from './types';
@@ -79,7 +79,7 @@ export const CoverVertical: React.FC<EpisodeProps> = ({ episode }) => {
       {c.fly !== false && <Fly size={90} wing={20} style={{ position: 'absolute', left: 90, top: 905 }} />}
       {c.exclaim !== false && <Exclaim x={120} y={1080} size={150} rot={-14} time={T} at={0} />}
       {/* фото «это я» */}
-      {c.before ? <BeforePhoto x={850} y={1060} w={340} rot={9} /> : <BeachPhoto x={850} y={1060} w={360} rot={9} caption={c.photoCaption} stamp={c.stamp} stampAt={0} time={T} at={0} />}
+      {c.icon ? <Icon name={c.icon.name} label={c.icon.label} x={850} y={1040} size={480} rot={8} time={T} at={0} /> : c.before ? <BeforePhoto x={850} y={1060} w={340} rot={9} /> : <BeachPhoto x={850} y={1060} w={360} rot={9} caption={c.photoCaption} stamp={c.stamp} stampAt={0} time={T} at={0} />}
       <Bubble x={470} y={1505} w={590} text={c.bubble} avatar={110} font={46} />
     </AbsoluteFill>
   );
@@ -111,7 +111,7 @@ export const CoverYouTube: React.FC<EpisodeProps> = ({ episode }) => {
           </>
         );
       })()}
-      {c.before ? <BeforePhoto x={1150} y={590} w={190} rot={8} /> : <BeachPhoto x={1145} y={596} w={200} rot={8} caption={c.photoCaption} stamp={c.stamp} stampAt={0} time={T} at={0} />}
+      {c.icon ? <Icon name={c.icon.name} label={c.icon.label} x={1150} y={585} size={220} rot={8} time={T} at={0} /> : c.before ? <BeforePhoto x={1150} y={590} w={190} rot={8} /> : <BeachPhoto x={1145} y={596} w={200} rot={8} caption={c.photoCaption} stamp={c.stamp} stampAt={0} time={T} at={0} />}
       <div style={{ position: 'absolute', left: 560, top: 548, width: 400 }}>
         <Bubble x={0} y={0} w={420} text={c.bubble} avatar={78} font={30} />
       </div>
