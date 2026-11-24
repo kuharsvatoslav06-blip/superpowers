@@ -1,34 +1,40 @@
 // ============ overlays: subtitles, infographics, title cards, post-processing ============
 const YEL = '#ffd23a', RED = '#ff3b3b', CYAN = '#5fd8ff', GRN = '#52e07a';
 
-// --- subtitles: chunks from timing [{start,end,text,words:[{w,s,e}]}] ---
+// --- subtitles: classic two-line captions, one cue per phrase (same split as the exported SRT) ---
+// cue rule (mirrored in tools/voice.py): up to ~84 characters, prefer ending at . ! ? then , ; : —
 let SUBS = [];
+const SUB_MAX = 84;
+function splitCues(words) {
+  const cues = []; let cur = [];
+  const len = a => a.map(w => w.w).join(' ').length;
+  words.forEach((w, i) => {
+    cur.push(w); const n = words[i + 1], L = len(cur);
+    const strong = /[.!?…]$/.test(w.w), weak = /[,;:—]$/.test(w.w);
+    if (!n || (strong && L > 30) || (weak && L > 55) || L + 1 + n.w.length > SUB_MAX) { cues.push(cur); cur = []; }
+  });
+  return cues;
+}
+function twoLines(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return [text];
+  const ws = text.split(' '); let best = null;
+  for (let k = 1; k < ws.length; k++) { const a = ws.slice(0, k).join(' '), b = ws.slice(k).join(' '); const d = Math.max(ctx.measureText(a).width, ctx.measureText(b).width); if (!best || d < best[0]) best = [d, [a, b]]; }
+  return best[1];
+}
 function buildSubs(lines) {
   SUBS = [];
-  for (const L of lines) {
-    // split into chunks of <= 44 chars on word boundaries, preferring punctuation
-    let cur = [], len = 0; const chunks = [];
-    L.words.forEach((w, i) => {
-      cur.push(w); len += w.w.length + 1;
-      const punct = /[,.;:!?—…]$/.test(w.w), next = L.words[i + 1];
-      if (!next || len > 44 || (punct && len > 22) || (next && len + next.w.length > 52)) { chunks.push(cur); cur = []; len = 0; }
-    });
-    chunks.forEach((c, i) => SUBS.push({ s: c[0].s, e: i < chunks.length - 1 ? chunks[i + 1][0].s : L.end + 0.25, words: c }));
-  }
+  for (const L of lines) { const cs = splitCues(L.words); cs.forEach((c, i) => SUBS.push({ s: c[0].s, e: i < cs.length - 1 ? cs[i + 1][0].s - 0.04 : L.end + 0.35, text: c.map(w => w.w).join(' ') })); }
 }
 function drawSubs(ctx, t) {
-  const c = SUBS.find(x => t >= x.s - 0.05 && t < x.e); if (!c) return;
-  const size = 50, y = H - 92; ctx.save(); ctx.font = `700 ${size}px Oswald`; ctx.textBaseline = 'middle';
-  const sp = size * 0.28, ws = c.words.map(w => ctx.measureText(w.w).width), tot = ws.reduce((a, b) => a + b, 0) + sp * (ws.length - 1);
-  const a = clamp((t - c.s + 0.05) / 0.12) * clamp((c.e - t) / 0.12);
-  ctx.globalAlpha = a; ctx.fillStyle = 'rgba(0,0,0,0.42)'; rrect(ctx, W / 2 - tot / 2 - 26, y - size * 0.72, tot + 52, size * 1.44, 14); ctx.fill();
-  let x = W / 2 - tot / 2;
-  c.words.forEach((w, i) => {
-    const on = t >= w.s, cur = t >= w.s && t < w.e, pop = cur ? eBack(clamp((t - w.s) / 0.15)) : 1;
-    ctx.save(); ctx.translate(x + ws[i] / 2, y); const k = cur ? 1 + 0.08 * Math.sin(clamp((t - w.s) / 0.15) * PI) : 1; ctx.scale(k, k);
-    ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.16; ctx.strokeStyle = '#000'; ctx.strokeText(w.w, -ws[i] / 2, 0);
-    ctx.fillStyle = cur ? YEL : on ? '#ffffff' : 'rgba(255,255,255,0.72)'; ctx.fillText(w.w, -ws[i] / 2, 0); ctx.restore();
-    x += ws[i] + sp;
+  const c = SUBS.find(x => t >= x.s && t < x.e); if (!c) return;
+  const size = 44, lh = size * 1.28; ctx.save(); ctx.font = `500 ${size}px Roboto`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  const rows = twoLines(ctx, c.text, 1500), yb = H - 78;
+  ctx.globalAlpha = clamp((t - c.s) / 0.12) * clamp((c.e - t) / 0.12);
+  rows.forEach((r, i) => {
+    const y = yb - (rows.length - 1 - i) * lh;
+    ctx.lineJoin = 'round'; ctx.shadowColor = 'rgba(0,0,0,0.75)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+    ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,0.9)'; ctx.strokeText(r, W / 2, y);
+    ctx.shadowColor = 'transparent'; ctx.fillStyle = '#ffffff'; ctx.fillText(r, W / 2, y);
   });
   ctx.restore();
 }

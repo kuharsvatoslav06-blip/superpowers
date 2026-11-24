@@ -125,10 +125,13 @@ def main():
         for i, wd in enumerate(L['words']):
             cur.append(wd); ln = len(' '.join(c['w'] for c in cur))
             nxt = L['words'][i + 1] if i + 1 < len(L['words']) else None
-            if not nxt or ln > 44 or (re.search(r'[,.;:!?—…]$', wd['w']) and ln > 22) or (nxt and ln + len(nxt['w']) > 52): chunks.append(cur); cur = []
+            strong, weak = re.search(r'[.!?…]$', wd['w']), re.search(r'[,;:—]$', wd['w'])
+            if not nxt or (strong and ln > 30) or (weak and ln > 55) or ln + 1 + len(nxt['w']) > 84: chunks.append(cur); cur = []
         for j, c in enumerate(chunks):
-            s, e = c[0]['s'], (chunks[j + 1][0]['s'] if j + 1 < len(chunks) else L['end'] + 0.25)
+            s, e = c[0]['s'], (chunks[j + 1][0]['s'] - 0.04 if j + 1 < len(chunks) else L['end'] + 0.35)
             txt = ' '.join(x['w'] for x in c)
+            if len(txt) > 42:   # two balanced lines
+                ws = txt.split(); cut = min(range(1, len(ws)), key=lambda m: max(len(' '.join(ws[:m])), len(' '.join(ws[m:])))); txt = ' '.join(ws[:cut]) + '\n' + ' '.join(ws[cut:])
             srt += [str(k), f'{ts(s)} --> {ts(e)}', txt, '']; vtt += [f"{ts(s, '.')} --> {ts(e, '.')}", txt, '']; k += 1
     open(os.path.join(BUILD, 'subtitles.srt'), 'w').write('\n'.join(srt))
     open(os.path.join(BUILD, 'subtitles.vtt'), 'w').write('\n'.join(vtt))

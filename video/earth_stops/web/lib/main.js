@@ -39,7 +39,7 @@ function render(t) {
 window.init = async (story, timing) => {
   STORY = story; TIMING = timing; const total = planScenes(story);
   buildSubs(timing ? timing.lines : []);
-  await document.fonts.load('700 50px Oswald'); await document.fonts.load('700 50px Oswald', 'ЖЖ'); await document.fonts.ready;
+  await document.fonts.load('700 50px Oswald'); await document.fonts.load('700 50px Oswald', 'ЖЖ'); await document.fonts.load('500 44px Roboto', 'ЖЖ'); await document.fonts.load('500 44px Roboto', 'AA'); await document.fonts.ready;
   await loadGlobeTextures();
   return { total, scenes: PLAN.map(p => [p.id, p.start, p.end]) };
 };
