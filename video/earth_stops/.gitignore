@@ -2,3 +2,4 @@ build/*
 !build/.gitkeep
 node_modules/
 __pycache__/
+voice_override/
