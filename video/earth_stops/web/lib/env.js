@@ -183,6 +183,8 @@ function drawStreet(ctx, x0, x1, roadY, o = {}) {
   ctx.fillStyle = '#4a4d55'; ctx.fillRect(x0, roadY, x1 - x0, rh);               // road
   ctx.fillStyle = 'rgba(255,255,255,0.03)'; for (let x = Math.floor(x0 / 37) * 37; x < x1; x += 37) ctx.fillRect(x, roadY + hash(x) * rh, 18, 3);
   ctx.fillStyle = '#f2f2f2'; for (let x = Math.floor(x0 / 160) * 160; x < x1; x += 160) ctx.fillRect(x, roadY + rh / 2 - 4, 80, 8);
+  ctx.fillStyle = '#8f8a80'; ctx.fillRect(x0, roadY + rh + (o.nearW || 120), x1 - x0, 1600);  // ground below the near sidewalk
+  ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x0, roadY + rh + (o.nearW || 120), x1 - x0, 14);
   ctx.fillStyle = '#d0cabf'; ctx.fillRect(x0, roadY + rh, x1 - x0, o.nearW || 120);  // near sidewalk
   ctx.fillStyle = '#a19a8e'; ctx.fillRect(x0, roadY + rh, x1 - x0, 10);
   ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 2; for (let x = Math.floor(x0 / 90) * 90; x < x1; x += 90) line(ctx, x, roadY + rh + 10, x - 20, roadY + rh + (o.nearW || 120));

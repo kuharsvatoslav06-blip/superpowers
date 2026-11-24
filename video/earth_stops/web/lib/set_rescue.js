@@ -58,3 +58,16 @@ function sunArcSky(ctx, k) {  // k 0..1 across a day (0 dawn, 0.5 noon, 1 night)
   const cols = k < 0.25 ? mixSky('dusk', 'morning', k * 4) : k < 0.6 ? mixSky('morning', 'day', (k - 0.25) / 0.35) : k < 0.8 ? mixSky('day', 'dusk', (k - 0.6) / 0.2) : mixSky('dusk', 'night', (k - 0.8) / 0.2);
   sky(ctx, cols); const a = PI * (1 - clamp(k / 0.85)); const sx = W / 2 + Math.cos(a) * 900, sy = 760 - Math.sin(a) * 620; if (k < 0.85) sun(ctx, sx, sy, 44, k > 0.65 ? '#ffd0a0' : '#fff6d8'); stars(ctx, 300, 4, k * 30, sm(0.78, 0.95, k));
 }
+function towerCrane(ctx, x, y, s, t, seed = 1) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.strokeStyle = '#f5b700'; ctx.lineWidth = 6;
+  for (let k = 0; k < 12; k++) { line(ctx, -14, -k * 40, 14, -(k + 1) * 40); line(ctx, 14, -k * 40, -14, -(k + 1) * 40); }
+  line(ctx, -14, 0, -14, -480); line(ctx, 14, 0, 14, -480);
+  const a = Math.sin(t * 0.3 + seed) * 0.4; ctx.save(); ctx.translate(0, -480); ctx.scale(Math.cos(a), 1);
+  line(ctx, -120, 0, 360, 0); line(ctx, -120, -16, 360, -16); ctx.fillStyle = '#555'; ctx.fillRect(-130, -10, 50, 40);
+  const hx = 120 + Math.sin(t * 0.5 + seed) * 120, hy = 120 + Math.sin(t * 0.7 + seed) * 60; ctx.strokeStyle = '#333'; ctx.lineWidth = 2; line(ctx, hx, 0, hx, hy); ctx.fillStyle = '#7f8c8d'; ctx.fillRect(hx - 40, hy, 80, 20);
+  ctx.restore(); ctx.restore();
+}
+// generic ground-level "camp" layout for recovery scenes (world coords around x0)
+function campGround(ctx, x0, gy, t, o = {}) {
+  ctx.fillStyle = o.ground || '#8a8270'; ctx.fillRect(x0 - 3000, gy, 6000, 800);
+}
