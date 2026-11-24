@@ -23,5 +23,5 @@ open('build/subs_range.srt', 'w').write(re.sub(r'(\d+):(\d+):(\d+),(\d+)', sh, s
 EOF
 ffmpeg -v error -y -i build/frames.mp4 -i build/mix.wav -i build/subs_range.srt \
   -map 0:v -map 1:a -map 2 -c:v copy -c:a aac -b:a 192k -c:s mov_text -metadata:s:s:0 language=rus \
-  -shortest -movflags +faststart "$OUT"
+  -t "$(python3 -c "print($TO-$FROM)")" -movflags +faststart "$OUT"
 echo "-> $OUT"
