@@ -8,7 +8,7 @@ const fs = require('fs'), path = require('path');
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1080, height: 1920 } });
   p.on('pageerror', e => console.error('PAGE ERROR', e.message));
-  await p.goto('file://' + path.resolve(__dirname, 'index.html') + '#export');
+  await p.goto('file://' + path.resolve(process.env.HTML || path.join(__dirname, 'index.html')) + '#export');
   await p.waitForFunction('window.READY === true', null, { timeout: 60000 });
   const dur = await p.evaluate('DURATION');
   const times = only.length ? only : Array.from({ length: Math.ceil(dur * fps) }, (_, i) => i / fps);

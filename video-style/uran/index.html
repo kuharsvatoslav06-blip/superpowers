@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Операция «Уран» за 2 минуты</title>
+<style>
+  html,body{margin:0;height:100%;background:#050606;color:#aaa;font-family:Inter,system-ui,sans-serif}
+  #wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px}
+  canvas{height:calc(100vh - 70px);aspect-ratio:9/16;background:#000;box-shadow:0 0 40px #000}
+  #ui{display:flex;gap:10px;align-items:center;font-size:13px}
+  #ui input{width:340px}
+  button{background:#1b2122;color:#ddd;border:1px solid #333;padding:4px 12px;border-radius:4px;cursor:pointer}
+  body.export #ui{display:none} body.export canvas{height:auto;box-shadow:none}
+  body.export #wrap{display:block}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="1080" height="1920"></canvas>
+  <div id="ui"><button id="pp">⏸</button><input id="seek" type="range" min="0" max="1000" value="0"><span id="tc">0.0</span></div>
+</div>
+<script>
+'use strict';
+/* =====================================================================
+   БАЗА: логическое полотно 576×1024 (9:16), рендер в 1080×1920
+   ===================================================================== */
+const W = 576, H = 1024;
+const cv = document.getElementById('c');
+const mainCtx = cv.getContext('2d');
+let ctx = mainCtx;
+const SC = cv.width / W;
+
+/* ---------- палитра ролика ---------- */
+const C = {
+  black:'#050606', ink:'#0a0d0d',
+  white:'#f2f2ee', gray:'#9aa3a3', dim:'#6b7474',
+  gold:'#c9a25e',
+  blue:'#4d7fd0', blueLite:'#8fb8ff', blueFill:'rgba(62,108,186,0.62)',
+  red:'#ff4d4d', redFill:'rgba(94,26,28,0.9)',
+  terrain:'#1f2923', water:'#21406c', river:'#4a7fc4',
+};
+
+/* ---------- утилиты ---------- */
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const inv=(a,b,v)=>clamp((v-a)/(b-a));
+const E={
+  out:t=>1-Math.pow(1-t,3),
+  inOut:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,
+  outBack:t=>{const c=1.6;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)},
+};
+// окно появления: 0→1 на [a,a+d]
+const win=(t,a,d=.6,ease=E.out)=>ease(inv(a,a+d,t));
+
+function hash(i,j,s){const v=Math.sin(i*127.1+j*311.7+s*74.7)*43758.5453;return v-Math.floor(v)}
+function vnoise(x,y,s){
+  const i=Math.floor(x),j=Math.floor(y),fx=x-i,fy=y-j;
+  const ux=fx*fx*(3-2*fx),uy=fy*fy*(3-2*fy);
+  const a=hash(i,j,s),b=hash(i+1,j,s),c=hash(i,j+1,s),d=hash(i+1,j+1,s);
+  return lerp(lerp(a,b,ux),lerp(c,d,ux),uy);
+}
+function fbm(x,y,s,o=4){let v=0,a=.5,f=1,n=0;for(let k=0;k<o;k++){v+=a*vnoise(x*f,y*f,s+k*13);n+=a;a*=.5;f*=2}return v/n}
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+
+/* ---------- текст ---------- */
+const F={
+  title:s=>`900 ${s}px "Inter Display","Inter",sans-serif`,
+  bold:s=>`700 ${s}px "Inter","Inter Display",sans-serif`,
+  semi:s=>`600 ${s}px "Inter",sans-serif`,
+  reg:s=>`500 ${s}px "Inter",sans-serif`,
+};
+function text(str,x,y,o={}){
+  ctx.save();
+  ctx.font=o.font||F.reg(13);
+  ctx.fillStyle=o.color||C.white;
+  ctx.textAlign=o.align||'center';
+  ctx.textBaseline=o.base||'alphabetic';
+  ctx.letterSpacing=(o.ls||0)+'px';
+  ctx.globalAlpha*=o.alpha==null?1:o.alpha;
+  if(o.glow){ctx.shadowColor=o.glow;ctx.shadowBlur=o.glowBlur||14}
+  if(o.shadow!==false&&!o.glow){ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=6;ctx.shadowOffsetY=1}
+  ctx.fillText(str,x,y+(o.dy||0));
+  ctx.restore();
+}
+// появление текста: подъём на 10px + проявление
+function riseText(str,x,y,t,a,o={}){
+  const k=win(t,a,o.d||.7);
+  if(k<=0)return;
+  text(str,x,y,{...o,alpha:(o.alpha??1)*k,dy:(1-k)*10});
+}
+// печатная машинка
+function typeText(str,x,y,t,a,cps,o={}){
+  if(t<a)return;
+  const n=Math.min(str.length,Math.floor((t-a)*cps));
+  const caret=(n<str.length||Math.floor(t*2.2)%2===0)?'▌':'';
+  text(str.slice(0,n)+(n<str.length?caret:''),x,y,o);
+}
+
+/* =====================================================================
+   ШАПКА: прогресс I–IV, большой заголовок, золотой подзаголовок, описание
+   ===================================================================== */
+function progressBar(active,alpha=1,y=30){
+  const segW=52,gap=6,total=4*segW+3*gap,x0=(W-total)/2;
+  const nums=['I','II','III','IV'];
+  ctx.save();ctx.globalAlpha*=alpha;
+  for(let i=0;i<4;i++){
+    const x=x0+i*(segW+gap);
+    const on=i<active, cur=i===Math.ceil(active)-1;
+    ctx.fillStyle=on?(cur?C.blue:'rgba(77,127,208,.55)'):'rgba(120,130,130,.28)';
+    if(on&&cur){ctx.shadowColor=C.blue;ctx.shadowBlur=8}else ctx.shadowBlur=0;
+    ctx.fillRect(x,y,segW,3);
+    ctx.shadowBlur=0;
+    text(nums[i],x+segW/2,y-7,{font:F.semi(9),color:on?'#c9d6ea':C.dim,shadow:false});
+  }
+  ctx.restore();
+}
+function header(t,a,{title,sub,desc,stage,y=78,size=38}){
+  if(stage!=null)progressBar(stage,win(t,a-.2,.6));
+  riseText(title,W/2,y,t,a,{font:F.title(size),ls:.5});
+  if(sub)riseText(sub,W/2,y+24,t,a+.25,{font:F.bold(11.5),color:C.gold,ls:2.6});
+  if(desc)riseText(desc,W/2,y+(sub?44:28),t,a+.45,{font:F.reg(11),color:C.gray});
+}
+// подпись слева с золотой вертикальной чертой («Главный удар»)
+function sideCaption(t,a,x,y,title,sub){
+  const k=win(t,a,.8);if(k<=0)return;
+  ctx.save();ctx.globalAlpha*=k;
+  ctx.fillStyle=C.gold;ctx.fillRect(x,y-15,2,lerp(0,36,k));
+  ctx.restore();
+  riseText(title,x+10,y,t,a+.1,{font:F.bold(15),align:'left'});
+  riseText(sub,x+10,y+16,t,a+.3,{font:F.reg(10),align:'left',color:C.gray});
+}
+// плашка со счётчиком (+40 км²)
+function statCard(t,a,cx,cy,value,prefix,caption,sub,o={}){
+  const k=win(t,a,.6,E.outBack);if(k<=0)return;
+  const w=o.w||196,h=o.h||82;
+  ctx.save();
+  ctx.globalAlpha*=clamp(k);
+  ctx.translate(cx,cy);ctx.scale(lerp(.85,1,k),lerp(.85,1,k));
+  if(!o.bare){
+    ctx.fillStyle='rgba(16,20,20,.86)';ctx.strokeStyle='rgba(255,255,255,.13)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(-w/2,-h/2,w,h,8);ctx.fill();ctx.stroke();
+  }
+  const n=Math.round(value*E.out(inv(a+.15,a+1.3,t)));
+  const big=o.big||40;
+  ctx.font=F.title(big);ctx.letterSpacing='0px';
+  const main=`${prefix}${n} км`;const mw=ctx.measureText(main).width;
+  text(main,-8,-h/2+big*.95+4,{font:F.title(big),glow:'rgba(150,190,255,.45)',glowBlur:18});
+  text('2',-8+mw/2+2,-h/2+big*.5+4,{font:F.title(big*.45),align:'left'});
+  text(caption,0,-h/2+big*.95+20,{font:F.semi(10),color:'#d7dbdb'});
+  if(sub)text(sub,0,-h/2+big*.95+33,{font:F.reg(8.5),color:C.dim});
+  ctx.restore();
+}
+
+/* =====================================================================
+   СИЛУЭТНЫЕ СЦЕНЫ: небо → свечение → горы → ряды елей → туман → земля
+   ===================================================================== */
+function sky(stops,glow){
+  const g=ctx.createLinearGradient(0,0,0,H);
+  stops.forEach(([p,c])=>g.addColorStop(p,c));
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  if(glow){
+    const [x,y,r,c]=glow;
+    const rg=ctx.createRadialGradient(x,y,0,x,y,r);
+    rg.addColorStop(0,c);rg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  }
+}
+function sunRays(x,y,n,len,alpha,t){
+  ctx.save();ctx.globalCompositeOperation='screen';
+  for(let i=0;i<n;i++){
+    const a=-Math.PI+(i+.5)/n*Math.PI+Math.sin(t*.15+i)*.01;
+    const w=.035+hash(i,3,1)*.03;
+    const g=ctx.createRadialGradient(x,y,0,x,y,len);
+    g.addColorStop(0,`rgba(255,220,170,${alpha*(.5+hash(i,1,2)*.5)})`);g.addColorStop(1,'rgba(255,220,170,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x,y);ctx.arc(x,y,len,a-w,a+w);ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
+function mountains(yb,amp,color,seed,shift=0){
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-10,H);
+  for(let x=-10;x<=W+10;x+=6){ctx.lineTo(x,yb-amp*fbm((x+shift)*.006,0,seed,4))}
+  ctx.lineTo(W+10,H);ctx.closePath();ctx.fill();
+}
+// ель: ярусный силуэт
+function pine(x,y,h){
+  const w=h*.28;ctx.moveTo(x,y-h);
+  const tiers=4;
+  for(let i=1;i<=tiers;i++){const yy=y-h+h*i/tiers*.92, ww=w*i/tiers;ctx.lineTo(x+ww,yy);ctx.lineTo(x+ww*.45,yy-h*.04)}
+  ctx.lineTo(x+w*.12,y);ctx.lineTo(x-w*.12,y);
+  for(let i=tiers;i>=1;i--){const yy=y-h+h*i/tiers*.92, ww=w*i/tiers;ctx.lineTo(x-ww*.45,yy-h*.04);ctx.lineTo(x-ww,yy)}
+  ctx.closePath();
+}
+function treeLine(yb,hMin,hMax,color,seed,step,shift=0,ground=true){
+  ctx.fillStyle=color;ctx.beginPath();
+  const off=((shift%step)+step)%step, base=Math.floor(shift/step);
+  for(let i=-2;i*step<W+step*2;i++){
+    const k=i+base, x=i*step-off+(hash(k,0,seed)-.5)*step*.8;
+    const h=lerp(hMin,hMax,hash(k,1,seed));
+    if(hash(k,2,seed)>.12)pine(x,yb+2,h);
+  }
+  ctx.fill();
+  if(ground)ctx.fillRect(0,yb,W,H-yb);
+}
+function fog(y,h,color,alpha){
+  ctx.save();ctx.globalAlpha*=alpha;
+  const g=ctx.createLinearGradient(0,y-h/2,0,y+h/2);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,color);g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(0,y-h/2,W,h);ctx.restore();
+}
+function hill(y,amp,color,seed){
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=8)ctx.lineTo(x,y-amp*Math.sin(x/W*Math.PI)*(.7+.3*fbm(x*.01,1,seed,2)));
+  ctx.lineTo(W,H);ctx.fill();
+}
+// путник с рюкзаком; phase — фаза шага
+function hiker(x,y,s,phase,color,rim){
+  if(rim)hiker(x+1.1*s,y-.4*s,s,phase,rim);
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';
+  const sw=Math.sin(phase), bob=Math.abs(Math.cos(phase))*1.2;
+  ctx.translate(0,-bob);
+  ctx.lineWidth=4.2;
+  ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(sw*7,0);ctx.moveTo(0,-20);ctx.lineTo(-sw*7,0);ctx.stroke();
+  ctx.beginPath();ctx.roundRect(-4.5,-38,9,20,3);ctx.fill();            // торс
+  ctx.beginPath();ctx.roundRect(-11,-37,8,15,2.5);ctx.fill();           // рюкзак
+  ctx.beginPath();ctx.arc(1,-43,4.6,0,7);ctx.fill();                    // голова
+  ctx.beginPath();ctx.ellipse(1,-46,5.6,2.6,0,Math.PI,0);ctx.fill();    // кепка/капюшон
+  ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(2,-34);ctx.lineTo(7+sw*3,-22);ctx.stroke(); // рука
+  ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(8+sw*3,-26);ctx.lineTo(13+sw*5,1);ctx.stroke(); // палка
+  ctx.restore();
+}
+function standing(x,y,s,color,pose=0,rim){
+  if(rim)standing(x+1.1*s,y-.3*s,s,rim,pose);
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineCap='round';
+  ctx.lineWidth=4.6;ctx.beginPath();ctx.moveTo(-2,-20);ctx.lineTo(-3,0);ctx.moveTo(2,-20);ctx.lineTo(3,0);ctx.stroke();
+  ctx.beginPath();ctx.roundRect(-5.5,-39,11,21,3);ctx.fill();
+  ctx.beginPath();ctx.roundRect(-9,-38,6,15,2);ctx.fill();
+  ctx.beginPath();ctx.arc(0,-44,5,0,7);ctx.fill();
+  ctx.lineWidth=3.2;ctx.beginPath();ctx.moveTo(4,-35);
+  if(pose===1)ctx.lineTo(11,-27),ctx.lineTo(13,-31); else if(pose===2)ctx.lineTo(9,-48); else ctx.lineTo(6,-21);
+  ctx.stroke();ctx.restore();
+}
+// дрон-квадрокоптер
+function drone(x,y,s,t,color='#0b0e0e',light=true){
+  ctx.save();ctx.translate(x,y+Math.sin(t*2.1)*1.5*s);ctx.scale(s,s);ctx.rotate(Math.sin(t*1.3)*.03);
+  ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(-14,-2);ctx.lineTo(14,-2);ctx.stroke();
+  ctx.beginPath();ctx.roundRect(-6,-4.5,12,6,2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-3,1.5);ctx.lineTo(-5,6);ctx.moveTo(3,1.5);ctx.lineTo(5,6);ctx.stroke();
+  for(const sx of[-14,14]){
+    ctx.fillRect(sx-.8,-6,1.6,4);
+    const r=6+Math.sin(t*60+sx)*1.2;
+    ctx.globalAlpha=.55;ctx.beginPath();ctx.ellipse(sx,-6.5,r,1,0,0,7);ctx.fill();ctx.globalAlpha=1;
+  }
+  if(light&&Math.floor(t*1.6)%2===0){ctx.fillStyle='#ff3b30';ctx.shadowColor='#ff3b30';ctx.shadowBlur=6;ctx.beginPath();ctx.arc(0,2.5,1.1,0,7);ctx.fill()}
+  ctx.restore();
+}
+// дым: столб мягких клубов
+function smoke(x,y,t,scale=1,alpha=.32,color='40,40,40'){
+  ctx.save();ctx.filter='blur(6px)';
+  for(let i=0;i<14;i++){
+    const life=((t*.11+i/14)%1);
+    const py=y-life*260*scale, px=x+Math.sin(life*4+i)*14*scale+life*40*scale;
+    const r=(10+life*38)*scale;
+    ctx.fillStyle=`rgba(${color},${alpha*Math.sin(life*Math.PI)})`;
+    ctx.beginPath();ctx.arc(px,py,r,0,7);ctx.fill();
+  }
+  ctx.restore();
+}
+function stars(n,seed,maxY,t){
+  for(let i=0;i<n;i++){
+    const x=hash(i,1,seed)*W,y=hash(i,2,seed)*maxY,a=.25+.6*hash(i,3,seed)*(.6+.4*Math.sin(t*2+i));
+    ctx.fillStyle=`rgba(220,230,255,${a})`;ctx.fillRect(x,y,1,1);
+  }
+}
+function sapling(x,y,s,grow,color){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2;
+  const h=26*grow;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-h);ctx.stroke();
+  ctx.beginPath();pine(0,-h*.25,h*.95);ctx.fill();
+  ctx.beginPath();ctx.ellipse(0,0,9,3,0,0,7);ctx.fill();ctx.restore();
+}
+
+/* =====================================================================
+   «ОПЕРАЦИЯ „УРАН“ ЗА 2 МИНУТЫ» — сцены под озвучку voice.mp3
+   Все реплики привязаны к абсолютному времени аудио (секунды).
+   ===================================================================== */
+
+/* ---------- силуэты эпохи ---------- */
+function soldier(x,y,s,phase,color,rim,o={}){
+  if(rim)soldier(x+1.1*s,y-.4*s,s,phase,rim,null,o);
+  const walk=o.walk??1;
+  ctx.save();ctx.translate(x,y);ctx.scale(o.flip?-s:s,s);
+  ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';
+  const sw=Math.sin(phase)*walk, bob=Math.abs(Math.cos(phase))*1.1*walk;
+  ctx.translate(0,-bob);
+  ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-1,-15);ctx.lineTo(sw*6,0);ctx.moveTo(1,-15);ctx.lineTo(-sw*6,0);ctx.stroke();
+  if(o.prisoner){
+    ctx.rotate(.12);
+    ctx.beginPath();ctx.moveTo(-6,-36);ctx.quadraticCurveTo(0,-41,6,-36);ctx.lineTo(8,-13);ctx.lineTo(-8,-13);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.arc(2,-40,4.6,0,7);ctx.fill();
+    ctx.beginPath();ctx.ellipse(1,-40,7,6,0,Math.PI*.9,Math.PI*2.1);ctx.fill(); // платок/одеяло
+  }else{
+    ctx.beginPath();ctx.moveTo(-5,-38);ctx.lineTo(5,-38);ctx.lineTo(8,-13);ctx.lineTo(-8,-13);ctx.closePath();ctx.fill(); // шинель
+    ctx.beginPath();ctx.roundRect(-10,-36,6,11,2);ctx.fill();                                                   // вещмешок
+    ctx.beginPath();ctx.arc(.5,-42,4.2,0,7);ctx.fill();
+    ctx.beginPath();ctx.ellipse(.5,-44,6.2,4.8,0,Math.PI,0);ctx.fill();ctx.fillRect(-6,-44.6,13,1.6);           // каска
+    ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-2,-22);ctx.lineTo(9,-60);ctx.stroke();                       // винтовка
+    ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(9,-60);ctx.lineTo(10.6,-67);ctx.stroke();                      // штык
+    ctx.lineWidth=2.8;ctx.beginPath();ctx.moveTo(3,-35);ctx.lineTo(5,-28);ctx.lineTo(1,-26);ctx.stroke();
+  }
+  ctx.restore();
+}
+function tank(x,y,s,t,color,rim){ // Т-34, носом вправо
+  if(rim)tank(x+.9*s,y-.5*s,s,t,rim);
+  ctx.save();ctx.translate(x,y+Math.sin(t*11+x)*.25*s);ctx.scale(s,s);ctx.fillStyle=color;
+  ctx.beginPath();ctx.roundRect(-30,-9,60,9,4.5);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-31,-8);ctx.lineTo(-28,-16);ctx.lineTo(16,-16);ctx.lineTo(31,-8);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(-11,-16);ctx.lineTo(-9,-24);ctx.lineTo(7,-25.5);ctx.lineTo(13,-16);ctx.closePath();ctx.fill();
+  ctx.fillRect(10,-22.3,27,2.3);ctx.fillRect(-2,-27,5,2);
+  ctx.restore();
+}
+function train(x,y,s,color,cars=9){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=color;
+  ctx.beginPath();ctx.roundRect(0,-19,34,13,3);ctx.fill();ctx.fillRect(-13,-27,15,21);ctx.fillRect(-15,-29,19,3);
+  ctx.fillRect(25,-27,5,9);ctx.fillRect(-15,-7,51,3);
+  ctx.beginPath();ctx.moveTo(34,-7);ctx.lineTo(41,0);ctx.lineTo(34,0);ctx.fill();
+  for(const wx of[-7,5,15,26]){ctx.beginPath();ctx.arc(wx,-1,4,0,7);ctx.fill()}
+  for(let i=1;i<=cars;i++){const vx=-15-i*41;ctx.fillRect(vx,-25,36,20);ctx.fillRect(vx-5,-7,46,2.5);
+    ctx.beginPath();ctx.arc(vx+8,-1.5,3.2,0,7);ctx.arc(vx+28,-1.5,3.2,0,7);ctx.fill()}
+  ctx.restore();
+}
+// ряд разрушенных зданий; win — цвет «окон» (огонь или просвет неба)
+function ruins(yb,color,seed,win,hMin=40,hMax=150,scale=1){
+  const R=rng(seed);let x=-30;
+  while(x<W+30){
+    const w=(28+R()*58)*scale,h=(hMin+R()*(hMax-hMin))*scale,gap=(2+R()*14)*scale;
+    ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x,yb);ctx.lineTo(x,yb-h*(.7+R()*.3));
+    const n=4+Math.floor(R()*5);
+    for(let i=1;i<=n;i++)ctx.lineTo(x+w*i/n,yb-h+(R()<.45?R()*h*.55:R()*6));
+    ctx.lineTo(x+w,yb);ctx.closePath();ctx.fill();
+    if(R()<.3){ctx.fillRect(x+w*.3,yb-h-14*scale,3*scale,16*scale)} // торчащая балка
+    if(win){
+      const cols=Math.max(1,Math.floor(w/(12*scale))),rows=Math.max(1,Math.floor(h*.45/(14*scale)));
+      for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+        const v=R();if(v<.5)continue;
+        ctx.fillStyle=typeof win==='function'?win(v):win;
+        ctx.fillRect(x+4*scale+c*12*scale,yb-10*scale-r*14*scale-6*scale,5*scale,7*scale);
+      }
+    }
+    x+=w+gap;
+  }
+}
+function flag(x,y,s,t,color='#b8141c'){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.fillStyle='#090a0a';ctx.fillRect(-1,-62,2,62);
+  ctx.fillStyle=color;ctx.shadowColor='rgba(255,60,40,.5)';ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(1,-62);
+  for(let i=0;i<=12;i++){const u=i/12;ctx.lineTo(1+u*30,-62+Math.sin(t*3.5-u*5)*2.4*u)}
+  for(let i=12;i>=0;i--){const u=i/12;ctx.lineTo(1+u*30,-43+Math.sin(t*3.5-u*5)*2.4*u)}
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function snowfall(t,n,alpha=.6,speed=1,seed=1){
+  for(let i=0;i<n;i++){
+    const sp=(18+hash(i,1,seed)*30)*speed, x=(hash(i,2,seed)*W+Math.sin(t*.7+i)*12+t*6)%W;
+    const y=(hash(i,3,seed)*H+t*sp)%H, r=.5+hash(i,4,seed)*1.3;
+    ctx.fillStyle=`rgba(230,236,240,${alpha*(.4+.6*hash(i,5,seed))})`;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  }
+}
+function flash(x,y,r,k){ // вспышка разрыва
+  if(k<=0)return;const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,`rgba(255,220,160,${.9*k})`);g.addColorStop(.3,`rgba(255,140,60,${.45*k})`);g.addColorStop(1,'rgba(255,120,40,0)');
+  ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r);
+}
+function planet(x,y,r,c1,c2,k=1,ring=false,bands=false){
+  if(k<=0)return;ctx.save();ctx.globalAlpha*=clamp(k);ctx.translate(x,y);ctx.scale(lerp(.6,1,E.outBack(clamp(k))),lerp(.6,1,E.outBack(clamp(k))));
+  const halo=ctx.createRadialGradient(0,0,r*.8,0,0,r*2.4);halo.addColorStop(0,c1.replace(')',',.25)').replace('rgb','rgba'));halo.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=halo;ctx.beginPath();ctx.arc(0,0,r*2.4,0,7);ctx.fill();
+  if(ring){ctx.strokeStyle='rgba(220,200,160,.55)';ctx.lineWidth=r*.18;ctx.beginPath();ctx.ellipse(0,0,r*1.9,r*.45,-.35,Math.PI,2*Math.PI);ctx.stroke()}
+  const g=ctx.createRadialGradient(-r*.35,-r*.35,r*.1,0,0,r);g.addColorStop(0,c1);g.addColorStop(1,c2);
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  if(bands){ctx.save();ctx.clip();ctx.fillStyle='rgba(120,80,50,.35)';for(let i=-3;i<=3;i++)ctx.fillRect(-r,i*r*.28,2*r,r*.1);ctx.restore()}
+  // терминатор
+  const sh=ctx.createLinearGradient(-r,0,r,0);sh.addColorStop(.45,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,0,.65)');
+  ctx.fillStyle=sh;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  if(ring){ctx.strokeStyle='rgba(220,200,160,.65)';ctx.lineWidth=r*.18;ctx.beginPath();ctx.ellipse(0,0,r*1.9,r*.45,-.35,0,Math.PI);ctx.stroke()}
+  ctx.restore();
+}
+
+/* ---------- текстовые помощники с привязкой к аудио ---------- */
+// последовательность шапок: каждая следующая сменяет предыдущую в свой момент
+function headerSeq(T,list){
+  list.forEach(([cue,o],i)=>{
+    const next=list[i+1]?list[i+1][0]:1e9;
+    const a=1-inv(next-.15,next+.2,T);if(a<=0||T<cue-.3)return;
+    ctx.save();ctx.globalAlpha*=a;header(T,cue,o);ctx.restore();
+  });
+}
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+function numberCard(T,cue,cx,cy,o){
+  const k=win(T,cue,.6,E.outBack);if(k<=0)return;
+  const w=o.w||220,h=o.h||96,big=o.big||46;
+  ctx.save();ctx.globalAlpha*=clamp(k);ctx.translate(cx,cy);ctx.scale(lerp(.85,1,k),lerp(.85,1,k));
+  if(!o.bare){ctx.fillStyle='rgba(16,20,20,.86)';ctx.strokeStyle='rgba(255,255,255,.13)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(-w/2,-h/2,w,h,8);ctx.fill();ctx.stroke()}
+  const val=o.text??((o.prefix||'')+fmt(Math.round(o.value*E.out(inv(cue+.1,cue+(o.count||1.4),T))))+(o.suffix||''));
+  text(val,0,-h/2+big*.95+6,{font:F.title(big),glow:o.glow||'rgba(150,190,255,.45)',glowBlur:18});
+  if(o.caption)text(o.caption,0,-h/2+big*.95+24,{font:F.semi(11),color:'#d7dbdb'});
+  if(o.sub)text(o.sub,0,-h/2+big*.95+38,{font:F.reg(9),color:C.dim});
+  ctx.restore();
+}
+
+/* ---------- карта: реальная география, схематично ---------- */
+const LAT0=50.4,LON0=40.8,KY=500,KX=330;        // 1° широты = 500 ед. (≈111 км)
+const G=(lat,lon)=>[(lon-LON0)*KX,(LAT0-lat)*KY];
+const GW=Math.round((46.8-LON0)*KX),GH=Math.round((LAT0-46.9)*KY);
+const KM=KY/111;                                   // единиц карты на 1 км
+const RIV={
+  don:[[50.1,40.6],[49.86,41.0],[49.7,41.6],[49.62,42.2],[49.58,42.73],[49.43,42.92],[49.32,43.06],[49.22,43.3],[49.26,43.66],[49.3,44.0],[49.12,43.96],[48.95,43.8],[48.8,43.64],[48.69,43.53],[48.55,43.4],[48.37,43.08],[48.1,42.72],[47.85,42.35],[47.6,42.05],[47.3,41.8],[46.8,41.5]],
+  volga:[[50.5,45.6],[50.08,45.4],[49.75,45.22],[49.45,45.04],[49.06,44.83],[48.83,44.65],[48.71,44.52],[48.6,44.49],[48.52,44.56],[48.43,44.95],[48.25,45.4],[48.06,46.1],[47.8,46.6],[47.5,47.0]],
+  akhtuba:[[48.8,44.78],[48.55,45.05],[48.3,45.55],[48.05,46.25],[47.75,46.75]],
+  chir:[[49.75,41.55],[49.45,41.85],[49.2,42.15],[48.9,42.5],[48.62,42.8],[48.37,43.08]],
+  myshkova:[[48.02,44.4],[48.12,44.12],[48.2,43.88],[48.29,43.62],[48.4,43.38],[48.47,43.26]],
+};
+const ORIG=[[49.8,39.5],[49.8,40.8],[49.62,41.6],[49.52,42.2],[49.45,42.5],[49.3,42.7],[49.35,42.95],[49.15,43.2],[49.2,43.4],[49.25,43.6],[49.15,43.9],[49.1,44.1],[48.98,44.4],[48.86,44.62],[48.75,44.56],[48.66,44.5],[48.58,44.42],[48.45,44.35],[48.3,44.45],[48.12,44.55],[47.95,44.62],[47.7,44.7],[47.3,44.6],[45.5,44.5],[45.5,39.5]];
+const POCKET=[[49.08,44.05],[49.1,44.1],[48.98,44.4],[48.86,44.62],[48.75,44.56],[48.66,44.5],[48.58,44.42],[48.52,44.2],[48.53,43.98],[48.6,43.8],[48.72,43.72],[48.9,43.85],[49.05,43.95]];
+const OUTER=[[49.8,39.5],[49.8,40.8],[49.62,41.6],[49.5,41.85],[49.3,42.0],[49.05,42.3],[48.8,42.6],[48.55,42.85],[48.37,43.08],[48.2,43.25],[48.0,43.5],[47.8,43.75],[47.55,44.0],[47.2,44.2],[45.5,44.3],[45.5,39.5]];
+// «рваная» граница: дробим отрезки и смещаем по шуму от положения (общие участки совпадают)
+function rough(poly){
+  const out=[];
+  for(let i=0;i<poly.length;i++){
+    const A1=G(...poly[i]),B1=G(...poly[(i+1)%poly.length]),L=Math.hypot(B1[0]-A1[0],B1[1]-A1[1]);
+    const nx=-(B1[1]-A1[1])/L,ny=(B1[0]-A1[0])/L,k=Math.max(1,Math.round(L/7));
+    for(let j=0;j<k;j++){const u=j/k,x=A1[0]+u*(B1[0]-A1[0]),y=A1[1]+u*(B1[1]-A1[1]);
+      const m=((fbm(x*.012,y*.012,71,3)-.5)*30+(fbm(x*.07,y*.07,73,2)-.5)*9)*Math.min(1,u*5,(1-u)*5);
+      out.push([LAT0-(y+ny*m)/KY,LON0+(x+nx*m)/KX])}
+  }
+  return out;
+}
+const CITIES=[
+  ['Сталинград',48.71,44.51,2],['Калач',48.69,43.53,1],['Советский',48.6,43.66,0],['Серафимович',49.58,42.73,0],
+  ['Клетская',49.32,43.06,0],['Котельниково',47.63,43.14,1],['Суровикино',48.6,42.85,0],['Нижне-Чирская',48.37,43.08,0],
+  ['Гумрак',48.79,44.38,0],['Дубовка',49.06,44.83,0],['Морозовск',48.35,41.83,0],['Абганерово',48.12,44.27,0],['Цимлянская',47.65,42.1,0],
+];
+let geoCv=null;
+const ORIGr=rough(ORIG),POCKETr=rough(POCKET),OUTERr=rough(OUTER);
+function buildGeo(){
+  const lw=GW/2,lh=GH/2,lo=document.createElement('canvas');lo.width=lw;lo.height=lh;
+  const lc=lo.getContext('2d'),img=lc.createImageData(lw,lh),d=img.data;
+  for(let y=0;y<lh;y++)for(let x=0;x<lw;x++){
+    const n=fbm(x*.01,y*.01,31,5),n2=fbm((x+1.5)*.01,(y+1.5)*.01,31,5);
+    const shade=clamp(.5+(n2-n)*16);
+    const balka=Math.pow(1-Math.abs(fbm(x*.03,y*.03,44,3)*2-1),6);          // овраги-балки
+    const snow=fbm(x*.004,y*.004,52,3);
+    let r=24+shade*15+snow*8-balka*7, g=29+shade*17+snow*8-balka*8, b=29+shade*15+snow*10-balka*6;
+    const i=(y*lw+x)*4;d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+  }
+  lc.putImageData(img,0,0);
+  geoCv=document.createElement('canvas');geoCv.width=GW;geoCv.height=GH;
+  const gc=geoCv.getContext('2d');gc.imageSmoothingQuality='high';gc.drawImage(lo,0,0,GW,GH);
+  // реки: сглаженная линия с меандрами + свечение
+  const river=(pts,w)=>{
+    const P0=pts.map(([la,lo])=>G(la,lo)),S=[];
+    for(let i=0;i<P0.length-1;i++){const [ax,ay]=P0[i],[bx,by]=P0[i+1],L=Math.hypot(bx-ax,by-ay),nx=-(by-ay)/L,ny=(bx-ax)/L;
+      const k=Math.max(2,Math.round(L/10));
+      for(let j=0;j<k;j++){const u=j/k,m=(fbm((ax+u*(bx-ax))*.02,(ay+u*(by-ay))*.02,61,2)-.5)*16*Math.sin(u*Math.PI);
+        S.push([ax+u*(bx-ax)+nx*m,ay+u*(by-ay)+ny*m])}}
+    S.push(P0[P0.length-1]);
+    const path=()=>{gc.beginPath();gc.moveTo(...S[0]);for(let i=1;i<S.length-1;i++){const mx=(S[i][0]+S[i+1][0])/2,my=(S[i][1]+S[i+1][1])/2;gc.quadraticCurveTo(S[i][0],S[i][1],mx,my)}gc.lineTo(...S[S.length-1])};
+    gc.save();gc.lineJoin=gc.lineCap='round';
+    gc.filter='blur(4px)';gc.strokeStyle='rgba(74,127,196,.35)';gc.lineWidth=w*3.5;path();gc.stroke();
+    gc.filter='none';gc.strokeStyle=C.river;gc.lineWidth=w;path();gc.stroke();gc.restore();
+  };
+  river(RIV.volga,6);river(RIV.akhtuba,2.2);river(RIV.don,3.6);river(RIV.chir,2);river(RIV.myshkova,1.8);
+  // Сарпинские озёра
+  [[48.12,44.62,22,9],[48.0,44.66,18,8],[47.92,44.7,14,7]].forEach(([la,lo,rx,ry])=>{const [x,y]=G(la,lo);
+    gc.fillStyle='rgba(33,64,108,.95)';gc.shadowColor='rgba(74,127,196,.5)';gc.shadowBlur=8;gc.beginPath();gc.ellipse(x,y,rx,ry,.9,0,7);gc.fill()});
+}
+// камера в географических координатах
+function geoCam(lat,lon,z){const [x,y]=G(lat,lon);cam={x,y,z}}
+function geoCamLerp(a,b,k){const A1=G(a[0],a[1]),B1=G(b[0],b[1]);cam={x:lerp(A1[0],B1[0],k),y:lerp(A1[1],B1[1],k),z:Math.exp(lerp(Math.log(a[2]),Math.log(b[2]),k))}}
+const GP=(lat,lon)=>P(...G(lat,lon));
+function geoTerrain(){ctx.fillStyle='#0b0e0e';ctx.fillRect(0,0,W,H);const [x0,y0]=P(0,0);ctx.drawImage(geoCv,x0,y0,GW*cam.z,GH*cam.z)}
+function polyPath(poly,tf){ctx.beginPath();poly.forEach((q,i)=>{const p=tf?tf(q):q;const s=GP(...p);i?ctx.lineTo(...s):ctx.moveTo(...s)});ctx.closePath()}
+function neon(){ctx.lineJoin='round';ctx.strokeStyle='rgba(255,60,60,.55)';ctx.lineWidth=7;ctx.filter='blur(5px)';ctx.stroke();
+  ctx.filter='none';ctx.strokeStyle='#ff6a6a';ctx.lineWidth=1.8;ctx.shadowColor='#ff3030';ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0}
+
+/* стрелки (широта, долгота); p — прорисовка 0..1 */
+const AR={
+  n1:[[49.42,42.65],[49.15,42.85],[48.9,43.2],[48.7,43.5]],
+  n2:[[49.22,43.08],[49.0,43.25],[48.8,43.45],[48.62,43.62]],
+  n3:[[49.22,43.28],[49.13,43.5],[49.05,43.7],[48.97,43.84]],
+  s1:[[48.1,44.6],[48.25,44.2],[48.45,43.85],[48.59,43.67]],
+  s2:[[48.35,44.45],[48.42,44.32],[48.48,44.18],[48.53,44.05]],
+  s3:[[48.0,44.58],[47.95,44.3],[47.86,44.02],[47.8,43.78]],
+  ws:[[47.66,43.15],[47.9,43.42],[48.08,43.66],[48.22,43.83]],
+  gv:[[48.27,43.9],[48.07,43.62],[47.84,43.33],[47.68,43.18]],
+  r1:[[48.86,43.55],[48.82,43.78],[48.79,43.98],[48.77,44.16]],
+  r2:[[48.42,43.82],[48.52,43.98],[48.62,44.14],[48.68,44.28]],
+  r3:[[49.18,43.75],[49.04,43.92],[48.94,44.1],[48.88,44.24]],
+  r4:[[48.38,44.28],[48.48,44.32],[48.58,44.36],[48.65,44.39]],
+};
+const bez=(pts,u)=>{const [a,b,c,d]=pts,m=1-u;return[0,1].map(i=>m*m*m*a[i]+3*m*m*u*b[i]+3*m*u*u*c[i]+u*u*u*d[i])};
+function geoArrow(name,p,alpha=1,red=false){
+  if(p<=0||alpha<=0)return;
+  const pts=AR[name].map(q=>G(...q));
+  const S=[];const N=48;for(let i=0;i<=N;i++)S.push(P(...bez(pts,i/N*p)));
+  const head=S[N],pre=S[N-2],ang=Math.atan2(head[1]-pre[1],head[0]-pre[0]),hl=13;
+  const base=[head[0]-Math.cos(ang)*hl*.7,head[1]-Math.sin(ang)*hl*.7];
+  const L=[],R=[];
+  for(let i=0;i<=N;i++){const q=S[i],nx=S[Math.min(N,i+1)],pv=S[Math.max(0,i-1)],an=Math.atan2(nx[1]-pv[1],nx[0]-pv[0]),w=lerp(.6,3.6,Math.pow(i/N,1.3));
+    L.push([q[0]+Math.cos(an+1.57)*w,q[1]+Math.sin(an+1.57)*w]);R.push([q[0]-Math.cos(an+1.57)*w,q[1]-Math.sin(an+1.57)*w])}
+  ctx.save();ctx.globalAlpha*=alpha;
+  const g=ctx.createLinearGradient(...S[0],...head);
+  if(red){g.addColorStop(0,'rgba(200,60,60,0)');g.addColorStop(.55,'rgba(240,95,90,.8)');g.addColorStop(1,'rgba(255,170,160,1)');ctx.shadowColor='rgba(255,80,70,.9)'}
+  else{g.addColorStop(0,'rgba(77,127,208,0)');g.addColorStop(.55,'rgba(110,160,240,.75)');g.addColorStop(1,'rgba(175,205,255,1)');ctx.shadowColor='rgba(120,170,255,.9)'}
+  ctx.fillStyle=g;ctx.shadowBlur=12;
+  ctx.beginPath();L.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));for(let i=N;i>=0;i--)ctx.lineTo(...R[i]);ctx.closePath();ctx.fill();
+  ctx.fillStyle=red?'#ffc2b8':'#c4dbff';ctx.beginPath();
+  ctx.moveTo(head[0]+Math.cos(ang)*4,head[1]+Math.sin(ang)*4);
+  ctx.lineTo(base[0]+Math.cos(ang+1.57)*8,base[1]+Math.sin(ang+1.57)*8);
+  ctx.lineTo(base[0]+Math.cos(ang)*3,base[1]+Math.sin(ang)*3);
+  ctx.lineTo(base[0]-Math.cos(ang+1.57)*8,base[1]-Math.sin(ang+1.57)*8);ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- ход операции как функция времени аудио ---------- */
+const Q={ // ключевые моменты озвучки, с
+  st1:41.89, artprep:44.83, flank:53.41, rumyn3:54.99, collapse:56.72,
+  st2:58.7, south:61.42, pincers:65.37, tanks:67.64, bridge:70.06, whole:73.85,
+  meet:74.76, closed:79.74, inside:81.98, est:86.66,
+  st3:90.93, dec:92.11, manst:93.09, storm:96.52, km50:98.76, myshk:102.43, fail:106.34,
+  st4:108.7, jan:110.04, ring:112.53, squeeze:114.3,
+};
+function opState(T){
+  const s={};
+  s.n1=lerp(0,.62,E.inOut(inv(46,51,T)))+.38*E.inOut(inv(Q.meet,78.8,T));
+  s.n2=lerp(0,.6,E.inOut(inv(46.6,51.6,T)))+.4*E.inOut(inv(Q.meet,79.2,T));
+  s.n3=E.inOut(inv(47.4,52,T));
+  s.s1=lerp(0,.55,E.inOut(inv(61.8,65,T)))+.45*E.inOut(inv(Q.meet,79.4,T));
+  s.s2=E.inOut(inv(62.3,65.4,T));s.s3=E.inOut(inv(62.8,65.8,T));
+  s.reveal=E.out(inv(Q.collapse,58.6,T));            // северный клин «проявляется»
+  s.revealS=E.out(inv(64.5,67,T));
+  s.full=E.inOut(inv(Q.closed,83,T));               // кольцо: всё вне котла и внешнего фронта — освобождено
+  s.arrowsOut=1-inv(88.5,90.5,T);                    // стрелки окружения гаснут к этапу 3
+  s.ws=E.inOut(inv(97,101.6,T)); s.wsA=1-.75*inv(Q.fail,107.5,T);
+  s.gv=E.inOut(inv(Q.fail,108.2,T));
+  s.ring=E.inOut(inv(112.8,115.2,T));
+  s.pocket=lerp(1,.42,E.inOut(inv(113,116.7,T)));
+  return s;
+}
+const PC=[48.74,44.46]; // точка, к которой сжимается котёл (центр Сталинграда)
+function drawFront(T){
+  const s=opState(T);
+  const pTf=q=>[PC[0]+(q[0]-PC[0])*s.pocket,PC[1]+(q[1]-PC[1])*s.pocket];
+  // 1. исходная зона противника
+  ctx.save();polyPath(ORIGr);ctx.fillStyle=hatchPat;ctx.fill();neon();ctx.restore();
+  // 2. маска проявления освобождённой территории
+  const circles=()=>{
+    ctx.beginPath();
+    const add=(name,p,r)=>{if(p<=0)return;const pts=AR[name].map(q=>G(...q));for(let i=0;i<=26;i++){const [x,y]=P(...bez(pts,i/26*p)),rr=r*cam.z*(.65+.7*hash(i,name.charCodeAt(1),5))*(1.25-.5*i/26);ctx.moveTo(x+rr,y);ctx.arc(x,y,rr,0,7)}};
+    const rN=lerp(0,95,s.reveal)+s.full*500, rS=lerp(0,80,s.revealS)+s.full*500;
+    add('n1',s.n1,rN);add('n2',s.n2,rN);add('n3',s.n3,rN*.7);add('s1',s.s1,rS);add('s2',s.s2,rS*.7);add('s3',s.s3,rS*.8);
+  };
+  ctx.save();
+  polyPath(ORIGr);ctx.clip();
+  ctx.beginPath();ctx.rect(-5000,-5000,10000,10000);
+  [POCKETr.map(pTf),OUTERr].forEach(poly=>poly.forEach((q,i)=>{const p=GP(...q);i?ctx.lineTo(...p):ctx.moveTo(...p)}));
+  ctx.clip('evenodd');
+  circles();ctx.clip();
+  const [x0,y0]=P(0,0);ctx.drawImage(geoCv,x0,y0,GW*cam.z,GH*cam.z);
+  ctx.fillStyle=C.blueFill;ctx.fillRect(0,0,W,H);
+  ctx.restore();
+  // 3. новые границы (котёл и внешний фронт) — неон, только там, где уже проявлено
+  ctx.save();polyPath(ORIGr);ctx.clip();circles();ctx.clip();
+  polyPath(POCKETr,pTf);neon();polyPath(OUTERr);neon();
+  ctx.restore();
+  return s;
+}
+function riverLabel(name,lat,lon,a,rot=0){
+  const [x,y]=GP(lat,lon);ctx.save();ctx.translate(x,y);ctx.rotate(rot);
+  text(name,0,0,{font:`italic 500 10px "Inter",sans-serif`,color:'rgba(140,180,235,.9)',alpha:a});ctx.restore();
+}
+function geoCities(a,hide=[]){
+  CITIES.forEach(([n,la,lo,big])=>{
+    if(hide.includes(n))return;
+    const [x,y]=GP(la,lo);if(x<-30||x>W+30||y<110||y>H-120)return;
+    ctx.save();ctx.globalAlpha*=a;
+    if(big===2){ctx.fillStyle=C.white;ctx.fillRect(x-3.5,y-3.5,7,7)}else{ctx.fillStyle=C.white;ctx.beginPath();ctx.arc(x,y,big?3:2.3,0,7);ctx.fill()}
+    ctx.restore();
+    const right=x<W-110;
+    text(n,x+(right?8:-8),y+4,{font:big?F.bold(big===2?15:13):F.semi(10.5),align:right?'left':'right',alpha:a});
+  });
+}
+function unitLabel(T,cue,lat,lon,str,red=true,o={}){
+  const k=win(T,cue,.5)*(o.out?1-inv(o.out,o.out+.5,T):1);if(k<=0)return;
+  const [x,y]=GP(lat,lon);
+  text(str,x,y,{font:F.bold(o.size||9.5),ls:1.2,color:red?'rgba(255,165,160,.95)':'#b7d0f5',alpha:k,dy:(1-k)*6});
+  if(o.sub)text(o.sub,x,y+12,{font:F.reg(8.5),color:red?'rgba(255,190,185,.75)':'rgba(190,210,240,.8)',alpha:k});
+}
+function geoRings(lat,lon,T,color,n,maxR,a){const [x,y]=G(lat,lon);rings(x,y,T,color,n,maxR,a)}
+function scaleBar(a){
+  const km=[10,20,25,50,100].find(k=>k*KM*cam.z>=60)||100,len=km*KM*cam.z,y=812;
+  ctx.save();ctx.globalAlpha*=a;ctx.strokeStyle='rgba(220,225,225,.75)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(36,y-3);ctx.lineTo(36,y);ctx.lineTo(36+len,y);ctx.lineTo(36+len,y-3);ctx.stroke();
+  text(`${km} км`,36+len/2,y-7,{font:F.semi(9.5),color:'#cfd4d4'});
+  const nx=36+len+30;ctx.fillStyle='#dfe3e3';ctx.beginPath();ctx.moveTo(nx,y-22);ctx.lineTo(nx+4,y-11);ctx.lineTo(nx,y-13);ctx.lineTo(nx-4,y-11);ctx.closePath();ctx.fill();
+  text('С',nx,y+2,{font:F.semi(8.5),color:'#cfd4d4'});ctx.restore();
+}
+function legend(a){
+  if(a<=0)return;const lx=W-150,ly=800;
+  ctx.save();ctx.globalAlpha*=a;
+  ctx.fillStyle='rgba(12,15,15,.72)';ctx.beginPath();ctx.roundRect(lx-8,ly-12,140,50,5);ctx.fill();
+  [['rgba(170,50,50,1)','Германия и союзники'],[C.blue,'Красная армия'],[null,'линия фронта']].forEach(([c,l],i)=>{
+    const yy=ly+i*14;if(c){ctx.fillStyle=c;ctx.fillRect(lx,yy-6,11,7)}else{ctx.fillStyle='#ff5a5a';ctx.fillRect(lx,yy-3,11,1.6)}
+    text(l,lx+17,yy,{font:F.reg(8.5),align:'left',color:'#c9cece',shadow:false})});
+  ctx.restore();
+}
+function footnote(a){
+  text('Схематическая реконструкция · линии фронта и направления ударов условные',W/2,H-112,{font:F.reg(8),color:'rgba(150,158,158,.7)',alpha:a,shadow:false});
+  text('ноябрь 1942 – февраль 1943',W/2,H-101,{font:F.reg(8),color:'rgba(150,158,158,.7)',alpha:a,shadow:false});
+}
+function geoMap(T,o={}){
+  geoTerrain();
+  const s=drawFront(T);
+  riverLabel('Волга',49.35,45.25,.9,-1.05);riverLabel('Дон',49.5,42.35,.9,-.25);riverLabel('Чир',49.02,42.33,.8,-.9);
+  if(T>Q.storm-1)riverLabel('р. Мышкова',48.36,43.47,win(T,Q.myshk-1.5),-.5);
+  geoCities(1,o.hideCities||[]);
+  return s;
+}
+function mapFrame(a=1,leg=true){mapLook();scaleBar(a);legend(leg?a:0);footnote(a)}
+
+/* ---------- сцены ---------- */
+const STEPPE_SKY=[[0,'#0e1418'],[.32,'#1b2529'],[.5,'#3a3d3c'],[.56,'#7d6147'],[.59,'#9c7550'],[.61,'#2a2d2c'],[1,'#0b0e0f']];
+const SCENES=[
+  // 1. Титул: зимняя степь, колонна, зарево над городом
+  [0,8.23,T=>{
+    ctx.save();const z=lerp(1,1.06,T/8.5);ctx.translate(W/2,H*.55);ctx.scale(z,z);ctx.translate(-W/2,-H*.55);
+    sky(STEPPE_SKY,[440,590,260,'rgba(255,150,80,.38)']);
+    smoke(430,590,T,1,.3,'50,44,40');smoke(500,592,T+4,.8,.25,'50,44,40');
+    for(let i=0;i<5;i++)flash(380+i*40+Math.sin(i*7)*20,592,30,Math.max(0,Math.sin(T*1.3+i*2.1))**12);
+    mountains(598,16,'#2a2e2d',2,T*3);
+    fog(598,26,'rgba(200,170,140,.35)',.8);
+    ruins(604,'#1a1c1c',5,null,6,22,.6);
+    ctx.fillStyle='#2b3235';ctx.fillRect(0,604,W,120);
+    fog(640,70,'rgba(190,195,200,.18)',1);
+    ctx.fillStyle='#0c0f10';ctx.fillRect(0,724,W,H-724);hill(728,6,'#0c0f10',1);
+    for(let i=0;i<6;i++)soldier(40+i*52+T*9,724,1.1,T*4.6+i*1.1,'#070909','rgba(255,170,110,.28)');
+    snowfall(T,70,.45,.6,3);
+    ctx.restore();vignette(.6);
+    riseText('ОПЕРАЦИЯ',W/2,262,T,.9,{font:F.bold(12),ls:6,color:'#d5d8d6'});
+    riseText('«УРАН»',W/2,326,T,1.1,{font:F.title(56),ls:1});
+    const k=win(T,1.6,.7);ctx.fillStyle=C.gold;ctx.globalAlpha=k;ctx.fillRect(W/2-lerp(0,22,k),346,lerp(0,44,k),1.5);ctx.globalAlpha=1;
+    riseText('19 – 23 НОЯБРЯ 1942',W/2,372,T,1.9,{font:F.bold(11.5),color:C.gold,ls:3});
+    riseText('как за четыре дня окружили целую армию',W/2,392,T,2.4,{font:F.reg(11),color:C.gray});
+    riseText('ЗА 2 МИНУТЫ',W/2,430,T,6.5,{font:F.bold(12),ls:4,color:'#e8e8e4'});
+  }],
+  // 2. Карта-обзор, наезд на Сталинград
+  [8.23,12.6,T=>{
+    geoCamLerp([49.0,43.4,.58],[48.82,44.15,.95],E.inOut(inv(8.3,12.6,T)));
+    geoMap(T);
+    geoRings(48.71,44.51,T,'255,90,90',3,46,win(T,10.1));
+    mapFrame(win(T,9));
+    header(T,8.4,{title:'ОСЕНЬ 1942',sub:'СТАЛИНГРАДСКОЕ НАПРАВЛЕНИЕ',desc:'Немецкие войска вышли к Волге'});
+  }],
+  // 3. Город: руины, пожары, бои
+  [12.49,17.5,T=>{
+    sky([[0,'#0d0f10'],[.35,'#1e1a18'],[.55,'#4a2c1c'],[.66,'#2a1b14'],[1,'#080909']],[300,600,320,'rgba(255,110,50,.35)']);
+    smoke(120,600,T,1.4,.4,'30,26,24');smoke(330,610,T+5,1.6,.45,'28,24,22');smoke(480,600,T+2,1.2,.35,'30,26,24');
+    ruins(640,'#181514',11,v=>`rgba(255,${120+v*60|0},60,${.25+v*.4})`,60,190,.8);
+    for(let i=0;i<4;i++)flash(80+i*140,560+Math.sin(i*3)*40,90,Math.max(0,Math.sin(T*1.7+i*1.9))**16);
+    ruins(700,'#0b0a0a',12,v=>`rgba(255,140,60,${v*.35})`,80,230,1.05);
+    ctx.fillStyle='#090808';ctx.fillRect(0,700,W,H-700);
+    // трассеры
+    for(let i=0;i<6;i++){const ph=(T*1.4+i*.37)%1;const x=lerp(-20,W+20,ph),y=480+i*18+Math.sin(i)*30;
+      ctx.strokeStyle=`rgba(255,200,120,${.8*Math.sin(ph*Math.PI)})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-26,y+3);ctx.stroke()}
+    vignette(.6);
+    typeText('БОИ ЗА КАЖДЫЙ ДОМ',W/2,300,T,12.7,12,{font:F.bold(13),color:'#f0c9a0',ls:3,glow:'rgba(255,140,60,.6)',glowBlur:10});
+    riseText('за каждый этаж · с сентября 1942',W/2,322,T,15,{font:F.reg(11),color:C.gray});
+  }],
+  // 4. Ставка, «Уран», планеты
+  [17.5,29.77,T=>{
+    sky([[0,'#05070a'],[.5,'#0a0e14'],[1,'#040506']]);stars(140,9,H,T);
+    const o=E.inOut(inv(23.6,25,T));
+    // орбиты
+    ctx.save();ctx.globalAlpha=o*.5;ctx.strokeStyle='rgba(160,180,210,.35)';ctx.setLineDash([2,5]);ctx.lineWidth=1;
+    [[170,60],[250,95],[330,130]].forEach(([rx,ry])=>{ctx.beginPath();ctx.ellipse(W/2,560,rx,ry,0,0,7);ctx.stroke()});ctx.restore();
+    const ux=W/2,uy=lerp(470,560,o),ur=lerp(42,30,o);
+    planet(ux,uy,ur,'rgb(190,235,240)','rgb(60,120,140)',win(T,22.6,1));
+    planet(W/2-170,560,11,'rgb(230,120,80)','rgb(110,40,25)',win(T,27.19,.5));
+    planet(W/2+250*Math.cos(.5),560+95*Math.sin(.5),20,'rgb(235,210,150)','rgb(120,95,55)',win(T,27.87,.5),true);
+    planet(W/2-330*Math.cos(.9)+20,560-130*Math.sin(.9),27,'rgb(225,190,150)','rgb(120,80,50)',win(T,28.68,.5),false,true);
+    const lbl=(s,x,y,cue,sub)=>{riseText(s,x,y,T,cue,{font:F.bold(12),ls:1.5});riseText(sub,x,y+14,T,cue+.2,{font:F.reg(9),color:C.gray})};
+    lbl('«МАРС»',W/2-170,594,27.19,'Ржев · ноябрь 1942');
+    lbl('«САТУРН»',W/2+219,674,27.87,'Средний Дон · декабрь');
+    lbl('«ЮПИТЕР»',W/2-178,480,28.68,'план, не осуществлён');
+    const a1=1-inv(21.5,21.9,T);
+    ctx.save();ctx.globalAlpha=a1;
+    riseText('СТАВКА ВЕРХОВНОГО ГЛАВНОКОМАНДОВАНИЯ',W/2,300,T,17.6,{font:F.bold(10.5),color:C.gold,ls:2.4});
+    riseText('не только оборона',W/2,330,T,18.2,{font:F.reg(13),color:'#c8cccc'});
+    riseText('ЛОВУШКА',W/2,384,T,20.1,{font:F.title(44),ls:1,glow:'rgba(255,255,255,.15)'});
+    ctx.restore();
+    if(T>21.8){
+      typeText('КОДОВОЕ НАЗВАНИЕ',W/2,232,T,21.9,14,{font:F.bold(12),color:'#a9c6f0',ls:4,glow:'rgba(120,170,255,.6)',glowBlur:10});
+      riseText('«УРАН»',W/2,290,T,23.13,{font:F.title(50),ls:1,glow:'rgba(160,230,240,.35)',glowBlur:22});
+      riseText('планеты — имена целой серии наступлений',W/2,318,T,24.3,{font:F.reg(11),color:C.gray});
+    }
+  }],
+  // 5. Ночь: эшелон без огней, маскировка, переправа через Дон
+  [29.77,39.7,T=>{
+    sky([[0,'#060a12'],[.45,'#0d1626'],[.6,'#152238'],[1,'#05070b']],[420,230,150,'rgba(190,210,255,.18)']);
+    stars(100,5,560,T);
+    ctx.fillStyle='rgba(225,232,255,.85)';ctx.shadowColor='#cfe0ff';ctx.shadowBlur=24;ctx.beginPath();ctx.arc(420,230,9,0,7);ctx.fill();ctx.shadowBlur=0;
+    mountains(600,26,'#111b2a',11,T*2);
+    treeLine(612,8,18,'#0d1523',14,9,T*3,false);
+    ctx.fillStyle='#1a2435';ctx.fillRect(0,612,W,40);                     // снежная насыпь
+    fog(612,30,'rgba(120,150,200,.3)',1);
+    const tx=lerp(-60,W+420,inv(29.77,39.7,T));
+    train(tx,640,1.05,'#05080d');smoke(tx+28,612,T,.55,.25,'30,36,48');
+    ctx.fillStyle='#0a1019';ctx.fillRect(0,652,W,40);
+    // река и понтонная переправа
+    const rk=win(T,35.6,1.2);
+    const rg=ctx.createLinearGradient(0,692,0,770);rg.addColorStop(0,'#0f1b2e');rg.addColorStop(1,'#0a1322');
+    ctx.fillStyle=rg;ctx.fillRect(0,692,W,78);
+    ctx.strokeStyle='rgba(150,180,230,.15)';for(let i=0;i<14;i++){const y=700+i*5,ph=(T*8+i*37)%W;ctx.beginPath();ctx.moveTo(ph,y);ctx.lineTo(ph+30,y);ctx.stroke()}
+    ctx.save();ctx.globalAlpha=rk;ctx.fillStyle='#04070c';ctx.fillRect(0,728,W,4);
+    for(let x=10;x<W;x+=34)ctx.fillRect(x,730,22,6);
+    for(let i=0;i<7;i++)soldier(((T-35.6)*16+i*64)%(W+60)-30,728,.95,T*4.4+i,'#04070c','rgba(140,175,230,.35)');
+    ctx.restore();
+    ctx.fillStyle='#070b12';ctx.fillRect(0,770,W,H-770);
+    // маскировочная сеть на переднем плане
+    const mk=win(T,34.57,1);
+    if(mk>0){ctx.save();ctx.globalAlpha=mk*.9;ctx.fillStyle='#05080c';ctx.beginPath();ctx.moveTo(0,790);
+      for(let x=0;x<=W*.55;x+=6)ctx.lineTo(x,790-Math.sin(x/W*1.8*Math.PI)*34-hash(x,1,3)*7);ctx.lineTo(W*.55,H);ctx.lineTo(0,H);ctx.fill();
+      tank(150,830,1.6,0,'#05080c');ctx.restore()}
+    snowfall(T,50,.35,.5,7);
+    vignette(.6);
+    typeText('РЕЖИМ МАСКИРОВКИ',W/2,330,T,29.9,12,{font:F.bold(13),color:'#a9c6f0',ls:3,glow:'rgba(120,170,255,.6)',glowBlur:10});
+    riseText('войска перебрасывают только по ночам',W/2,352,T,32.21,{font:F.reg(11),color:'#b0b8c2'});
+    riseText('днём — маскировка',W/2,370,T,35.17,{font:F.reg(11),color:'#b0b8c2'});
+    sideCaption(T,36.3,30,880,'Переправы через Дон','плацдармы для будущего удара');
+  }],
+  // 6. План — 4 этапа
+  [39.7,42.3,T=>{
+    sky([[0,'#090b0c'],[.5,'#0d1112'],[1,'#060707']]);vignette(.5);
+    riseText('ПЛАН — ЧЕТЫРЕ ЭТАПА',W/2,455,T,39.75,{font:F.bold(15),color:C.gold,ls:2});
+    const xs=[96,224,352,480],y=545,top=['19 НОЯ','20 НОЯ','ДЕКАБРЬ','ЯНВАРЬ'],num=['I','II','III','IV'],bot=['ПРОРЫВ','КЛЕЩИ','«ЗИМНЯЯ\nГРОЗА»','«КОЛЬЦО»'];
+    const lk=E.inOut(inv(39.9,41.1,T));
+    ctx.strokeStyle='rgba(77,127,208,.5)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(xs[0],y);ctx.lineTo(lerp(xs[0],xs[3],lk),y);ctx.stroke();
+    xs.forEach((x,i)=>{
+      const k=win(T,39.95+i*.28,.45,E.outBack);if(k<=0)return;
+      ctx.save();ctx.globalAlpha=clamp(k);ctx.translate(x,y);ctx.scale(k,k);
+      ctx.fillStyle='#0b1018';ctx.strokeStyle=C.blue;ctx.lineWidth=2;ctx.shadowColor=C.blue;ctx.shadowBlur=14;
+      ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();ctx.stroke();ctx.restore();
+      text(num[i],x,y+6,{font:F.title(16),alpha:clamp(k)});
+      text(top[i],x,y-32,{font:F.bold(8.5),color:C.gray,ls:1.2,alpha:clamp(k)});
+      bot[i].split('\n').forEach((l,j)=>text(l,x,y+40+j*11,{font:F.bold(8.5),ls:.8,alpha:clamp(k)}));
+    });
+  }],
+  // 7. ЭТАП 1 — удар с севера
+  [41.89,58.7,T=>{
+    geoCamLerp([49.12,43.25,.82],[48.98,43.45,.9],inv(41.9,58.7,T));
+    const s=geoMap(T);
+    for(let i=0;i<5;i++)geoRings(49.36-i*.05,42.62+i*.14,T+i*.31,'255,200,120',1,26,win(T,Q.artprep)*(1-inv(49,50,T)));
+    geoArrow('n1',s.n1);geoArrow('n2',s.n2);geoArrow('n3',s.n3);
+    unitLabel(T,45.5,49.7,42.2,'ЮГО-ЗАПАДНЫЙ ФРОНТ',false);
+    unitLabel(T,46.2,49.47,43.55,'ДОНСКОЙ ФРОНТ',false);
+    unitLabel(T,Q.rumyn3,49.1,42.98,'3-Я РУМЫНСКАЯ АРМИЯ',true,{size:10.5});
+    if(T>Q.rumyn3)geoRings(49.2,42.95,T,'255,90,90',2,40,win(T,Q.rumyn3)*(1-inv(57,58,T)));
+    mapFrame(1);
+    header(T,Q.st1,{title:'ЭТАП 1',sub:'19 НОЯБРЯ 1942',desc:'Удар северо-западнее Сталинграда',stage:1});
+    riseText('не в лоб — по флангу',W/2,190,T,Q.flank,{font:F.semi(11),color:'#e6c38a'});
+  }],
+  // 8. ЭТАП 2 — удар с юга, клещи
+  [58.7,67.64,T=>{
+    geoCamLerp([48.45,44.05,.88],[48.8,43.75,.62],E.inOut(inv(Q.pincers,67.6,T)));
+    const s=geoMap(T);
+    geoArrow('n1',s.n1);geoArrow('n2',s.n2);geoArrow('n3',s.n3);
+    geoArrow('s1',s.s1);geoArrow('s2',s.s2);geoArrow('s3',s.s3);
+    unitLabel(T,Q.south,48.3,44.72,'СТАЛИНГРАДСКИЙ ФРОНТ',false);
+    unitLabel(T,61.9,47.95,44.15,'4-Я РУМЫНСКАЯ АРМИЯ',true,{size:10.5});
+    mapFrame(1);
+    header(T,Q.st2,{title:'ЭТАП 2',sub:'20 НОЯБРЯ 1942',desc:'Удар южнее Сталинграда',stage:2});
+    riseText('вторая половина клещей',W/2,190,T,Q.pincers+.2,{font:F.semi(11),color:'#e6c38a'});
+  }],
+  // 9. Танки и мост у Калача
+  [67.64,74.76,T=>{
+    sky([[0,'#121a20'],[.35,'#26323a'],[.52,'#5d5a55'],[.58,'#b48862'],[.62,'#3a3a38'],[1,'#0b0e0f']],[150,600,300,'rgba(255,190,130,.4)']);
+    mountains(610,14,'#2c3232',6,T*3);
+    fog(612,30,'rgba(220,200,180,.4)',.9);
+    treeLine(620,5,12,'#1e2424',8,6,T*4,false);
+    ctx.fillStyle='#2f3739';ctx.fillRect(0,620,W,40);
+    // река
+    const rg=ctx.createLinearGradient(0,660,0,740);rg.addColorStop(0,'#3b4a55');rg.addColorStop(1,'#1b242b');ctx.fillStyle=rg;ctx.fillRect(0,660,W,80);
+    ctx.strokeStyle='rgba(230,235,240,.18)';for(let i=0;i<10;i++){const y=670+i*7,ph=(i*71)%W;ctx.beginPath();ctx.moveTo(ph,y);ctx.lineTo(ph+50,y);ctx.stroke()}
+    // мост
+    const bk=win(T,Q.bridge-.8,1.4);
+    ctx.save();ctx.globalAlpha=bk;ctx.fillStyle='#0a0d0e';ctx.fillRect(-10,652,W+20,8);
+    for(let x=40;x<W;x+=120){ctx.fillRect(x,652,10,90)}
+    ctx.strokeStyle='#0a0d0e';ctx.lineWidth=2;ctx.beginPath();for(let x=-20;x<W+20;x+=40){ctx.moveTo(x,652);ctx.lineTo(x+20,630);ctx.lineTo(x+40,652)}ctx.moveTo(-20,630);ctx.lineTo(W+20,630);ctx.stroke();
+    ctx.restore();
+    // танки: до моста — по степи (передний план), потом на мосту
+    const tA=1-inv(Q.bridge-.6,Q.bridge+.4,T);
+    ctx.save();ctx.globalAlpha=tA;ctx.fillStyle='#0c0f10';ctx.fillRect(0,740,W,H-740);
+    for(let i=0;i<3;i++)tank(lerp(-80,W+60,inv(67.2,72,T))-i*140,800+i*16,2.2-i*.25,T,'#07090a','rgba(255,190,130,.3)');
+    ctx.restore();
+    for(let i=0;i<4;i++)tank(lerp(-100,W+120,inv(Q.bridge-1,76,T))-i*110,651,.95,T,'#090b0c');
+    if(tA<1){ctx.save();ctx.globalAlpha=1-tA;ctx.fillStyle='#0c0f10';ctx.fillRect(0,740,W,H-740);ctx.restore()}
+    snowfall(T,40,.3,.5,11);
+    vignette(.55);
+    riseText('ТАНКИ ИДУТ НАВСТРЕЧУ',W/2,200,T,67.8,{font:F.bold(12),color:C.gold,ls:3,alpha:1-inv(Q.bridge-.3,Q.bridge,T)});
+    if(T>Q.bridge-.2){
+      riseText('МОСТ У КАЛАЧА',W/2,190,T,Q.bridge,{font:F.title(36)});
+      riseText('22 НОЯБРЯ 1942',W/2,214,T,Q.bridge+.4,{font:F.bold(11.5),color:C.gold,ls:2.6});
+    }
+    sideCaption(T,Q.bridge+.6,30,880,'Калач-на-Дону','мост через Дон захвачен целым');
+  }],
+  // 10. Кольцо замкнуто
+  [74.76,90.93,T=>{
+    geoCamLerp([48.78,43.85,.85],[48.8,44.1,1.08],E.inOut(inv(74.8,90.9,T)));
+    const s=geoMap(T);
+    ['n1','n2','n3','s1','s2','s3'].forEach(n=>geoArrow(n,s[n],s.arrowsOut));
+    if(T>Q.closed-.2){geoRings(48.6,43.66,T,'150,190,255',3,70,win(T,Q.closed)*(1-inv(88,89,T)));
+      const [x,y]=GP(48.6,43.66);flash(x,y,90,Math.max(0,1-(T-Q.closed)*1.5)*.6)}
+    unitLabel(T,Q.inside,48.86,44.12,'6-Я АРМИЯ ПАУЛЮСА',true,{size:11,sub:'и часть 4-й танковой армии'});
+    mapFrame(1);
+    headerSeq(T,[[Q.meet,{title:'23 НОЯБРЯ',sub:'ХУТОР СОВЕТСКИЙ',desc:'встреча танкистов двух фронтов',stage:2}],
+                 [Q.closed,{title:'КОЛЬЦО ЗАМКНУТО',sub:'23 НОЯБРЯ 1942',stage:2,size:34}]]);
+    numberCard(T,Q.est,W/2,700,{text:'250–330 тыс.',big:38,w:270,h:92,caption:'человек в окружении',sub:'по разным оценкам',glow:'rgba(255,150,140,.35)'});
+  }],
+  // 11. ЭТАП 3 — «Зимняя гроза»
+  [90.93,108.7,T=>{
+    geoCamLerp([48.45,43.75,.85],[48.3,43.65,.95],inv(90.9,108.7,T));
+    const s=geoMap(T);
+    geoArrow('ws',s.ws,s.wsA,true);
+    unitLabel(T,Q.storm,47.58,43.62,'«ЗИМНЯЯ ГРОЗА»',true,{size:11.5,sub:'группа армий «Дон» · Манштейн'});
+    // расстояние до котла
+    if(T>Q.km50){const a=win(T,Q.km50,.6)*(1-inv(Q.fail,Q.fail+.5,T));const [x1,y1]=GP(48.24,43.85),[x2,y2]=GP(48.52,43.98);
+      ctx.save();ctx.globalAlpha=a;ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,230,200,.85)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+      text('< 50 км',(x1+x2)/2+10,(y1+y2)/2,{font:F.bold(13),align:'left',alpha:a,color:'#ffe6c8'})}
+    if(T>Q.myshk){const a=win(T,Q.myshk,.6);
+      ctx.save();ctx.globalAlpha=a;ctx.beginPath();RIV.myshkova.forEach((q,i)=>{const p=GP(...q);i?ctx.lineTo(...p):ctx.moveTo(...p)});
+      ctx.strokeStyle='rgba(140,185,255,.9)';ctx.lineWidth=3.5;ctx.shadowColor=C.blue;ctx.shadowBlur=14;ctx.stroke();ctx.restore();
+      geoRings(48.24,43.84,T,'150,190,255',2,40,a);
+      unitLabel(T,Q.myshk+.3,48.4,44.25,'2-Я ГВАРДЕЙСКАЯ АРМИЯ',false,{size:10.5})}
+    geoArrow('gv',s.gv,1);
+    mapFrame(1);
+    header(T,Q.st3,{title:'ЭТАП 3',sub:'ДЕКАБРЬ 1942',desc:'Манштейн пытается пробить кольцо снаружи',stage:3});
+    riseText('деблокада проваливается',W/2,190,T,Q.fail,{font:F.semi(11),color:'#e6c38a'});
+  }],
+  // 12. ЭТАП 4 — «Кольцо»
+  [108.7,116.71,T=>{
+    geoCamLerp([48.78,44.15,1.15],[48.76,44.3,1.35],E.inOut(inv(108.7,116.7,T)));
+    const s=geoMap(T,{hideCities:['Котельниково']});
+    ['r1','r2','r3','r4'].forEach((n,i)=>geoArrow(n,clamp(s.ring*1.15-i*.05)));
+    if(T>Q.squeeze)geoRings(...PC,T,'255,200,120',3,34,win(T,Q.squeeze));
+    mapFrame(1);
+    header(T,Q.st4,{title:'ЭТАП 4',sub:'10 ЯНВАРЯ 1943',desc:'Операция «Кольцо» · котёл сжимают день за днём',stage:4});
+  }],
+  // 13. Капитуляция: руины, колонна пленных
+  [116.71,125.03,T=>{
+    sky([[0,'#151b20'],[.35,'#2a3236'],[.52,'#59534c'],[.57,'#8c7259'],[.61,'#36383a'],[1,'#0c0f10']],[380,600,280,'rgba(255,200,150,.3)']);
+    smoke(200,600,T,1.2,.28,'40,40,42');smoke(470,605,T+3,1,.22,'40,40,42');
+    ruins(630,'#202426',21,null,40,140,.8);
+    fog(630,40,'rgba(210,200,190,.3)',1);
+    ctx.fillStyle='#33393c';ctx.fillRect(0,630,W,110);
+    fog(680,80,'rgba(200,205,210,.15)',1);
+    ctx.fillStyle='#0d1011';ctx.fillRect(0,740,W,H-740);hill(744,6,'#0d1011',2);
+    for(let i=0;i<11;i++)soldier(W+40-((T-116.7)*11+i*44)%(W+120),740-(i%2)*3,.95,T*3+i*1.7,'#0a0c0d','rgba(255,210,170,.22)',{prisoner:true,flip:true,walk:.7});
+    soldier(80+(T-116.7)*2,748,1.15,T*3,'#07090a','rgba(255,210,170,.3)',{walk:.3});
+    snowfall(T,70,.45,.6,13);
+    vignette(.55);
+    headerSeq(T,[[116.75,{title:'31 ЯНВАРЯ 1943',sub:'ПАУЛЮС СДАЁТСЯ В ПЛЕН',desc:'накануне произведён в фельдмаршалы',y:190,size:34}],
+                 [121.82,{title:'2 ФЕВРАЛЯ 1943',sub:'КАПИТУЛЯЦИЯ ПОСЛЕДНИХ ЧАСТЕЙ',y:190,size:34}]]);
+  }],
+  // 14. Итоги: пленные, генералы
+  [125.03,131.84,T=>{
+    sky([[0,'#07090b'],[.6,'#0d1114'],[1,'#060708']]);snowfall(T,90,.4,.6,17);vignette(.5);
+    riseText('ИТОГ ОКРУЖЕНИЯ',W/2,300,T,125.1,{font:F.bold(12),color:C.gold,ls:3.5});
+    numberCard(T,125.67,W/2,420,{value:91000,suffix:'+',big:52,w:300,h:110,caption:'пленных — солдат и офицеров',bare:true,count:2.2});
+    numberCard(T,129.92,W/2,590,{value:24,big:46,w:220,h:96,caption:'генерала',count:.8});
+  }],
+  // 15. Финал: рассвет над руинами, флаг, «перелом»
+  [131.84,143.3,T=>{
+    sky([[0,'#1a242c'],[.25,'#2f3e48'],[.47,'#8a6c50'],[.57,'#e0a364'],[.61,'#4a4038'],[1,'#08090a']],[W/2,605,330,'rgba(255,215,160,.55)']);
+    sunRays(W/2,605,18,560,.05,T);
+    const sg=ctx.createRadialGradient(W/2,605,0,W/2,605,40);sg.addColorStop(0,'rgba(255,245,220,.95)');sg.addColorStop(1,'rgba(255,245,220,0)');ctx.fillStyle=sg;ctx.fillRect(W/2-40,565,80,80);
+    ruins(628,'#24282a',31,null,20,70,.7);
+    fog(628,34,'rgba(230,205,170,.4)',.8);
+    ruins(690,'#0c0e0f',32,null,50,170,.95);
+    ctx.fillStyle='#0c0e0f';ctx.fillRect(0,688,W,H-688);
+    flag(400,575,1.2,T);
+    snowfall(T,40,.3,.4,19);
+    vignette(.5);
+    progressBar(4,win(T,132.2),150);
+    riseText('200 ДНЕЙ И НОЧЕЙ',W/2,200,T,131.9,{font:F.title(34),ls:.5});
+    riseText('СТАЛИНГРАДСКАЯ БИТВА · 1942–1943',W/2,222,T,132.6,{font:F.bold(11),color:C.gold,ls:2.4});
+    riseText('впервые за войну',W/2,262,T,135.81,{font:F.reg(11.5),color:'#d3d6d6'});
+    riseText('целая немецкая армия сложила оружие',W/2,280,T,136.5,{font:F.reg(11.5),color:'#d3d6d6'});
+    riseText('ПЕРЕЛОМ',W/2,800,T,141.0,{font:F.title(54),ls:4,glow:'rgba(255,220,170,.35)',glowBlur:24});
+  }],
+];
+const XF=.6, DURATION=143.3;
+
+/* ---------- общие слои ---------- */
+let hatchPat=null,grainCv=null;
+function buildAssets(){
+  const hp=document.createElement('canvas');hp.width=hp.height=7*SC;
+  const hc=hp.getContext('2d');hc.scale(SC,SC);
+  hc.fillStyle=C.redFill;hc.fillRect(0,0,7,7);
+  hc.strokeStyle='rgba(255,105,105,.17)';hc.lineWidth=1.1;
+  hc.beginPath();hc.moveTo(-1,8);hc.lineTo(8,-1);hc.moveTo(-1,1);hc.lineTo(1,-1);hc.moveTo(6,8);hc.lineTo(8,6);hc.stroke();
+  hatchPat=ctx.createPattern(hp,'repeat');hatchPat.setTransform(new DOMMatrix().scale(1/SC));
+  grainCv=document.createElement('canvas');grainCv.width=grainCv.height=256;
+  const gc=grainCv.getContext('2d'),gi=gc.createImageData(256,256),R2=rng(3);
+  for(let i=0;i<gi.data.length;i+=4){const v=R2()*255;gi.data[i]=gi.data[i+1]=gi.data[i+2]=v;gi.data[i+3]=255}
+  gc.putImageData(gi,0,0);
+  buildGeo();
+}
+let cam={x:0,y:0,z:1};
+const P=(x,y)=>[(x-cam.x)*cam.z+W/2,(y-cam.y)*cam.z+H/2];
+function rings(x,y,t,color='255,80,80',n=2,maxR=34,alpha=1){
+  const [sx,sy]=P(x,y);if(alpha<=0)return;
+  ctx.save();
+  for(let i=0;i<n;i++){
+    const p=((t*.6+i/n)%1), r=6+p*maxR*cam.z;
+    ctx.strokeStyle=`rgba(${color},${(1-p)*.8*alpha})`;ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(sx,sy,r,0,7);ctx.stroke();
+    const g=ctx.createRadialGradient(sx,sy,0,sx,sy,r);g.addColorStop(0,`rgba(${color},${(1-p)*.25*alpha})`);g.addColorStop(1,`rgba(${color},0)`);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,r,0,7);ctx.fill();
+  }
+  ctx.restore();
+}
+function vignette(strength=.7){
+  const g=ctx.createRadialGradient(W/2,H*.48,H*.22,W/2,H*.5,H*.75);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${strength})`);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+function mapLook(){
+  let g=ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,'rgba(8,10,10,.94)');g.addColorStop(1,'rgba(8,10,10,0)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,220);
+  g=ctx.createLinearGradient(0,H-260,0,H);g.addColorStop(0,'rgba(8,10,10,0)');g.addColorStop(1,'rgba(8,10,10,.97)');
+  ctx.fillStyle=g;ctx.fillRect(0,H-260,W,260);
+  vignette(.55);
+}
+function grain(t){
+  ctx.save();ctx.globalAlpha=.045;ctx.globalCompositeOperation='overlay';
+  const ox=Math.floor(hash(Math.floor(t*30),0,9)*256),oy=Math.floor(hash(Math.floor(t*30),1,9)*256);
+  for(let x=-ox;x<W;x+=128)for(let y=-oy;y<H;y+=128)ctx.drawImage(grainCv,x,y,128,128);
+  ctx.restore();
+}
+const layer=document.createElement('canvas');layer.width=cv.width;layer.height=cv.height;
+const layerCtx=layer.getContext('2d');
+function render(T){
+  ctx=mainCtx;ctx.setTransform(SC,0,0,SC,0,0);ctx.globalAlpha=1;ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  SCENES.forEach(([a,b,fn],i)=>{
+    const s0=a-XF/2,s1=b+XF/2;if(T<s0||T>s1)return;
+    const fin=i===0?inv(0,.8,T):inv(s0,a+XF/2,T), fout=i===SCENES.length-1?1-inv(b-1.3,b,T):1-inv(b-XF/2,s1,T);
+    const al=clamp(Math.min(fin,fout));if(al<=0)return;
+    ctx=layerCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,layer.width,layer.height);
+    ctx.setTransform(SC,0,0,SC,0,0);ctx.globalAlpha=1;ctx.save();fn(T);ctx.restore();
+    ctx=mainCtx;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=al;ctx.drawImage(layer,0,0);ctx.restore();
+  });
+  ctx.setTransform(SC,0,0,SC,0,0);grain(T);
+}
+
+/* ---------- плеер с озвучкой ---------- */
+const audio=new Audio('voice.mp3');
+let playing=false,t0=0,cur=0;
+const seek=document.getElementById('seek'),tc=document.getElementById('tc'),pp=document.getElementById('pp');
+pp.textContent='▶';
+pp.onclick=()=>{playing=!playing;pp.textContent=playing?'⏸':'▶';
+  if(playing){t0=performance.now()-cur*1000;audio.currentTime=cur;audio.play().catch(()=>{})}else audio.pause()};
+seek.oninput=()=>{cur=seek.value/1000*DURATION;t0=performance.now()-cur*1000;audio.currentTime=cur;render(cur)};
+function loop(){
+  if(playing){cur=(performance.now()-t0)/1000;if(cur>=DURATION){cur=0;t0=performance.now();audio.currentTime=0}
+    seek.value=cur/DURATION*1000;tc.textContent=cur.toFixed(1)+' / '+DURATION.toFixed(1)+'s';render(cur)}
+  requestAnimationFrame(loop);
+}
+window.render=render;window.DURATION=DURATION;
+document.fonts.load(F.title(40)).then(()=>document.fonts.load(F.bold(12))).then(()=>{
+  buildAssets();
+  if(location.hash==='#export'){document.body.classList.add('export');window.READY=true}
+  else{render(0);loop()}
+});
+</script>
+</body>
+</html>
