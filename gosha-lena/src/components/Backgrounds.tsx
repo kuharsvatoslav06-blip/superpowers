@@ -153,3 +153,27 @@ export const Kitchen: React.FC<{ time: number }> = ({ time }) => (
     <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
   </svg>
 );
+
+/** Торговый центр: витрины, плитка */
+export const Mall: React.FC<{ time: number }> = () => (
+  <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
+    <rect width={1080} height={1920} fill="#E9E4F2" />
+    <rect x={0} y={0} width={1080} height={180} fill="#D8D0E8" />
+    {[60, 400, 740].map((x, i) => (
+      <g key={x} transform="translate(0 110)">
+        <rect x={x} y={240} width={300} height={70} rx={10} fill={['#E3477E', '#2F6FD6', '#2FA55A'][i]} stroke={INK} strokeWidth={10} />
+        <text x={x + 150} y={290} fontFamily="Oswald" fontWeight={700} fontSize={40} fill="#fff" textAnchor="middle">{['МОДА', 'XXL', 'СКИДКИ'][i]}</text>
+        <rect x={x} y={330} width={300} height={610} rx={8} fill="#CFE8F3" stroke={INK} strokeWidth={10} />
+        <path d={`M ${x + 40} 380 L ${x + 120} 360`} stroke="#fff" strokeWidth={16} strokeLinecap="round" opacity={0.8} />
+        {/* манекен */}
+        <circle cx={x + 150} cy={560} r={36} fill="#F2E6D8" stroke={INK} strokeWidth={8} />
+        <path d={`M ${x + 90} 620 L ${x + 210} 620 L ${x + 195} 860 L ${x + 105} 860 Z`} fill={['#F6B8CF', '#8EC0EE', '#B9E3A8'][i]} stroke={INK} strokeWidth={8} />
+        <rect x={x + 140} y={860} width={20} height={70} fill="#9AA6B8" stroke={INK} strokeWidth={6} />
+      </g>
+    ))}
+    <rect x={0} y={1060} width={1080} height={440} fill="#D8D0E8" />
+    <rect x={0} y={1500} width={1080} height={420} fill="#F4F1F8" />
+    {Array.from({ length: 10 }).map((_, i) => <line key={i} x1={i * 130} y1={1500} x2={i * 130 - 200} y2={1920} stroke="#DCD6E6" strokeWidth={6} />)}
+    <line x1={0} y1={1500} x2={1080} y2={1500} stroke={INK} strokeWidth={10} />
+  </svg>
+);

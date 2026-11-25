@@ -37,6 +37,8 @@ export type GoshaProps = {
   cape?: boolean;
   /** предмет в левой руке */
   holding?: 'dumbbell';
+  /** одежда: tank — майка в пятнах, shirt — новая рубашка в клетку */
+  outfit?: 'tank' | 'shirt';
   style?: React.CSSProperties;
   width?: number | string;
   height?: number | string;
@@ -117,6 +119,7 @@ export const Gosha: React.FC<GoshaProps> = ({
   hair = 'long',
   cape = false,
   holding,
+  outfit = 'tank',
   style,
   width = '100%',
   height = '100%',
@@ -218,6 +221,15 @@ export const Gosha: React.FC<GoshaProps> = ({
 
   return (
     <svg viewBox={VIEWBOX[crop]} width={width} height={height} style={{ overflow: 'visible', ...style }} xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="gosha-check" width="56" height="56" patternUnits="userSpaceOnUse">
+          <rect width="56" height="56" fill="#8EC0EE" />
+          <rect width="28" height="56" fill="#6FA6DE" opacity={0.7} />
+          <rect width="56" height="28" fill="#6FA6DE" opacity={0.5} />
+          <line x1="0" y1="14" x2="56" y2="14" stroke="#F4F8FD" strokeWidth="3" />
+          <line x1="14" y1="0" x2="14" y2="56" stroke="#F4F8FD" strokeWidth="3" />
+        </pattern>
+      </defs>
       {/* тень под ногами */}
       {crop === 'full' && <ellipse cx={515} cy={1948} rx={340} ry={32} fill="#000" opacity={0.18} />}
 
@@ -251,10 +263,12 @@ export const Gosha: React.FC<GoshaProps> = ({
         )}
         <circle cx={198} cy={1485} r={45} fill={SKIN} stroke={INK} strokeWidth={SW} />
         <path d="M 176 1500 Q 198 1518 220 1500" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
+        {outfit === 'shirt' && <path id="sleeve-left" d="M 245 958 C 205 1020 188 1090 178 1168 L 264 1180 C 270 1110 288 1050 315 995 Z" fill="url(#gosha-check)" stroke={INK} strokeWidth={SW} strokeLinejoin="round" />}
       </g>
       <g id="arm-right">
         <ellipse cx={766} cy={1015} rx={50} ry={46} fill={SKIN} stroke={INK} strokeWidth={SW} />
         <path d="M 780 975 C 830 1050 870 1180 878 1320 L 878 1380 L 800 1380 C 800 1290 790 1200 780 1150 C 770 1100 750 1040 730 1000 Z" fill={SKIN} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+        {outfit === 'shirt' && <path id="sleeve-right" d="M 785 958 C 825 1020 842 1090 852 1168 L 766 1180 C 760 1110 742 1050 715 995 Z" fill="url(#gosha-check)" stroke={INK} strokeWidth={SW} strokeLinejoin="round" />}
       </g>
 
       {/* ========== ВОЛОСЫ СЗАДИ ========== */}
@@ -292,6 +306,26 @@ export const Gosha: React.FC<GoshaProps> = ({
         ))}
         <path d="M 503 1398 C 498 1385 515 1378 525 1386 C 532 1394 522 1408 508 1405" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
       </g>
+
+      {/* ========== РУБАШКА ========== */}
+      {outfit === 'shirt' && (
+        <g id="shirt-new">
+          <path d="M 330 945 L 700 945 C 765 1000 815 1120 832 1300 C 842 1400 805 1468 705 1495 L 562 1500 L 515 1425 L 468 1500 L 325 1495 C 225 1468 188 1400 198 1300 C 215 1120 265 1000 330 945 Z" fill="url(#gosha-check)" stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
+          {/* воротник и вырез */}
+          <path d="M 440 945 L 515 1035 L 590 945 Z" fill={SKIN_D} stroke={INK} strokeWidth={8} strokeLinejoin="round" />
+          <path d="M 420 940 L 515 1035 L 470 1060 Z M 610 940 L 515 1035 L 560 1060 Z" fill="#EAF2FB" stroke={INK} strokeWidth={8} strokeLinejoin="round" />
+          <line x1={515} y1={1035} x2={515} y2={1425} stroke={INK} strokeWidth={6} />
+          {[1110, 1200, 1290, 1375].map((y, i) => (
+            <circle key={y} cx={i === 3 ? 528 : 527} cy={y} r={11} fill="#F4F6FA" stroke={INK} strokeWidth={5} />
+          ))}
+          {/* натянутые складки у пуговиц */}
+          {[1200, 1290, 1375].map((y) => (
+            <path key={y} d={`M 470 ${y - 25} Q 500 ${y} 470 ${y + 25} M 560 ${y - 25} Q 530 ${y} 560 ${y + 25}`} fill="none" stroke="#3E6FA8" strokeWidth={4} strokeLinecap="round" />
+          ))}
+          {/* карман */}
+          <path d="M 600 1080 L 680 1080 L 680 1150 L 640 1165 L 600 1150 Z" fill="none" stroke={INK} strokeWidth={6} strokeLinejoin="round" />
+        </g>
+      )}
 
       {/* ========== НАКИДКА ПАРИКМАХЕРА ========== */}
       {cape && (

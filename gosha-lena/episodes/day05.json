@@ -1,0 +1,1085 @@
+{
+  "id": "day05",
+  "title": "Гоша и Лена — День 5",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "voice": {
+    "src": "voice/day05.mp3",
+    "stub": "voice/day05_silence.mp3",
+    "volume": 1
+  },
+  "music": {
+    "src": "music/theme.mp3",
+    "volume": 0.15,
+    "duck": 0.5
+  },
+  "sfxVolume": 0.5,
+  "hud": {
+    "days": 27,
+    "progress": 25
+  },
+  "cover": {
+    "badge": "ДЕНЬ 5 / 30",
+    "title": "НОВАЯ РУБАШКА",
+    "subtitle": "ЗАСТЕГНУЛАСЬ.\nПОЧТИ ВСЯ",
+    "bubble": "Ого 😍 А лицо?",
+    "color": "pink",
+    "gosha": {
+      "beard": "stubble",
+      "hair": "short",
+      "outfit": "shirt",
+      "eyes": "happy",
+      "mouth": "smile"
+    },
+    "icon": {
+      "name": "shirt",
+      "label": "XXL"
+    },
+    "fly": false,
+    "exclaim": false
+  },
+  "scenes": [
+    {
+      "id": "01-intro",
+      "duration": 6.44,
+      "bg": {
+        "type": "room"
+      },
+      "caption": {
+        "accent": "green",
+        "parts": [
+          {
+            "text": "День пятый.",
+            "start": 0,
+            "end": 1.178
+          },
+          {
+            "text": "Вы выбрали: **одежда**.",
+            "start": 1.425,
+            "end": 3.028
+          },
+          {
+            "text": "Мусор снова проиграл.",
+            "start": 3.402,
+            "end": 4.947
+          },
+          {
+            "text": "Он уже привык.",
+            "start": 5.144,
+            "end": 5.915
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 0.2,
+          "text": "ДЕНЬ 5",
+          "x": 800,
+          "y": 300,
+          "color": "#FFD23A",
+          "size": 84,
+          "rot": 4,
+          "textColor": "#1E1E2A",
+          "screen": true
+        },
+        {
+          "type": "sticker",
+          "t": 1.45,
+          "text": "ВЫ ВЫБРАЛИ: 2 👕",
+          "x": 540,
+          "y": 1180,
+          "color": "#2F6FD6",
+          "size": 68,
+          "rot": -3,
+          "screen": true
+        },
+        {
+          "type": "sticker",
+          "t": 3.4,
+          "text": "МУСОР: 0 ПОБЕД",
+          "x": 540,
+          "y": 1310,
+          "color": "#FF3B47",
+          "size": 58,
+          "rot": 2,
+          "screen": true
+        }
+      ],
+      "hud": {
+        "days": 26
+      },
+      "camera": [
+        {
+          "t": 0,
+          "zoom": 1,
+          "x": 540,
+          "y": 960
+        },
+        {
+          "t": 5,
+          "zoom": 1.05,
+          "x": 540,
+          "y": 900
+        }
+      ],
+      "voice": {
+        "from": 0,
+        "to": 6.035,
+        "at": 0
+      }
+    },
+    {
+      "id": "02-mall",
+      "duration": 5,
+      "bg": {
+        "type": "mall"
+      },
+      "caption": {
+        "accent": "red",
+        "parts": [
+          {
+            "text": "Гоша пошёл в торговый центр.",
+            "start": 0.34,
+            "end": 1.958
+          },
+          {
+            "text": "В майке.",
+            "start": 2.224,
+            "end": 2.801
+          },
+          {
+            "text": "Охрана **насторожилась**.",
+            "start": 3.129,
+            "end": 4.469
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 520,
+          "h": 1100,
+          "beard": "stubble",
+          "hair": "short",
+          "stink": true,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 2.2,
+          "text": "В МАЙКЕ",
+          "x": 250,
+          "y": 1200,
+          "color": "#1E1E2A",
+          "size": 60,
+          "rot": -5
+        },
+        {
+          "type": "sticker",
+          "t": 3.1,
+          "text": "ОХРАНА: 👀",
+          "x": 820,
+          "y": 1300,
+          "color": "#FF3B47",
+          "size": 62,
+          "rot": 4
+        }
+      ],
+      "voice": {
+        "from": 6.165,
+        "to": 10.455,
+        "at": 0.3
+      }
+    },
+    {
+      "id": "03-seller",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "accent": "red",
+        "parts": [
+          {
+            "text": "Продавец спросил:",
+            "start": 0.34,
+            "end": 1.273
+          },
+          {
+            "text": "«Вам помочь?»",
+            "start": 1.508,
+            "end": 2.135
+          },
+          {
+            "text": "Гоша ответил: «Уже **поздно**».",
+            "start": 2.447,
+            "end": 4.369
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 440,
+          "h": 1000,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "sleepy",
+              "mouth": "flat"
+            },
+            {
+              "t": 2.45,
+              "eyes": "worried",
+              "mouth": "o"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 1.5,
+          "text": "«ВАМ ПОМОЧЬ?»",
+          "x": 700,
+          "y": 380,
+          "color": "#fff",
+          "size": 62,
+          "rot": 3,
+          "textColor": "#1E1E2A"
+        },
+        {
+          "type": "sticker",
+          "t": 3.4,
+          "text": "«УЖЕ ПОЗДНО»",
+          "x": 540,
+          "y": 1300,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": -3
+        }
+      ],
+      "voice": {
+        "from": 10.651,
+        "to": 14.839,
+        "at": 0.3
+      }
+    },
+    {
+      "id": "04-sizes",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "blue"
+      },
+      "caption": {
+        "accent": "pink",
+        "parts": [
+          {
+            "text": "Размер эм — не налез.",
+            "start": 0.308,
+            "end": 1.949
+          },
+          {
+            "text": "Размер эль —",
+            "start": 2.188,
+            "end": 2.936
+          },
+          {
+            "text": "тоже.",
+            "start": 3.23,
+            "end": 3.543
+          },
+          {
+            "text": "Икс-икс-эль…",
+            "start": 3.873,
+            "end": 4.819
+          },
+          {
+            "text": "**почти**.",
+            "start": 5.092,
+            "end": 5.58
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "gosha",
+          "x": 380,
+          "y": 520,
+          "h": 1000,
+          "beard": "stubble",
+          "hair": "short",
+          "crop": "bust",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "grit",
+              "sweat": true
+            },
+            {
+              "t": 5.1,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "icon",
+          "t": 0.3,
+          "name": "shirt",
+          "label": "M",
+          "x": 860,
+          "y": 520,
+          "size": 360,
+          "rot": 6
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "✗",
+          "x": 960,
+          "y": 440,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": 8
+        },
+        {
+          "type": "icon",
+          "t": 2.2,
+          "name": "shirt",
+          "label": "L",
+          "x": 860,
+          "y": 860,
+          "size": 360,
+          "rot": -5
+        },
+        {
+          "type": "sticker",
+          "t": 3.25,
+          "text": "✗",
+          "x": 960,
+          "y": 780,
+          "color": "#FF3B47",
+          "size": 70,
+          "rot": -8
+        },
+        {
+          "type": "icon",
+          "t": 3.9,
+          "name": "shirt",
+          "label": "XXL",
+          "x": 860,
+          "y": 1200,
+          "size": 360,
+          "rot": 4
+        },
+        {
+          "type": "sticker",
+          "t": 5.1,
+          "text": "ПОЧТИ",
+          "x": 700,
+          "y": 1330,
+          "color": "#2FA55A",
+          "size": 64,
+          "rot": -4
+        }
+      ],
+      "voice": {
+        "from": 15.051,
+        "to": 20.483,
+        "at": 0.268
+      }
+    },
+    {
+      "id": "05-fitting",
+      "duration": 5.1,
+      "bg": {
+        "type": "rays",
+        "color": "purple"
+      },
+      "caption": {
+        "accent": "red",
+        "parts": [
+          {
+            "text": "Примерочная.",
+            "start": 0.151,
+            "end": 0.894
+          },
+          {
+            "text": "Двадцать минут.",
+            "start": 1.256,
+            "end": 1.967
+          },
+          {
+            "text": "Изнутри доносились **звуки борьбы**.",
+            "start": 2.246,
+            "end": 4.58
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "icon",
+          "t": 0.2,
+          "name": "curtain",
+          "x": 540,
+          "y": 900,
+          "size": 760
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "БАМ!",
+          "x": 200,
+          "y": 700,
+          "color": "#FF3B47",
+          "size": 74,
+          "rot": -12
+        },
+        {
+          "type": "sticker",
+          "t": 2.5,
+          "text": "ТРЕСК!",
+          "x": 880,
+          "y": 960,
+          "color": "#F7943A",
+          "size": 70,
+          "rot": 10
+        },
+        {
+          "type": "sticker",
+          "t": 3.3,
+          "text": "ПУФ",
+          "x": 230,
+          "y": 1200,
+          "color": "#2F6FD6",
+          "size": 66,
+          "rot": -6
+        },
+        {
+          "type": "sticker",
+          "t": 4.1,
+          "text": "ХРУСТ",
+          "x": 860,
+          "y": 1300,
+          "color": "#E3477E",
+          "size": 62,
+          "rot": 6
+        }
+      ],
+      "shake": [
+        {
+          "t": 1.3,
+          "dur": 0.3,
+          "amp": 16
+        },
+        {
+          "t": 2.5,
+          "dur": 0.3,
+          "amp": 16
+        },
+        {
+          "t": 3.3,
+          "dur": 0.3,
+          "amp": 16
+        },
+        {
+          "t": 4.1,
+          "dur": 0.3,
+          "amp": 16
+        }
+      ],
+      "sfx": [
+        {
+          "t": 1.3,
+          "name": "punch",
+          "volume": 0.45
+        },
+        {
+          "t": 2.5,
+          "name": "punch",
+          "volume": 0.45
+        },
+        {
+          "t": 3.3,
+          "name": "punch",
+          "volume": 0.45
+        },
+        {
+          "t": 4.1,
+          "name": "punch",
+          "volume": 0.45
+        }
+      ],
+      "voice": {
+        "from": 20.697,
+        "to": 25.287,
+        "at": 0.111
+      }
+    },
+    {
+      "id": "06-reveal",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "blue"
+      },
+      "caption": {
+        "accent": "green",
+        "parts": [
+          {
+            "text": "И вот… **рубашка**!",
+            "start": 0.34,
+            "end": 1.756
+          },
+          {
+            "text": "Застегнулась.",
+            "start": 2.009,
+            "end": 2.928
+          },
+          {
+            "text": "Почти вся.",
+            "start": 3.16,
+            "end": 3.836
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "particles",
+          "t": 0.2,
+          "kind": "sparkle",
+          "x": 120,
+          "y": 380,
+          "w": 840,
+          "h": 1000,
+          "count": 16
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 420,
+          "h": 1300,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.4,
+          "pop": true,
+          "outfit": "shirt",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "sticker",
+          "t": 1,
+          "text": "НОВАЯ РУБАШКА",
+          "x": 640,
+          "y": 370,
+          "color": "#2FA55A",
+          "size": 70,
+          "rot": -3
+        },
+        {
+          "type": "arrowLabel",
+          "t": 3.2,
+          "text": "ПОЧТИ ВСЯ",
+          "x": 840,
+          "y": 1330,
+          "tx": 570,
+          "ty": 1325,
+          "color": "#FF3B47",
+          "rot": 3
+        }
+      ],
+      "voice": {
+        "from": 25.487,
+        "to": 29.143,
+        "at": 0.3
+      }
+    },
+    {
+      "id": "07-funeral",
+      "duration": 5,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "accent": "red",
+        "parts": [
+          {
+            "text": "Старую майку не выбросили.",
+            "start": 0.34,
+            "end": 1.854
+          },
+          {
+            "text": "Её **похоронили**.",
+            "start": 2.149,
+            "end": 3.091
+          },
+          {
+            "text": "С почестями.",
+            "start": 3.365,
+            "end": 4.133
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "sticker",
+          "t": 0.3,
+          "text": "R.I.P. МАЙКА\n2019 – 2026",
+          "x": 540,
+          "y": 470,
+          "color": "#fff",
+          "size": 70,
+          "rot": -2,
+          "textColor": "#1E1E2A"
+        },
+        {
+          "type": "icon",
+          "t": 0.6,
+          "name": "tanktop",
+          "x": 370,
+          "y": 1020,
+          "size": 440,
+          "rot": -4
+        },
+        {
+          "type": "gosha",
+          "x": 820,
+          "y": 840,
+          "h": 520,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.8,
+          "pop": true,
+          "outfit": "shirt",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "flat",
+              "tears": true
+            }
+          ]
+        }
+      ],
+      "sfx": [
+        {
+          "t": 2.15,
+          "name": "fail",
+          "volume": 0.4
+        }
+      ],
+      "voice": {
+        "from": 29.306,
+        "to": 33.259,
+        "at": 0.3
+      }
+    },
+    {
+      "id": "08-chat",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "pink"
+      },
+      "caption": {
+        "accent": "pink",
+        "parts": [
+          {
+            "text": "Гоша отправил Лене фото в рубашке.",
+            "start": 0.171,
+            "end": 2.238
+          },
+          {
+            "text": "Без лица.",
+            "start": 2.461,
+            "end": 3.188
+          },
+          {
+            "text": "Лена ответила:",
+            "start": 3.549,
+            "end": 4.751
+          },
+          {
+            "text": "«А **лицо**?»",
+            "start": 4.988,
+            "end": 5.58
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "phone",
+          "t": 0,
+          "contact": "Лена",
+          "avatar": "characters/lena_avatar.png",
+          "status": "в сети",
+          "typing": [
+            3.5,
+            5.0
+          ],
+          "messages": [
+            {
+              "t": 1.0,
+              "from": "me",
+              "text": "📷 Фото"
+            },
+            {
+              "t": 5.0,
+              "from": "her",
+              "text": "Ого 😍 А лицо?"
+            }
+          ]
+        }
+      ],
+      "voice": {
+        "from": 33.456,
+        "to": 39.024,
+        "at": 0.131
+      }
+    },
+    {
+      "id": "09-progress",
+      "duration": 5.11,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "accent": "green",
+        "parts": [
+          {
+            "text": "Прогресс:",
+            "start": 0.04,
+            "end": 0.621
+          },
+          {
+            "text": "**тридцать три** процента.",
+            "start": 0.822,
+            "end": 2.049
+          },
+          {
+            "text": "Плюс рубашка, минус майка в пятнах.",
+            "start": 2.352,
+            "end": 4.593
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "progressBar",
+          "t": 0.1,
+          "x": 540,
+          "y": 800,
+          "w": 860,
+          "value": 33,
+          "from": 25,
+          "label": "ПРОКАЧКА"
+        },
+        {
+          "type": "sticker",
+          "t": 2.35,
+          "text": "+ РУБАШКА",
+          "x": 280,
+          "y": 1250,
+          "color": "#2F6FD6",
+          "size": 54,
+          "rot": -4
+        },
+        {
+          "type": "sticker",
+          "t": 3.4,
+          "text": "− МАЙКА",
+          "x": 810,
+          "y": 1250,
+          "color": "#1E1E2A",
+          "size": 54,
+          "rot": 4
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1090,
+          "h": 300,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "outfit": "shirt",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile"
+            }
+          ]
+        }
+      ],
+      "hud": {
+        "progress": 33
+      },
+      "voice": {
+        "from": 39.208,
+        "to": 43.921,
+        "at": 0
+      }
+    },
+    {
+      "id": "10-choice",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "dark"
+      },
+      "caption": {
+        "accent": "blue",
+        "parts": [
+          {
+            "text": "Что **дальше**?",
+            "start": 0.34,
+            "end": 0.951
+          },
+          {
+            "text": "Мусор, который ждёт уже пять дней…",
+            "start": 1.242,
+            "end": 3.082
+          },
+          {
+            "text": "или стоматолог?",
+            "start": 3.312,
+            "end": 4.142
+          },
+          {
+            "text": "Решаете вы.",
+            "start": 4.435,
+            "end": 5.131
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ЧТО\nДАЛЬШЕ?",
+          "x": 540,
+          "y": 450,
+          "size": 116,
+          "color": "#FFD23A"
+        },
+        {
+          "type": "choice",
+          "t": 1.25,
+          "x": 540,
+          "y": 690,
+          "w": 920,
+          "num": "1",
+          "text": "ВЫБРОСИТЬ МУСОР\n(ЖДЁТ 5-Й ДЕНЬ)",
+          "color": "#E3477E",
+          "rot": -1.5
+        },
+        {
+          "type": "bigText",
+          "t": 3.15,
+          "text": "ИЛИ",
+          "x": 540,
+          "y": 862,
+          "size": 74,
+          "color": "#fff"
+        },
+        {
+          "type": "choice",
+          "t": 3.3,
+          "x": 540,
+          "y": 1030,
+          "w": 920,
+          "num": "2",
+          "text": "СХОДИТЬ\nК СТОМАТОЛОГУ",
+          "color": "#2F6FD6",
+          "rot": 1.5
+        },
+        {
+          "type": "gosha",
+          "x": 540,
+          "y": 1150,
+          "h": 290,
+          "beard": "stubble",
+          "hair": "short",
+          "t": 0.6,
+          "pop": true,
+          "outfit": "shirt",
+          "mug": false,
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "worried",
+              "mouth": "smile"
+            }
+          ]
+        },
+        {
+          "type": "question",
+          "t": 1,
+          "x": 690,
+          "y": 1175,
+          "size": 120
+        }
+      ],
+      "voice": {
+        "from": 44.061,
+        "to": 49.012,
+        "at": 0.3
+      }
+    },
+    {
+      "id": "11-cta",
+      "duration": 6,
+      "bg": {
+        "type": "rays",
+        "color": "green"
+      },
+      "caption": {
+        "accent": "green",
+        "parts": [
+          {
+            "text": "Пиши в **комменты**: один или два.",
+            "start": 0.34,
+            "end": 2.345
+          },
+          {
+            "text": "Итоги — в шестой серии.",
+            "start": 2.655,
+            "end": 4.325
+          }
+        ]
+      },
+      "layers": [
+        {
+          "type": "bigText",
+          "t": 0.1,
+          "text": "ПИШИ\nВ КОММЕНТЫ",
+          "x": 540,
+          "y": 440,
+          "size": 110,
+          "color": "#fff"
+        },
+        {
+          "type": "sticker",
+          "t": 1.3,
+          "text": "1 — МУСОР",
+          "x": 400,
+          "y": 650,
+          "color": "#E3477E",
+          "size": 60,
+          "rot": -3
+        },
+        {
+          "type": "sticker",
+          "t": 1.9,
+          "text": "2 — СТОМАТОЛОГ",
+          "x": 420,
+          "y": 770,
+          "color": "#2F6FD6",
+          "size": 60,
+          "rot": 2
+        },
+        {
+          "type": "sticker",
+          "t": 2.6,
+          "text": "ИТОГИ → СЕРИЯ 6",
+          "x": 400,
+          "y": 890,
+          "color": "#FFD23A",
+          "size": 54,
+          "rot": -2,
+          "textColor": "#1E1E2A"
+        },
+        {
+          "type": "comment",
+          "t": 3.4,
+          "x": 50,
+          "y": 990,
+          "w": 640,
+          "name": "lesha_m",
+          "text": "1. мусор уже прописан тут",
+          "likes": 455,
+          "avatarColor": "#F2994A"
+        },
+        {
+          "type": "comment",
+          "t": 4.1,
+          "x": 50,
+          "y": 1170,
+          "w": 640,
+          "name": "olya.k",
+          "text": "2, зуб видно из космоса",
+          "likes": 431,
+          "avatarColor": "#9B6BF2"
+        },
+        {
+          "type": "gosha",
+          "x": 860,
+          "y": 900,
+          "h": 560,
+          "beard": "stubble",
+          "hair": "short",
+          "wave": true,
+          "outfit": "shirt",
+          "poses": [
+            {
+              "t": 0,
+              "eyes": "happy",
+              "mouth": "smile",
+              "leftArm": "wave"
+            }
+          ]
+        }
+      ],
+      "voice": {
+        "from": 49.215,
+        "to": 53.24,
+        "at": 0.3
+      }
+    }
+  ]
+}

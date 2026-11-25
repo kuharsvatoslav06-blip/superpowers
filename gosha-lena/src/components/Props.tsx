@@ -254,6 +254,44 @@ export const Icon: React.FC<{ name: IconName; x: number; y: number; size?: numbe
             <circle cx={0} cy={0} r={9} fill={INK} />
           </g>
         );
+      case 'shirt':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <path d="M -60 -130 L -150 -90 L -120 -10 L -85 -25 L -85 140 L 85 140 L 85 -25 L 120 -10 L 150 -90 L 60 -130 Q 0 -95 -60 -130 Z" fill="url(#icon-check)" />
+            <defs>
+              <pattern id="icon-check" width="40" height="40" patternUnits="userSpaceOnUse">
+                <rect width="40" height="40" fill="#8EC0EE" /><rect width="20" height="40" fill="#6FA6DE" opacity={0.7} />
+                <line x1="0" y1="10" x2="40" y2="10" stroke="#F4F8FD" strokeWidth="3" />
+              </pattern>
+            </defs>
+            {label && (
+              <g>
+                <rect x={-62} y={-10} width={124} height={70} rx={12} fill="#fff" />
+                <text x={0} y={42} fontFamily="Oswald" fontWeight={700} fontSize={50} fill={INK} textAnchor="middle" stroke="none">{label}</text>
+              </g>
+            )}
+          </g>
+        );
+      case 'tanktop':
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <path d="M -70 -140 L -40 -140 Q 0 -80 40 -140 L 70 -140 Q 80 -60 110 -20 L 110 140 L -110 140 L -110 -20 Q -80 -60 -70 -140 Z" fill="#E4E0D4" />
+            <ellipse cx={-45} cy={30} rx={30} ry={22} fill="#DCC06A" stroke="none" />
+            <ellipse cx={50} cy={0} rx={28} ry={22} fill="#CF5A4C" stroke="none" />
+            <circle cx={10} cy={80} r={16} fill="#AE9A7E" stroke="none" />
+          </g>
+        );
+      case 'curtain': {
+        const sh = Math.sin(time * 26) * 10 + Math.sin(time * 41) * 6;
+        return (
+          <g stroke={INK} strokeWidth={8} strokeLinejoin="round">
+            <rect x={-160} y={-170} width={320} height={14} rx={6} fill="#9AA6B8" />
+            <path d={`M -150 -156 L 150 -156 L ${150 + sh} 165 L ${-150 + sh} 165 Z`} fill="#C0392B" />
+            {[-100, -50, 0, 50, 100].map((x) => <path key={x} d={`M ${x} -156 L ${x + sh} 165`} stroke="#962D22" strokeWidth={8} fill="none" />)}
+            <ellipse cx={sh * 0.5} cy={175} rx={150} ry={12} fill="#000" opacity={0.15} stroke="none" />
+          </g>
+        );
+      }
       case 'broccoli': {
         const look = Math.sin(time * 1.3) * 6;
         return (

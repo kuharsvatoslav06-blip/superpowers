@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import type { EpisodeProps, Layer, Scene } from './types';
-import { Bathroom, Kitchen, Rays, Room } from './components/Backgrounds';
+import { Bathroom, Kitchen, Mall, Rays, Room } from './components/Backgrounds';
 import { ArrowLabel, BigText, Exclaim, Hud, Impact, Question, Sticker, Subtitles } from './components/Overlay';
 import { BeachPhoto, Choice, Comment, Desk, Gosha, Icon, Particles, Phone, ProgressBar } from './components/Props';
 import { Fly, VIEWBOX } from './characters/Gosha';
@@ -106,6 +106,7 @@ const GoshaLayer: React.FC<{ l: Extract<Layer, { type: 'gosha' }>; t: number }> 
         hair={l.hair}
         cape={l.cape}
         holding={l.holding}
+        outfit={l.outfit}
         style={{ position: 'absolute', inset: 0 }}
       />
       {l.stink && (
@@ -193,7 +194,7 @@ const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
   return (
     <AbsoluteFill style={{ overflow: 'hidden', transform: `translate(${sh.dx}px, ${sh.dy}px) rotate(${sh.r}deg) scale(${enter})` }}>
       <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(540px, 960px) scale(${cam.zoom}) translate(${-cam.x}px, ${-cam.y}px)` }}>
-        {scene.bg.type === 'room' ? <Room time={t} /> : scene.bg.type === 'bathroom' ? <Bathroom time={t} /> : scene.bg.type === 'kitchen' ? <Kitchen time={t} /> : <Rays color={scene.bg.color} time={t} />}
+        {scene.bg.type === 'room' ? <Room time={t} /> : scene.bg.type === 'bathroom' ? <Bathroom time={t} /> : scene.bg.type === 'kitchen' ? <Kitchen time={t} /> : scene.bg.type === 'mall' ? <Mall time={t} /> : <Rays color={scene.bg.color} time={t} />}
         {world.map((l, i) => <LayerView key={i} l={l} t={t} />)}
       </AbsoluteFill>
       {screen.map((l, i) => <LayerView key={i} l={l} t={t} />)}

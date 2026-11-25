@@ -1,6 +1,6 @@
 import type { Eyes, Mouth, Antenna, ArmPose, GoshaProps } from './characters/Gosha';
 
-export type IconName = 'razor' | 'razorBroken' | 'scissors' | 'comb' | 'broccoli' | 'shawarma' | 'scale';
+export type IconName = 'razor' | 'razorBroken' | 'scissors' | 'comb' | 'broccoli' | 'shawarma' | 'scale' | 'shirt' | 'tanktop' | 'curtain';
 
 export type Accent = 'red' | 'green' | 'blue' | 'pink' | 'yellow';
 
@@ -18,7 +18,7 @@ export type Pose = {
 type Base = { t?: number; screen?: boolean; until?: number };
 
 export type Layer = Base & (
-  | { type: 'gosha'; x: number; y: number; h: number; crop?: 'full' | 'bust' | 'head'; poses?: Pose[]; wave?: boolean; stink?: boolean; mug?: boolean; pop?: boolean; flip?: boolean; beard?: 'full' | 'stubble' | 'none'; hair?: 'long' | 'short'; cape?: boolean; holding?: 'dumbbell'; lift?: boolean; rot?: number; bounce?: number }
+  | { type: 'gosha'; x: number; y: number; h: number; crop?: 'full' | 'bust' | 'head'; poses?: Pose[]; wave?: boolean; stink?: boolean; mug?: boolean; pop?: boolean; flip?: boolean; beard?: 'full' | 'stubble' | 'none'; hair?: 'long' | 'short'; cape?: boolean; holding?: 'dumbbell'; outfit?: 'tank' | 'shirt'; lift?: boolean; rot?: number; bounce?: number }
   | { type: 'fly'; orbit: { cx: number; cy: number; rx: number; ry: number; speed?: number }; land?: { t: number; x: number; y: number }; leave?: { t: number; x: number; y: number }; size?: number }
   | { type: 'sticker'; text: string; x: number; y: number; color?: string; textColor?: string; rot?: number; size?: number; pad?: number; maxWidth?: number }
   | { type: 'arrowLabel'; text: string; x: number; y: number; tx: number; ty: number; color?: string; rot?: number; size?: number }
@@ -44,7 +44,7 @@ export type CameraKey = { t: number; zoom: number; x: number; y: number };
 export type Scene = {
   id: string;
   duration: number;
-  bg: { type: 'room' } | { type: 'bathroom' } | { type: 'kitchen' } | { type: 'rays'; color: 'blue' | 'pink' | 'purple' | 'green' | 'orange' | 'dark' };
+  bg: { type: 'room' } | { type: 'bathroom' } | { type: 'kitchen' } | { type: 'mall' } | { type: 'rays'; color: 'blue' | 'pink' | 'purple' | 'green' | 'orange' | 'dark' };
   hud?: boolean | { days?: number; progress?: number };
   camera?: CameraKey[];
   shake?: { t: number; dur: number; amp: number }[];
@@ -71,7 +71,7 @@ export type Episode = {
   cover?: {
     badge?: string; title?: string; subtitle?: string; bubble?: string; photoCaption?: string; stamp?: string; color?: string;
     /** облик Гоши на обложке (по умолчанию — шок) */
-    gosha?: Partial<Pick<GoshaProps, 'eyes' | 'mouth' | 'antenna' | 'sweat' | 'beard' | 'hair'>>;
+    gosha?: Partial<Pick<GoshaProps, 'eyes' | 'mouth' | 'antenna' | 'sweat' | 'beard' | 'hair' | 'outfit' | 'tears'>>;
     /** вместо фото качка — полароид «ДО» со старым Гошей */
     before?: boolean;
     /** предмет вместо фото на обложке */
