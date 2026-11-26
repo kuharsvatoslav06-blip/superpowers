@@ -961,6 +961,74 @@ function render(T){
   ctx.setTransform(SC,0,0,SC,0,0);grain(T);
 }
 
+/* ---------- обложки для TikTok / YouTube Shorts (9:16) ----------
+   Главное — в центральной зоне 3:4 (y 128…896): так видно и в сетке профиля TikTok,
+   низ (~20%) и правый край закрыты интерфейсом приложений. */
+function badge(str,cx,cy,bg='#c62828'){
+  ctx.save();ctx.font=F.bold(15);ctx.letterSpacing='3px';const w=ctx.measureText(str).width+34;
+  ctx.fillStyle=bg;ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=14;ctx.beginPath();ctx.roundRect(cx-w/2,cy-17,w,34,6);ctx.fill();ctx.restore();
+  text(str,cx+1.5,cy+5.5,{font:F.bold(15),ls:3,shadow:false});
+}
+function bigTitle(str,y,size,o={}){
+  ctx.save();ctx.font=F.title(size);ctx.letterSpacing=(o.ls||0)+'px';
+  ctx.lineJoin='round';ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=size*.12;ctx.textAlign='center';ctx.strokeText(str,W/2,y);ctx.restore();
+  text(str,W/2,y,{font:F.title(size),ls:o.ls||0,color:o.color||C.white,glow:o.glow||'rgba(0,0,0,.6)',glowBlur:20});
+}
+const COVERS=[
+  // A: карта котла + крючок
+  ()=>{
+    geoCam(48.78,44.0,1.0);geoMap(84);
+    ['n1','n2','n3','s1','s2','s3'].forEach(n=>geoArrow(n,1));
+    geoRings(48.6,43.66,.35,'150,190,255',3,70,1);
+    mapLook();
+    let g=ctx.createLinearGradient(0,0,0,430);g.addColorStop(0,'rgba(6,8,8,.95)');g.addColorStop(.7,'rgba(6,8,8,.7)');g.addColorStop(1,'rgba(6,8,8,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,430);
+    text('ОПЕРАЦИЯ',W/2,178,{font:F.bold(16),ls:8,color:'#e0e3e1'});
+    bigTitle('«УРАН»',262,92,{ls:2});
+    text('4 ДНЯ, ЧТОБЫ ОКРУЖИТЬ',W/2,310,{font:F.title(27),color:'#f2f2ee'});
+    text('ЦЕЛУЮ АРМИЮ',W/2,343,{font:F.title(27),color:C.gold});
+    unitLabel(99,0,48.84,44.12,'6-Я АРМИЯ',true,{size:15});
+    unitLabel(99,0,48.76,44.12,'В КОТЛЕ',true,{size:11});
+    g=ctx.createLinearGradient(0,690,0,890);g.addColorStop(0,'rgba(6,8,8,0)');g.addColorStop(1,'rgba(6,8,8,.85)');ctx.fillStyle=g;ctx.fillRect(0,690,W,200);
+    badge('ЗА 2 МИНУТЫ',W/2,790);
+  },
+  // B: силуэт — рассвет над руинами, танки, флаг
+  ()=>{
+    sky([[0,'#121a20'],[.28,'#2a363e'],[.5,'#7a6550'],[.58,'#d8995c'],[.62,'#3d3a36'],[1,'#08090a']],[W/2,610,340,'rgba(255,200,140,.55)']);
+    sunRays(W/2,610,18,600,.06,0);
+    smoke(150,610,2,1.3,.35,'40,36,34');smoke(440,615,5,1.1,.3,'40,36,34');
+    ruins(632,'#22272a',31,null,20,80,.7);
+    fog(632,40,'rgba(230,200,165,.4)',.9);
+    ruins(700,'#0b0d0e',41,v=>`rgba(255,140,60,${v*.3})`,60,200,1);
+    ctx.fillStyle='#0b0d0e';ctx.fillRect(0,698,W,H-698);
+    flag(430,560,1.6,1.2);
+    tank(170,742,2.6,0,'#060708','rgba(255,190,130,.35)');
+    for(let i=0;i<4;i++)soldier(300+i*44,748,1.25,i*1.4,'#060708','rgba(255,190,130,.3)');
+    snowfall(3,60,.35,.4,19);
+    vignette(.55);
+    let g=ctx.createLinearGradient(0,0,0,420);g.addColorStop(0,'rgba(6,8,8,.9)');g.addColorStop(1,'rgba(6,8,8,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,420);
+    text('ОПЕРАЦИЯ',W/2,190,{font:F.bold(16),ls:8,color:'#e0e3e1'});
+    bigTitle('«УРАН»',276,96,{ls:2});
+    text('КАК ОКРУЖИЛИ',W/2,326,{font:F.title(28)});
+    text('ЦЕЛУЮ АРМИЮ',W/2,360,{font:F.title(28),color:C.gold});
+    badge('ЗА 2 МИНУТЫ',W/2,790);
+  },
+  // C: «Сталинградский котёл» — крупная цифра
+  ()=>{
+    geoCam(48.78,44.2,1.25);geoMap(116.5);
+    ['r1','r2','r3','r4'].forEach(n=>geoArrow(n,.9));
+    mapLook();
+    ctx.fillStyle='rgba(6,8,8,.55)';ctx.fillRect(0,0,W,H);vignette(.6);
+    text('СТАЛИНГРАДСКИЙ КОТЁЛ',W/2,200,{font:F.bold(16),ls:5,color:C.gold});
+    bigTitle('91 000',330,100);
+    text('ПЛЕННЫХ И 24 ГЕНЕРАЛА',W/2,380,{font:F.title(25)});
+    text('Операция «Уран» · 1942–1943',W/2,412,{font:F.semi(14),color:'#c9cece'});
+    badge('ЗА 2 МИНУТЫ',W/2,790);
+  },
+];
+window.cover=n=>{ctx=mainCtx;ctx.setTransform(SC,0,0,SC,0,0);ctx.globalAlpha=1;ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  ctx.save();COVERS[n]();ctx.restore();ctx.setTransform(SC,0,0,SC,0,0);grain(0)};
+
 /* ---------- плеер с озвучкой ---------- */
 const audio=new Audio('voice.mp3');
 let playing=false,t0=0,cur=0;
